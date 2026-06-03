@@ -4,9 +4,8 @@ import {
   loadVaultRecords,
   saveVaultRecords,
   type VaultRecord,
+  VAULT_KEY,
 } from "./encryption";
-
-const VAULT_KEY = "deepshield_vault_enc";
 
 export function getVaultPin(): string | null {
   return sessionStorage.getItem("deepshield_vault_pin");

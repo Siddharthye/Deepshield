@@ -1,6 +1,11 @@
 import CryptoJS from "crypto-js";
 
-const VAULT_KEY = "deepshield_vault_enc";
+export const VAULT_KEY = "deepshield_vault_enc";
+
+export function vaultExists(): boolean {
+  if (typeof window === "undefined") return false;
+  return Boolean(localStorage.getItem(VAULT_KEY));
+}
 
 export function encryptPayload(plain: string, pin: string): string {
   return CryptoJS.AES.encrypt(plain, pin).toString();

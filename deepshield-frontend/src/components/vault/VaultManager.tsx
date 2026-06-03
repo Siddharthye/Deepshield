@@ -1,52 +1,125 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 import {
   loadVaultRecords,
   saveVaultRecords,
+  vaultExists,
   type VaultRecord,
 } from "@/lib/encryption";
 
+const KIND_KEYS: Record<VaultRecord["kind"], I18nKey> = {
+  scan: "vaultKindScan",
+  trace: "vaultKindTrace",
+  report: "vaultKindReport",
+  note: "vaultKindNote",
+  video: "vaultKindVideo",
+};
+
+function isImagePayload(payload: string) {
+  return payload.startsWith("data:image/");
+}
+
 export function VaultManager() {
   const { t } = useLanguage();
+  const [mode, setMode] = useState<"unlock" | "setup">("unlock");
   const [digits, setDigits] = useState(["", "", "", ""]);
+  const [confirmDigits, setConfirmDigits] = useState(["", "", "", ""]);
+  const [pinMismatch, setPinMismatch] = useState(false);
   const [pin, setPin] = useState<string | null>(null);
   const [records, setRecords] = useState<VaultRecord[]>([]);
   const [shake, setShake] = useState(false);
   const [shield, setShield] = useState(false);
   const [burst, setBurst] = useState(false);
+  const [preview, setPreview] = useState<VaultRecord | null>(null);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMode(vaultExists() ? "unlock" : "setup");
+    const saved = sessionStorage.getItem("deepshield_vault_pin");
+    if (saved) {
+      try {
+        const list = loadVaultRecords(saved);
+        setPin(saved);
+        setRecords(list);
+      } catch {
+        sessionStorage.removeItem("deepshield_vault_pin");
+      }
+    }
+  }, []);
 
   function flashShield() {
     setShield(true);
     setTimeout(() => setShield(false), 900);
   }
 
+  function unlockSuccess(entered: string, list: VaultRecord[]) {
+    setPin(entered);
+    setRecords(list);
+    sessionStorage.setItem("deepshield_vault_pin", entered);
+    setBurst(true);
+    setTimeout(() => setBurst(false), 600);
+    flashShield();
+    setDigits(["", "", "", ""]);
+    setConfirmDigits(["", "", "", ""]);
+  }
+
   function unlock(entered: string) {
     try {
       const list = loadVaultRecords(entered);
-      setPin(entered);
-      setRecords(list);
-      sessionStorage.setItem("deepshield_vault_pin", entered);
-      setBurst(true);
-      setTimeout(() => setBurst(false), 600);
-      flashShield();
+      unlockSuccess(entered, list);
     } catch {
       setShake(true);
       setTimeout(() => setShake(false), 500);
     }
   }
 
-  function handlePinChange(value: string) {
+  function setupVault(entered: string, confirm: string) {
+    if (entered !== confirm) {
+      setPinMismatch(true);
+      setShake(true);
+      setTimeout(() => {
+        setShake(false);
+        setPinMismatch(false);
+      }, 500);
+      return;
+    }
+    saveVaultRecords(entered, []);
+    unlockSuccess(entered, []);
+  }
+
+  function handlePinChange(value: string, isConfirm = false) {
     const nums = value.replace(/\D/g, "").slice(0, 4).split("");
     const next = ["", "", "", ""].map((_, i) => nums[i] ?? "");
-    setDigits(next);
-    if (nums.length === 4) unlock(nums.join(""));
+    if (isConfirm) {
+      setConfirmDigits(next);
+      if (nums.length === 4) {
+        setupVault(digits.join(""), next.join(""));
+      }
+    } else {
+      setDigits(next);
+      if (mode === "unlock" && nums.length === 4) {
+        unlock(next.join(""));
+      }
+    }
+  }
+
+  function lockVault() {
+    setPin(null);
+    setRecords([]);
+    sessionStorage.removeItem("deepshield_vault_pin");
+    setDigits(["", "", "", ""]);
+    setConfirmDigits(["", "", "", ""]);
+    setMode(vaultExists() ? "unlock" : "setup");
   }
 
   function persist(next: VaultRecord[]) {
@@ -68,8 +141,49 @@ export function VaultManager() {
         payload: reader.result as string,
       };
       persist([rec, ...records]);
+      flashShield();
     };
     reader.readAsDataURL(file);
+  }
+
+  function saveNote() {
+    const text = noteText.trim();
+    if (!text || !pin) return;
+    const rec: VaultRecord = {
+      id: crypto.randomUUID(),
+      name: `note_${new Date().toISOString().slice(0, 10)}.txt`,
+      kind: "note",
+      savedAt: new Date().toISOString(),
+      sizeBytes: text.length,
+      payload: text,
+    };
+    persist([rec, ...records]);
+    setNoteText("");
+    setNoteOpen(false);
+    flashShield();
+  }
+
+  function deleteRecord(id: string) {
+    if (!confirm(t("vaultDeleteItemConfirm"))) return;
+    persist(records.filter((r) => r.id !== id));
+  }
+
+  function downloadRecord(r: VaultRecord) {
+    if (r.payload.startsWith("data:")) {
+      const a = document.createElement("a");
+      a.href = r.payload;
+      a.download = r.name;
+      a.click();
+    } else {
+      const blob = new Blob([r.payload], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = r.name;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    flashShield();
   }
 
   async function exportAll() {
@@ -99,36 +213,72 @@ export function VaultManager() {
     persist([]);
   }
 
+  const pinDots = (vals: string[], filled: boolean) =>
+    vals.map((d, i) => (
+      <motion.div
+        key={i}
+        animate={burst && filled ? { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] } : {}}
+        className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
+      >
+        {d ? "•" : ""}
+      </motion.div>
+    ));
+
   if (!pin) {
     return (
       <>
         <ShieldOverlay show={shield} />
         <GlassCard className="mx-auto max-w-sm">
-          <p className="mb-6 text-center text-sm text-ink/75">{t("vaultPinPrompt")}</p>
+          <p className="mb-2 text-center font-display text-lg text-ink">
+            {mode === "setup" ? t("vaultSetupTitle") : t("vaultUnlock")}
+          </p>
+          <p className="mb-6 text-center text-sm text-ink/75">
+            {mode === "setup" ? t("vaultSetupHint") : t("vaultPinPrompt")}
+          </p>
           <motion.div
             animate={shake ? { x: [-8, 8, 0] } : {}}
-            className="mb-6 flex justify-center gap-3"
+            className="mb-4 flex flex-col gap-4"
           >
-            {digits.map((d, i) => (
-              <motion.div
-                key={i}
-                animate={burst ? { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] } : {}}
-                className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
-              >
-                {d ? "•" : ""}
-              </motion.div>
-            ))}
+            <div className="flex justify-center gap-3">{pinDots(digits, true)}</div>
+            {mode === "setup" && (
+              <>
+                <p className="text-center text-xs text-ink/60">{t("vaultConfirmPin")}</p>
+                <div className="flex justify-center gap-3">{pinDots(confirmDigits, false)}</div>
+              </>
+            )}
           </motion.div>
+          {pinMismatch && (
+            <p className="mb-4 text-center text-sm text-pink">{t("vaultPinMismatch")}</p>
+          )}
           <input
             type="password"
             inputMode="numeric"
             maxLength={4}
             className="sr-only"
             aria-label={t("vaultPinAria")}
-            onChange={(e) => handlePinChange(e.target.value)}
+            autoFocus
+            onChange={(e) => handlePinChange(e.target.value, false)}
           />
-          <Button variant="dark" className="w-full" onClick={() => unlock(digits.join(""))}>
-            {t("vaultUnlock")}
+          {mode === "setup" && (
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={4}
+              className="sr-only"
+              aria-label={t("vaultConfirmPin")}
+              onChange={(e) => handlePinChange(e.target.value, true)}
+            />
+          )}
+          <Button
+            variant="dark"
+            className="w-full"
+            onClick={() =>
+              mode === "setup"
+                ? setupVault(digits.join(""), confirmDigits.join(""))
+                : unlock(digits.join(""))
+            }
+          >
+            {mode === "setup" ? t("vaultCreate") : t("vaultUnlock")}
           </Button>
         </GlassCard>
       </>
@@ -143,6 +293,9 @@ export function VaultManager() {
           <Button variant="primary" onClick={() => fileRef.current?.click()}>
             {t("vaultAddFile")}
           </Button>
+          <Button variant="secondary" onClick={() => setNoteOpen(true)}>
+            {t("vaultAddNote")}
+          </Button>
           <Button
             variant="secondary"
             onClick={() => void exportAll()}
@@ -153,9 +306,13 @@ export function VaultManager() {
           <Button variant="ghost" onClick={deleteAll} disabled={!records.length}>
             {t("vaultDeleteAll")}
           </Button>
+          <Button variant="ghost" onClick={lockVault}>
+            {t("vaultLock")}
+          </Button>
           <input
             ref={fileRef}
             type="file"
+            accept="image/*,video/*,application/pdf,text/plain"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
@@ -168,6 +325,34 @@ export function VaultManager() {
         </p>
       </GlassCard>
 
+      <AnimatePresence>
+        {noteOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+          >
+            <GlassCard className="space-y-3">
+              <textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder={t("vaultNotePlaceholder")}
+                rows={4}
+                className="input-field w-full"
+              />
+              <div className="flex gap-2">
+                <Button variant="primary" onClick={saveNote}>
+                  {t("vaultSaveNote")}
+                </Button>
+                <Button variant="ghost" onClick={() => setNoteOpen(false)}>
+                  {t("vaultClose")}
+                </Button>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {records.length === 0 ? (
         <GlassCard>
           <p className="text-center text-sm text-ink/70">{t("vaultEmpty")}</p>
@@ -175,21 +360,67 @@ export function VaultManager() {
       ) : (
         <ul className="space-y-3">
           {records.map((r) => (
-            <GlassCard key={r.id} className="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <p className="font-medium text-ink">{r.name}</p>
+            <GlassCard key={r.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-ink">{r.name}</p>
                 <p className="text-xs text-ink/55">
-                  {r.kind} · {(r.sizeBytes / 1024).toFixed(1)} KB ·{" "}
+                  {t(KIND_KEYS[r.kind])} · {(r.sizeBytes / 1024).toFixed(1)} KB ·{" "}
                   {new Date(r.savedAt).toLocaleString()}
                 </p>
+                {r.kind === "note" && (
+                  <p className="mt-2 line-clamp-2 text-xs text-ink/70">{r.payload}</p>
+                )}
               </div>
-              <span className="rounded-full bg-sage/40 px-2 py-0.5 text-xs">
-                {t("vaultEncryptedBadge")}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-sage/40 px-2 py-0.5 text-xs">
+                  {t("vaultEncryptedBadge")}
+                </span>
+                {isImagePayload(r.payload) && (
+                  <Button variant="ghost" className="!px-3 !py-1 text-xs" onClick={() => setPreview(r)}>
+                    {t("vaultPreview")}
+                  </Button>
+                )}
+                <Button variant="ghost" className="!px-3 !py-1 text-xs" onClick={() => downloadRecord(r)}>
+                  {t("vaultDownload")}
+                </Button>
+                <Button variant="ghost" className="!px-3 !py-1 text-xs" onClick={() => deleteRecord(r.id)}>
+                  {t("vaultDeleteItem")}
+                </Button>
+              </div>
             </GlassCard>
           ))}
         </ul>
       )}
+
+      <AnimatePresence>
+        {preview && isImagePayload(preview.payload) && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPreview(null)}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+            <GlassCard className="max-h-[90vh] max-w-lg overflow-auto p-4">
+              <p className="mb-3 text-sm font-medium text-ink">{preview.name}</p>
+              <div className="relative aspect-square w-full min-w-[280px]">
+                <Image
+                  src={preview.payload}
+                  alt={preview.name}
+                  fill
+                  className="rounded-xl object-contain"
+                  unoptimized
+                />
+              </div>
+              <Button variant="primary" className="mt-4 w-full" onClick={() => setPreview(null)}>
+                {t("vaultClose")}
+              </Button>
+            </GlassCard>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

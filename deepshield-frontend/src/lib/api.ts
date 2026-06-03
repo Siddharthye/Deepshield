@@ -176,43 +176,9 @@ export async function fetchQuizRound(language: string): Promise<{
 
 }> {
 
-  const q = `Return ONLY valid JSON: {"hintA":"description of image A","hintB":"description of image B","answer":"a" or "b","explanation":"why one is more likely AI-generated"}. 
+  const { getQuizRound } = await import("./quizBank");
 
-Create one deepfake awareness quiz round comparing two hypothetical portrait descriptions. Language code: ${language}.`;
-
-  const res = await askRights({ question: q, language });
-
-  try {
-
-    const json = JSON.parse(res.answer.replace(/```json?|```/g, "").trim());
-
-    return {
-
-      hintA: json.hintA ?? "Natural lighting portrait",
-
-      hintB: json.hintB ?? "Uneven skin at jawline",
-
-      answer: json.answer === "b" ? "b" : "a",
-
-      explanation: json.explanation ?? "Look for boundary artifacts.",
-
-    };
-
-  } catch {
-
-    return {
-
-      hintA: "Consistent lighting and natural skin texture.",
-
-      hintB: "Blurred earring merging into skin.",
-
-      answer: "b",
-
-      explanation: "Warped accessories often indicate manipulation.",
-
-    };
-
-  }
+  return getQuizRound(language === "hi" ? "hi" : "en");
 
 }
 
