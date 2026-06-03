@@ -6,8 +6,10 @@ export type AuthUser = {
   provider: AuthProvider;
 };
 
+export const AUTH_COOKIE = "deepshield_auth";
 const SESSION_KEY = "deepshield_auth_session";
 const ACCOUNTS_KEY = "deepshield_auth_accounts";
+const COOKIE_MAX_AGE_DAYS = 30;
 
 type StoredAccount = {
   email: string;
@@ -21,6 +23,16 @@ function normalizeEmail(email: string) {
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function setAuthCookie(active: boolean) {
+  if (typeof document === "undefined") return;
+  if (active) {
+    const maxAge = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60;
+    document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${maxAge}; SameSite=Lax`;
+  } else {
+    document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+  }
 }
 
 function readAccounts(): StoredAccount[] {
@@ -50,9 +62,16 @@ export function readSession(): AuthUser | null {
 export function writeSession(user: AuthUser | null) {
   if (!user) {
     sessionStorage.removeItem(SESSION_KEY);
+    setAuthCookie(false);
     return;
   }
   sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  setAuthCookie(true);
+}
+
+/** Restore auth cookie when session exists (e.g. after tab refresh). */
+export function syncAuthCookieFromSession() {
+  setAuthCookie(readSession() !== null);
 }
 
 export function registerWithEmail(

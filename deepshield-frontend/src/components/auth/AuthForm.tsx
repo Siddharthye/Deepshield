@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
@@ -39,6 +38,12 @@ export function AuthForm() {
   const { t } = useLanguage();
   const { signInEmail, registerEmail, signInGoogle } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const returnTo =
+    from && from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/login")
+      ? from
+      : "/";
   const [mode, setMode] = useState<Mode>("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -71,7 +76,8 @@ export function AuthForm() {
           else if (result.reason === "exists") setError(t("authEmailExists"));
           return;
         }
-        router.push("/");
+        router.push(returnTo);
+        router.refresh();
         return;
       }
 
@@ -81,7 +87,8 @@ export function AuthForm() {
         else setError(t("authSignInFailed"));
         return;
       }
-      router.push("/");
+      router.push(returnTo);
+      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -244,15 +251,6 @@ export function AuthForm() {
           >
             {mode === "signin" ? t("authSwitchToRegister") : t("authSwitchToSignIn")}
           </button>
-        </p>
-
-        <p className="mt-6 text-center">
-          <Link
-            href="/"
-            className="text-sm font-medium text-ink-muted underline-offset-2 hover:text-ink hover:underline"
-          >
-            {t("authContinueGuest")}
-          </Link>
         </p>
 
         <p className="mt-4 rounded-2xl bg-secondary/8 px-3 py-2 text-center text-[11px] leading-relaxed text-ink-subtle">

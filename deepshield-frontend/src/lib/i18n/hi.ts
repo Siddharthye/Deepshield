@@ -182,7 +182,7 @@ export const HI: Record<keyof typeof EN, string> = {
   loginBadge: "खाता",
   loginTitle: "DeepShield में साइन इन करें",
   loginSubtitle:
-    "वैकल्पिक खाता — बिना साइन इन के भी सभी मुख्य टूल मुफ़्त रहते हैं।",
+    "DeepShield उपयोग के लिए साइन इन करें। तत्काल सहायता के लिए नीचे हेल्पलाइन हमेशा दिखती है।",
   authSignIn: "साइन इन",
   authRegister: "रजिस्टर",
   authEmail: "ईमेल पता",

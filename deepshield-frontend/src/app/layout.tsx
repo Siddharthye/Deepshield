@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { SafetyRibbon } from "@/components/layout/SafetyRibbon";
-import { Navbar } from "@/components/layout/Navbar";
-import { MobileNav } from "@/components/layout/MobileNav";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { PageTransition } from "@/components/layout/PageTransition";
+import { AppShell } from "@/components/layout/AppShell";
 import { ClientProviders } from "@/components/layout/ClientProviders";
-import { IntroLoader } from "@/components/ui/IntroLoader";
 import { AmbientBackground } from "@/components/ui/AmbientBackground";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import "./globals.css";
@@ -40,15 +35,8 @@ export default function RootLayout({
         <ScrollProgress />
         <LanguageProvider>
           <AuthProvider>
-            <IntroLoader />
             <ClientProviders>
-              <Navbar />
-              <PageTransition>
-                <main className="relative z-10 flex-1">{children}</main>
-              </PageTransition>
-              <MobileNav />
-              <SiteFooter />
-              <SafetyRibbon />
+              <AppShell>{children}</AppShell>
             </ClientProviders>
           </AuthProvider>
         </LanguageProvider>

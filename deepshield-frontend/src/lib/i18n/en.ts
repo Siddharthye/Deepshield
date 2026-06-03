@@ -181,7 +181,7 @@ export const EN = {
   loginBadge: "Account",
   loginTitle: "Sign in to DeepShield",
   loginSubtitle:
-    "Optional account to sync preferences. All core tools remain free without signing in.",
+    "Sign in to access DeepShield. National helplines stay visible below if you need help right now.",
   authSignIn: "Sign in",
   authRegister: "Register",
   authEmail: "Email address",

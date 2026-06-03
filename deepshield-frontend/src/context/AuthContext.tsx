@@ -13,6 +13,7 @@ import {
   signInWithEmail,
   signInWithGoogleMock,
   signOut as clearSession,
+  syncAuthCookieFromSession,
   type AuthUser,
 } from "@/lib/authStorage";
 
@@ -36,7 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useLayoutEffect(() => {
-    setUser(readSession());
+    const session = readSession();
+    if (session) syncAuthCookieFromSession();
+    setUser(session);
     setReady(true);
   }, []);
 
