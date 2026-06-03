@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --color-fantasy: #f7f3ed;
+  --color-blush: #efd8d6;
+  --color-sage: #c2c6b9;
+  --color-rose: #dba1a2;
+  --color-espresso: #422b23;
+}
+
+@theme inline {
+  --color-fantasy: #f7f3ed;
+  --color-blush: #efd8d6;
+  --color-sage: #c2c6b9;
+  --color-rose: #dba1a2;
+  --color-espresso: #422b23;
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--color-fantasy);
+  color: var(--color-espresso);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.glass-card {
+  backdrop-filter: blur(20px);
+  background: rgba(239, 216, 214, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+}
+
+.glass-card:hover {
+  backdrop-filter: blur(28px);
+}
