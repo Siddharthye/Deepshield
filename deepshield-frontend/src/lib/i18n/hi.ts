@@ -83,7 +83,7 @@ export const HI: Record<keyof typeof EN, string> = {
   actionVaultTitle: "एन्क्रिप्टेड वॉल्ट खोलें",
   actionVaultDesc: "इस डिवाइस पर PIN सुरक्षा।",
   actionLearnTitle: "नकली मीडिया पहचानें",
-  actionLearnDesc: "खतरे के संकेत और सुरक्षा पर क्विज़।",
+  actionLearnDesc: "फ़ोटो उदाहरण, गाइड और पहले 24 घंटों की चेकलिस्ट।",
   faq1Q: "क्या DeepShield मेरी फ़ोटो सर्वर पर रखता है?",
   faq1A:
     "स्कैन केवल मॉडल स्कोरिंग के लिए API पर जाते हैं — हम आपकी गैलरी नहीं बनाते। वॉल्ट, ट्रेस और सत्र आपके ब्राउज़र में एन्क्रिप्टेड रहते हैं।",
@@ -156,7 +156,8 @@ export const HI: Record<keyof typeof EN, string> = {
   communityPageTitle: "समुदाय ढाल",
   learnPageBadge: "सीखें",
   learnPageTitle: "जागरूकता केंद्र",
-  learnPageSubtitle: "LLM क्विज़ और शैक्षिक कार्ड — डीपफेक पहचानें।",
+  learnPageSubtitle:
+    "फ़ोटो उदाहरण, सादी गाइड और ऑनलाइन हानि दिखने के बाद पहले 24 घंटों की शांत चेकलिस्ट।",
   communityPageSubtitle: "गुमनाम कहानियाँ — केवल आपके डिवाइस पर संग्रहीत।",
   tabImage: "छवि",
   tabVideo: "वीडियो",

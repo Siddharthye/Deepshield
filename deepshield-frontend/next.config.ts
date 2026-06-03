@@ -5,6 +5,15 @@ const BACKEND_URL =
   "https://deepshield-xi.vercel.app";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
+  },
   async rewrites() {
     return [
       {

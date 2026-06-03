@@ -7,15 +7,18 @@ export function GlassCard({
   children,
   className = "",
   tilt = true,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
   tilt?: boolean;
+  id?: string;
 }) {
   const { ref, transform, onMove, onLeave } = useTilt(6);
 
   return (
     <motion.div
+      id={id}
       ref={tilt ? ref : undefined}
       onMouseMove={tilt ? onMove : undefined}
       onMouseLeave={tilt ? onLeave : undefined}

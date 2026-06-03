@@ -82,7 +82,7 @@ export const EN = {
   actionVaultTitle: "Open encrypted vault",
   actionVaultDesc: "PIN-protected storage on this device.",
   actionLearnTitle: "Learn to spot fakes",
-  actionLearnDesc: "Quick quiz on red flags and safety.",
+  actionLearnDesc: "Photo examples, guides, and a first-24-hours checklist.",
   faq1Q: "Does DeepShield store my photos on a server?",
   faq1A:
     "Scans are sent to our API only for model scoring — we do not build a gallery of your uploads. Your vault, trace log, and saved sessions stay encrypted in your browser.",
@@ -154,7 +154,8 @@ export const EN = {
   communityPageTitle: "Community shield",
   learnPageBadge: "Learn",
   learnPageTitle: "Awareness hub",
-  learnPageSubtitle: "LLM-generated quiz rounds and educational cards — spot deepfakes with confidence.",
+  learnPageSubtitle:
+    "Side-by-side photo examples, plain-language guides, and a calm checklist for the first 24 hours after harm appears online.",
   communityPageSubtitle: "Anonymous stories and solidarity — stored only on your device.",
   tabImage: "Image",
   tabVideo: "Video",

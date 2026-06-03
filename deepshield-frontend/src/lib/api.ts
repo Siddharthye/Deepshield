@@ -168,26 +168,6 @@ export async function translateStrings(
 
 
 
-export async function fetchQuizRound(language: string): Promise<{
-
-  hintA: string;
-
-  hintB: string;
-
-  answer: "a" | "b";
-
-  explanation: string;
-
-}> {
-
-  const { getQuizRound } = await import("./quizBank");
-
-  return getQuizRound(language === "hi" ? "hi" : "en");
-
-}
-
-
-
 export async function moderatePost(args: {
 
   text: string;
