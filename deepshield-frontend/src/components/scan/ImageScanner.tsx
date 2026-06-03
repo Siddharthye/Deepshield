@@ -145,7 +145,7 @@ export function ImageScanner() {
       <GlassCard>
         <label className="upload-zone">
           <span className="font-display text-lg text-ink">{t("uploadImageTitle")}</span>
-          <span className="mt-2 text-sm text-ink/60">{t("uploadImageHint")}</span>
+          <span className="mt-2 text-sm text-ink-subtle">{t("uploadImageHint")}</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
@@ -207,7 +207,7 @@ export function ImageScanner() {
           <GlassCard className="space-y-4">
             <div>
               <p className="text-sm font-medium text-ink">{t("compareTitle")}</p>
-              <p className="text-xs text-ink/55">{t("compareHint")}</p>
+              <p className="text-xs text-ink-subtle">{t("compareHint")}</p>
             </div>
             <CompareSlider
               originalSrc={preview}
@@ -230,14 +230,14 @@ export function ImageScanner() {
                   showBaseImage
                 />
               </div>
-              <p className="mt-2 text-xs text-ink/55">{t("heatmapFullHint")}</p>
+              <p className="mt-2 text-xs text-ink-subtle">{t("heatmapFullHint")}</p>
             </div>
           </GlassCard>
           <GlassCard>
-            <p className="text-sm text-ink/70">{t("manipulationRisk")}</p>
+            <p className="text-sm text-ink-muted">{t("manipulationRisk")}</p>
             <AnimatedRisk value={risk.finalRisk} />
-            <p className="mt-2 text-xl font-medium text-pink">{t(verdictLabelKey(risk.verdict))}</p>
-            <ul className="mt-4 space-y-2 text-sm text-ink/80">
+            <p className="mt-2 text-xl font-medium text-accent">{t(verdictLabelKey(risk.verdict))}</p>
+            <ul className="mt-4 space-y-2 text-sm text-ink-muted">
               <li className="flex justify-between">
                 <span>{t("breakdownHf")}</span>
                 <span>{(risk.breakdown.modelScore * 100).toFixed(0)}%</span>

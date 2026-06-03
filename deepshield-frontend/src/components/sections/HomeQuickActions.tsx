@@ -28,7 +28,7 @@ export function HomeQuickActions() {
               <span className="text-2xl">{a.icon}</span>
               <div>
                 <p className="font-semibold text-ink">{t(a.titleKey)}</p>
-                <p className="mt-1 text-xs leading-relaxed text-ink/70">{t(a.descKey)}</p>
+                <p className="mt-1 text-xs leading-relaxed text-ink-muted">{t(a.descKey)}</p>
               </div>
             </GlassCard>
           </Link>

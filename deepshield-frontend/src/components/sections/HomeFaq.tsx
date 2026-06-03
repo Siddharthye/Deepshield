@@ -34,7 +34,7 @@ export function HomeFaq() {
               <span className="text-sage">{open === i ? "−" : "+"}</span>
             </button>
             {open === i && (
-              <p className="border-t border-white/30 px-6 pb-5 pt-2 text-sm leading-relaxed text-ink/75">
+              <p className="border-t border-white/30 px-6 pb-5 pt-2 text-sm leading-relaxed text-ink-muted">
                 {t(item.a)}
               </p>
             )}

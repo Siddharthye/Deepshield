@@ -45,7 +45,7 @@ export function Tooltip({
           >
             {label}
             {learnMoreHref && (
-              <span className="mt-1 block text-pink">{t("learnMore")}</span>
+              <span className="mt-1 block text-accent">{t("learnMore")}</span>
             )}
           </motion.span>
         )}

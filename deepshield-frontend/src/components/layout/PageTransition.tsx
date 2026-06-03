@@ -81,7 +81,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
                 />
               </div>
               <p className="font-display mt-5 text-xl tracking-tight text-ink">DeepShield</p>
-              <p className="mt-1 text-xs text-ink/55">{t("transitionTagline")}</p>
+              <p className="mt-1 text-xs text-ink-subtle">{t("transitionTagline")}</p>
             </motion.div>
           </motion.div>
         )}

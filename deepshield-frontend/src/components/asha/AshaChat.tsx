@@ -111,12 +111,12 @@ export function AshaChat({
           />
           <div>
             <h2 className="font-display text-lg font-semibold text-ink">{t("ashaChatTitle")}</h2>
-            <p className="text-xs text-ink/70">{t("ashaChatSubtitle")}</p>
+            <p className="text-xs text-ink-muted">{t("ashaChatSubtitle")}</p>
           </div>
         </div>
 
         <div className="border-b border-white/20 px-4 py-3">
-          <p className="mb-2 text-xs font-medium text-ink/70">{t("ashaQuickRights")}</p>
+          <p className="mb-2 text-xs font-medium text-ink-muted">{t("ashaQuickRights")}</p>
           <div className="flex flex-wrap gap-2">
             {RIGHTS_PROMPT_KEYS.map((key) => (
               <button
@@ -164,14 +164,14 @@ export function AshaChat({
                           }}
                         />
                       ))}
-                      <span className="ml-2 text-xs text-ink/60">{t("ashaThinking")}</span>
+                      <span className="ml-2 text-xs text-ink-subtle">{t("ashaThinking")}</span>
                     </span>
                   )}
                 {streaming &&
                   i === messages.length - 1 &&
                   m.role === "assistant" &&
                   m.content && (
-                    <span className="ml-1 inline-block animate-pulse text-pink">▍</span>
+                    <span className="ml-1 inline-block animate-pulse text-accent">▍</span>
                   )}
               </motion.div>
             ))}
@@ -210,7 +210,7 @@ export function AshaChat({
         </button>
         {crisisOpen && (
           <GlassCard className="mt-3 border-pink/30 bg-peach/20">
-            <ul className="space-y-1 text-sm text-ink/85">
+            <ul className="space-y-1 text-sm text-ink-muted">
               {CRISIS_KEYS.map((key) => (
                 <li key={key}>{t(key)}</li>
               ))}

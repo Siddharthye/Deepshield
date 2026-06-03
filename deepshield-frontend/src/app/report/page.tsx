@@ -70,9 +70,9 @@ export default function ReportPage() {
 
       {!scan ? (
         <GlassCard>
-          <p className="text-sm text-ink/80">
+          <p className="text-sm text-ink-muted">
             {t("reportNoScan")}{" "}
-            <Link href="/scan" className="font-medium text-pink underline">
+            <Link href="/scan" className="font-medium text-link underline">
               {t("reportRunScanFirst")}
             </Link>
             .

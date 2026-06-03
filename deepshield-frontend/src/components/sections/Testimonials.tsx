@@ -28,7 +28,7 @@ export function Testimonials() {
         {PRINCIPLE_KEYS.map((p) => (
           <GlassCard key={p.title} className="p-5 text-center md:text-left">
             <p className="font-display text-lg text-ink">{t(p.title)}</p>
-            <p className="mt-2 text-xs leading-relaxed text-ink/75">{t(p.desc)}</p>
+            <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t(p.desc)}</p>
           </GlassCard>
         ))}
       </div>
@@ -36,8 +36,8 @@ export function Testimonials() {
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {QUOTE_KEYS.map((q) => (
           <GlassCard key={q.label}>
-            <p className="text-sm leading-relaxed text-ink/85">&ldquo;{t(q.text)}&rdquo;</p>
-            <p className="mt-4 text-xs font-medium text-pink">{t(q.label)}</p>
+            <p className="text-sm leading-relaxed text-ink-muted">&ldquo;{t(q.text)}&rdquo;</p>
+            <p className="mt-4 text-xs font-medium text-accent">{t(q.label)}</p>
           </GlassCard>
         ))}
       </div>

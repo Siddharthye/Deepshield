@@ -12,7 +12,7 @@ export function CtaStrip() {
       <GlassCard className="glass-card-tint-sage flex flex-col items-center gap-6 py-12 text-center md:flex-row md:justify-between md:text-left">
         <div className="max-w-lg">
           <h2 className="font-display text-2xl text-ink">{t("ctaTitle")}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink/75">{t("ctaBody")}</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t("ctaBody")}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-3">
           <ButtonLink href="/scan" variant="primary">

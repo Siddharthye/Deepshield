@@ -65,11 +65,11 @@ export default function LearnPage() {
       />
 
       <GlassCard className="mb-8">
-        <p className="font-display text-2xl text-pink">
+        <p className="font-display text-2xl text-accent">
           {t("learnScore")}: {score}
         </p>
         {loading || !round ? (
-          <p className="mt-4 text-sm text-ink/60">{t("learnLoading")}</p>
+          <p className="mt-4 text-sm text-ink-subtle">{t("learnLoading")}</p>
         ) : (
           <>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -78,7 +78,7 @@ export default function LearnPage() {
                 onClick={() => guess("a")}
                 className="rounded-xl bg-blue/35 p-4 text-left text-sm hover:bg-pink/30"
               >
-                <span className="text-xs font-semibold text-pink">{t("learnImageA")}</span>
+                <span className="text-xs font-semibold text-accent">{t("learnImageA")}</span>
                 <p className="mt-2">{round.hintA}</p>
               </button>
               <button
@@ -86,7 +86,7 @@ export default function LearnPage() {
                 onClick={() => guess("b")}
                 className="rounded-xl bg-peach/40 p-4 text-left text-sm hover:bg-pink/30"
               >
-                <span className="text-xs font-semibold text-pink">{t("learnImageB")}</span>
+                <span className="text-xs font-semibold text-accent">{t("learnImageB")}</span>
                 <p className="mt-2">{round.hintB}</p>
               </button>
             </div>
@@ -109,9 +109,9 @@ export default function LearnPage() {
 
       <div ref={shareRef} className="mb-8" id="share-card">
         <GlassCard className="text-center">
-          <p className="text-xs uppercase tracking-wide text-pink">{t("learnShareTitle")}</p>
+          <p className="text-xs uppercase tracking-wide text-accent">{t("learnShareTitle")}</p>
           <p className="font-display mt-2 text-5xl text-ink">{score}</p>
-          <p className="mt-1 text-sm text-ink/65">{t("learnSharePoints")}</p>
+          <p className="mt-1 text-sm text-ink-muted">{t("learnSharePoints")}</p>
         </GlassCard>
       </div>
 
@@ -119,7 +119,7 @@ export default function LearnPage() {
         {CARD_KEYS.map((c) => (
           <GlassCard key={c.title}>
             <h3 className="font-display text-lg text-ink">{t(c.title)}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink/80">{t(c.body)}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t(c.body)}</p>
           </GlassCard>
         ))}
       </div>

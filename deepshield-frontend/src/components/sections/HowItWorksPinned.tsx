@@ -47,21 +47,21 @@ export function HowItWorksPinned() {
     <section className="section-pad mx-auto max-w-6xl px-4">
       <p className="page-badge">{t("howBadge")}</p>
       <h2 className="font-display text-2xl text-ink md:text-3xl">{t("howTitle")}</h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">{t("howIntro")}</p>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">{t("howIntro")}</p>
 
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {STEPS.map((s, i) => (
           <GlassCard key={s.title} className="flex h-full flex-col p-6" tilt>
-            <span className="text-xs font-bold text-pink">
+            <span className="text-xs font-bold text-accent">
               {t("howStep")} {i + 1}
             </span>
             <span className="mt-3 text-3xl">{s.icon}</span>
             <h3 className="font-display mt-3 text-xl text-ink">{t(s.title)}</h3>
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-ink/75">{t(s.body)}</p>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted">{t(s.body)}</p>
             <ul className="mt-4 space-y-2 border-t border-white/30 pt-4">
               {s.checklist.map((item) => (
-                <li key={item} className="flex gap-2 text-xs text-ink/80">
-                  <span className="text-pink">✓</span>
+                <li key={item} className="flex gap-2 text-xs text-ink-muted">
+                  <span className="text-accent">✓</span>
                   {t(item)}
                 </li>
               ))}
@@ -74,8 +74,8 @@ export function HowItWorksPinned() {
       </div>
 
       <GlassCard className="mt-8 flex flex-col items-start gap-4 p-6 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm text-ink/80">{t("howPrivacyNote")}</p>
-        <Link href="/vault" className="text-sm font-medium text-pink underline">
+        <p className="text-sm text-ink-muted">{t("howPrivacyNote")}</p>
+        <Link href="/vault" className="text-sm font-medium text-link underline">
           {t("howVaultLink")}
         </Link>
       </GlassCard>

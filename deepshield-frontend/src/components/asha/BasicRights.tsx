@@ -34,11 +34,11 @@ export function BasicRights() {
       >
         {t("rightsHeading")}
       </h2>
-      <p className="mb-6 text-sm text-ink/75">{t("rightsIntro")}</p>
+      <p className="mb-6 text-sm text-ink-muted">{t("rightsIntro")}</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {LAW_CARD_KEYS.map((law) => (
           <GlassCard key={law.title}>
-            <p className="text-xs font-medium uppercase tracking-wide text-pink">
+            <p className="text-xs font-medium uppercase tracking-wide text-accent">
               {t(law.subtitle as I18nKey)}
             </p>
             <h3 className="mt-1 font-semibold text-ink">
@@ -46,7 +46,7 @@ export function BasicRights() {
                 {t(law.title as I18nKey)}
               </Tooltip>
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink/85">
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               {t(law.body as I18nKey)}
             </p>
           </GlassCard>

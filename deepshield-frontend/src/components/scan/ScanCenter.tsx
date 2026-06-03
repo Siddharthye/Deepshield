@@ -23,7 +23,7 @@ export function ScanCenter() {
             type="button"
             onClick={() => setTab(id)}
             className={`rounded-full px-5 py-2 text-sm font-medium transition ${
-              tab === id ? "bg-cream text-ink shadow-sm" : "text-ink/65 hover:text-ink"
+              tab === id ? "bg-cream text-ink shadow-sm" : "text-ink-muted hover:text-ink"
             }`}
           >
             {label}

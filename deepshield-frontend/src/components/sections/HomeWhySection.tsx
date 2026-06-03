@@ -23,7 +23,7 @@ export function HomeWhySection() {
         {FACT_KEYS.map((f) => (
           <GlassCard key={f.title} className="p-6" tilt>
             <h3 className="font-display text-lg text-ink">{t(f.title)}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-ink/75">{t(f.body)}</p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t(f.body)}</p>
           </GlassCard>
         ))}
       </div>
@@ -33,13 +33,13 @@ export function HomeWhySection() {
           {LAWS.map((law) => (
             <span
               key={law}
-              className="rounded-full bg-blue/35 px-3 py-1 text-xs font-medium text-ink/85"
+              className="rounded-full bg-blue/35 px-3 py-1 text-xs font-medium text-ink-muted"
             >
               {law}
             </span>
           ))}
         </div>
-        <p className="mt-4 text-xs text-ink/60">{t("whyLawDisclaimer")}</p>
+        <p className="mt-4 text-xs text-ink-subtle">{t("whyLawDisclaimer")}</p>
       </GlassCard>
     </section>
   );

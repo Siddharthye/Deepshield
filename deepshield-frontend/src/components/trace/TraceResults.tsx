@@ -91,17 +91,17 @@ export function TraceResults() {
           </h3>
           {hits.map((h) => (
             <GlassCard key={h.id}>
-              <p className="text-xs font-medium text-pink">{h.platform}</p>
+              <p className="text-xs font-medium text-accent">{h.platform}</p>
               <p className="font-medium text-ink">{h.title}</p>
               <a
                 href={h.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 block truncate text-sm text-pink underline"
+                className="mt-1 block truncate text-sm text-link underline"
               >
                 {h.url}
               </a>
-              <p className="mt-2 text-xs text-ink/55">
+              <p className="mt-2 text-xs text-ink-subtle">
                 {t("traceFirstSeen")} {h.firstSeen}
               </p>
             </GlassCard>

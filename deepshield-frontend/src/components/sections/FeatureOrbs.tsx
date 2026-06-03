@@ -30,7 +30,7 @@ export function FeatureOrbs() {
     <section className="section-pad section-alt-blue mx-auto max-w-6xl px-4">
       <p className="page-badge">{t("featuresBadge")}</p>
       <h2 className="font-display text-2xl text-ink md:text-3xl">{t("featuresTitle")}</h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">{t("featuresIntro")}</p>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted">{t("featuresIntro")}</p>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start">
         <div
@@ -38,8 +38,8 @@ export function FeatureOrbs() {
           style={{ width: BOX, height: BOX }}
         >
           <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center">
-            <span className="font-display text-3xl text-pink">11</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-ink/60">
+            <span className="font-display text-3xl text-accent">11</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
               {t("orbTools")}
             </span>
           </div>
@@ -57,7 +57,7 @@ export function FeatureOrbs() {
                 className={`absolute flex flex-col items-center justify-center rounded-full shadow-md transition-colors ${
                   isActive
                     ? "z-20 bg-blue text-ink ring-4 ring-sage/50"
-                    : "z-10 bg-cream text-ink/80 hover:bg-sage/40"
+                    : "z-10 bg-cream text-ink-muted hover:bg-sage/40"
                 }`}
                 style={{ ...orbStyle(i, ORB_FEATURE_META.length), width: ORB_SIZE, height: ORB_SIZE }}
                 animate={{ scale: isActive ? 1.12 : dim ? 0.88 : 1, opacity: dim ? 0.55 : 1 }}
@@ -85,14 +85,14 @@ export function FeatureOrbs() {
                 </span>
                 <div>
                   <h3 className="font-display text-2xl text-ink">{t(keys.label)}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-ink/80">{t(keys.desc)}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t(keys.desc)}</p>
                 </div>
               </div>
               <ul className="mt-6 grid gap-2 sm:grid-cols-3">
                 {[keys.p1, keys.p2, keys.p3].map((pk) => (
                   <li
                     key={pk}
-                    className="rounded-xl bg-blue/25 px-3 py-2 text-xs font-medium text-ink/85"
+                    className="rounded-xl bg-blue/25 px-3 py-2 text-xs font-medium text-ink-muted"
                   >
                     ✓ {t(pk)}
                   </li>

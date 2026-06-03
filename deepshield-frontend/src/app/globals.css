@@ -7,7 +7,12 @@
   --color-peach: #fdd6c1;
   --color-sage: #c5ccad;
   --color-blue: #d6e8f2;
-  --color-ink: #5a534c;
+  --color-ink: #3d2417;
+  --color-ink-muted: #523528;
+  --color-ink-subtle: #6d4a3e;
+  --color-accent: #6b3428;
+  --color-link: #4a2618;
+  --color-danger: #8b3a3a;
   --gradient-soft: linear-gradient(
     165deg,
     var(--color-cream) 0%,
@@ -22,7 +27,7 @@
     var(--color-peach) 85%
   );
   --gradient-accent: linear-gradient(135deg, var(--color-sage) 0%, var(--color-blue) 100%);
-  --shadow-soft: 0 8px 32px rgba(90, 83, 76, 0.06);
+  --shadow-soft: 0 8px 32px rgba(61, 36, 23, 0.08);
   --shadow-glow: 0 4px 24px rgba(214, 232, 242, 0.65);
 }
 
@@ -32,7 +37,12 @@
   --color-peach: #fdd6c1;
   --color-sage: #c5ccad;
   --color-blue: #d6e8f2;
-  --color-ink: #5a534c;
+  --color-ink: #3d2417;
+  --color-ink-muted: #523528;
+  --color-ink-subtle: #6d4a3e;
+  --color-accent: #6b3428;
+  --color-link: #4a2618;
+  --color-danger: #8b3a3a;
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
@@ -101,7 +111,7 @@ body::before {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--color-ink) 75%, var(--color-sage));
+  color: var(--color-ink-muted);
 }
 
 .page-header::after {
@@ -210,10 +220,40 @@ body::before {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.input-field::placeholder {
+  color: var(--color-ink-subtle);
+}
+
 .input-field:focus {
   outline: none;
   border-color: color-mix(in srgb, var(--color-blue) 70%, var(--color-sage));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-blue) 35%, transparent);
+}
+
+/* Readable body text on pastel backgrounds */
+.text-ink-muted {
+  color: var(--color-ink-muted);
+}
+
+.text-ink-subtle {
+  color: var(--color-ink-subtle);
+}
+
+.text-accent {
+  color: var(--color-accent);
+}
+
+.text-link {
+  color: var(--color-link);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+a.text-link:hover,
+.text-link:hover {
+  color: var(--color-ink);
 }
 
 .upload-zone {

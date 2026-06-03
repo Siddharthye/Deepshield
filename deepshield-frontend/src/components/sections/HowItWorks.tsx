@@ -38,9 +38,9 @@ export function HowItWorks() {
             transition={{ delay: i * 0.08 }}
           >
             <GlassCard className="h-full">
-              <span className="text-xs font-semibold tracking-widest text-pink">{s.n}</span>
+              <span className="text-xs font-semibold tracking-widest text-accent">{s.n}</span>
               <h3 className="font-display mt-2 text-lg text-ink">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink/75">{s.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{s.body}</p>
             </GlassCard>
           </motion.div>
         ))}

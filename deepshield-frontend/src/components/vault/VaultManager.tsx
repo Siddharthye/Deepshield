@@ -293,13 +293,13 @@ export function VaultManager() {
           <p className="mb-2 text-center font-display text-lg text-ink">
             {mode === "setup" ? t("vaultSetupTitle") : t("vaultUnlock")}
           </p>
-          <p className="mb-6 text-center text-sm text-ink/75">
+          <p className="mb-6 text-center text-sm text-ink-muted">
             {mode === "setup" ? t("vaultSetupHint") : t("vaultPinPrompt")}
           </p>
           <div className="mb-4 space-y-4">
             {mode === "setup" && setupStep === "confirm" ? (
               <>
-                <p className="text-center text-xs text-ink/60">{t("vaultConfirmPin")}</p>
+                <p className="text-center text-xs text-ink-subtle">{t("vaultConfirmPin")}</p>
                 <PinPad
                   value={confirmValue}
                   onChange={onConfirmValueChange}
@@ -319,9 +319,9 @@ export function VaultManager() {
             )}
           </div>
           {pinMismatch && (
-            <p className="mb-4 text-center text-sm text-pink">{t("vaultPinMismatch")}</p>
+            <p className="mb-4 text-center text-sm text-danger">{t("vaultPinMismatch")}</p>
           )}
-          <p className="mb-4 text-center text-xs text-ink/50">{t("vaultPinTapHint")}</p>
+          <p className="mb-4 text-center text-xs text-ink-subtle">{t("vaultPinTapHint")}</p>
           <Button
             variant="dark"
             className="w-full"
@@ -386,7 +386,7 @@ export function VaultManager() {
             }}
           />
         </div>
-        <p className="mt-4 text-xs text-ink/55">
+        <p className="mt-4 text-xs text-ink-subtle">
           {records.length} {t("vaultItemCount")}
         </p>
       </GlassCard>
@@ -421,7 +421,7 @@ export function VaultManager() {
 
       {records.length === 0 ? (
         <GlassCard>
-          <p className="text-center text-sm text-ink/70">{t("vaultEmpty")}</p>
+          <p className="text-center text-sm text-ink-muted">{t("vaultEmpty")}</p>
         </GlassCard>
       ) : (
         <ul className="space-y-3">
@@ -429,12 +429,12 @@ export function VaultManager() {
             <GlassCard key={r.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-ink">{r.name}</p>
-                <p className="text-xs text-ink/55">
+                <p className="text-xs text-ink-subtle">
                   {t(KIND_KEYS[r.kind])} · {(r.sizeBytes / 1024).toFixed(1)} KB ·{" "}
                   {new Date(r.savedAt).toLocaleString()}
                 </p>
                 {r.kind === "note" && (
-                  <p className="mt-2 line-clamp-2 text-xs text-ink/70">{r.payload}</p>
+                  <p className="mt-2 line-clamp-2 text-xs text-ink-muted">{r.payload}</p>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2">

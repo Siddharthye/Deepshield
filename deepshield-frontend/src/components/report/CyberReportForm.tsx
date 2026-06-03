@@ -24,8 +24,8 @@ export function CyberReportForm() {
 
   return (
     <GlassCard className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-pink">{t("cyberFormTitle")}</p>
-      <label className="block text-sm text-ink/75">
+      <p className="text-xs font-semibold uppercase tracking-wide text-accent">{t("cyberFormTitle")}</p>
+      <label className="block text-sm text-ink-muted">
         {t("cyberIncidentLabel")}
         <textarea
           className="input-field mt-1"
@@ -34,7 +34,7 @@ export function CyberReportForm() {
           onChange={(e) => setIncident(e.target.value)}
         />
       </label>
-      <label className="block text-sm text-ink/75">
+      <label className="block text-sm text-ink-muted">
         {t("cyberPlatformLabel")}
         <input
           className="input-field mt-1"
@@ -42,7 +42,7 @@ export function CyberReportForm() {
           onChange={(e) => setPlatform(e.target.value)}
         />
       </label>
-      <label className="block text-sm text-ink/75">
+      <label className="block text-sm text-ink-muted">
         {t("cyberNotesLabel")}
         <textarea
           className="input-field mt-1"
@@ -51,7 +51,7 @@ export function CyberReportForm() {
           onChange={(e) => setNotes(e.target.value)}
         />
       </label>
-      <p className="text-xs text-ink/55">{t("cyberCopyHint")}</p>
+      <p className="text-xs text-ink-subtle">{t("cyberCopyHint")}</p>
       <Button
         variant="primary"
         className="w-full"
@@ -74,7 +74,7 @@ export function CyberReportForm() {
         href="https://cybercrime.gov.in/"
         target="_blank"
         rel="noopener noreferrer"
-        className="block text-center text-sm text-pink underline"
+        className="block text-center text-sm text-link underline"
       >
         {t("cyberOpenPortal")}
       </a>

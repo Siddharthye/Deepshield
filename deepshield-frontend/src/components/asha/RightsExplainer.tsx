@@ -30,7 +30,7 @@ export function RightsExplainer() {
   return (
     <GlassCard className="mt-8">
       <h3 className="font-display text-lg text-ink">{t("rightsExplainerTitle")}</h3>
-      <p className="mt-1 text-sm text-ink/65">{t("rightsExplainerDesc")}</p>
+      <p className="mt-1 text-sm text-ink-muted">{t("rightsExplainerDesc")}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {RIGHTS_PROMPT_KEYS.map((key) => (
           <button

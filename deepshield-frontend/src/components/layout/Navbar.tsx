@@ -76,7 +76,7 @@ export function Navbar() {
                 className={`rounded-full px-2 py-1.5 md:px-3 ${
                   active
                     ? "bg-blue/50 font-medium text-ink ring-1 ring-sage/40"
-                    : "text-ink/70 hover:bg-sage/35"
+                    : "text-ink-muted hover:bg-sage/35"
                 }`}
               >
                 {t(key)}

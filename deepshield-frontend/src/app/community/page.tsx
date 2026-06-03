@@ -107,21 +107,21 @@ export default function CommunityPage() {
           placeholder={t("communityPlaceholder")}
           className="input-field"
         />
-        <p className="text-right text-xs text-ink/50">{text.length}/300</p>
+        <p className="text-right text-xs text-ink-subtle">{text.length}/300</p>
         <Button variant="primary" onClick={publish} disabled={posting} className="w-full">
           {posting ? t("communityChecking") : t("communityPost")}
         </Button>
-        {error && <p className="text-sm text-pink">{error}</p>}
+        {error && <p className="text-sm text-danger">{error}</p>}
       </GlassCard>
 
       <div className="space-y-4">
         {posts.length === 0 && (
-          <p className="text-center text-sm text-ink/60">{t("communityEmpty")}</p>
+          <p className="text-center text-sm text-ink-subtle">{t("communityEmpty")}</p>
         )}
         {posts.map((p) => (
           <GlassCard key={p.id}>
-            <p className="text-xs font-medium text-pink">{p.author}</p>
-            <span className="mt-1 inline-block rounded-full bg-peach/50 px-2 py-0.5 text-xs text-ink/70">
+            <p className="text-xs font-medium text-accent">{p.author}</p>
+            <span className="mt-1 inline-block rounded-full bg-peach/50 px-2 py-0.5 text-xs text-ink-muted">
               {p.tag}
             </span>
             <p className="mt-3 text-sm leading-relaxed">{p.text}</p>
@@ -130,7 +130,7 @@ export default function CommunityPage() {
               onClick={() =>
                 save(posts.map((x) => (x.id === p.id ? { ...x, hearts: x.hearts + 1 } : x)))
               }
-              className="mt-4 text-sm font-medium text-pink transition hover:text-ink"
+              className="mt-4 text-sm font-medium text-accent transition hover:text-ink"
             >
               ♥ {p.hearts}
             </button>

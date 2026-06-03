@@ -47,7 +47,7 @@ export function LanguageMenu() {
                   setOpen(false);
                 }}
                 className={`w-full px-3 py-2 text-left text-sm transition hover:bg-peach/40 ${
-                  language === l.code ? "bg-pink/35 font-medium text-ink" : "text-ink/80"
+                  language === l.code ? "bg-pink/35 font-medium text-ink" : "text-ink-muted"
                 }`}
               >
                 {l.label}

@@ -50,9 +50,9 @@ export function TypewriterSubtitle() {
   }, [text, deleting, phraseIdx, t]);
 
   return (
-    <p className="mt-3 min-h-[1.75rem] text-lg text-ink/75">
+    <p className="mt-3 min-h-[1.75rem] text-lg text-ink-muted">
       {text}
-      <span className="ml-0.5 inline-block animate-pulse text-sage">|</span>
+      <span className="ml-0.5 inline-block animate-pulse text-accent">|</span>
     </p>
   );
 }

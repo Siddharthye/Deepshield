@@ -61,7 +61,7 @@ export default function TracePage() {
             />
           </div>
         )}
-        {preview && <p className="text-center text-xs text-ink/55">{t("traceLensHint")}</p>}
+        {preview && <p className="text-center text-xs text-ink-subtle">{t("traceLensHint")}</p>}
         <a
           href="https://lens.google.com/"
           target="_blank"
@@ -116,7 +116,7 @@ export default function TracePage() {
           {t("traceSaveUrls")}
         </Button>
         {saved && (
-          <p className="text-center text-sm text-pink">
+          <p className="text-center text-sm text-danger">
             {t("traceSavedLocal")}
             {vaultSaved ? t("traceSavedVault") : t("traceSavedVaultHint")}
           </p>
@@ -133,7 +133,7 @@ export default function TracePage() {
               href={l.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-pink underline underline-offset-4"
+              className="text-sm font-medium text-link underline underline-offset-4"
             >
               {t(l.nameKey)}
             </a>

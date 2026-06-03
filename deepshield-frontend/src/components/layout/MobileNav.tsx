@@ -27,7 +27,7 @@ export function MobileNav() {
               key={href}
               href={href}
               className={`px-2 py-1 text-xs font-medium ${
-                active ? "text-ink underline decoration-blue/80" : "text-ink/60"
+                active ? "text-ink underline decoration-blue/80" : "text-ink-subtle"
               }`}
             >
               {t(key)}

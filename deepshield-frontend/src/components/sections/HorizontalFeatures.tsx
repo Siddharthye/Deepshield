@@ -77,7 +77,7 @@ export function HorizontalFeatures() {
     <section className="section-pad section-alt-sage mx-auto max-w-6xl px-4">
       <p className="page-badge">{t("journeyBadge")}</p>
       <h2 className="font-display text-2xl text-ink md:text-3xl">{t("journeyTitle")}</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink/70">{t("journeyIntro")}</p>
+      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-muted">{t("journeyIntro")}</p>
 
       <div className="mt-8 -mx-4 flex gap-5 overflow-x-auto px-4 pb-4 snap-x snap-mandatory scroll-smooth md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:snap-none lg:grid-cols-3">
         {PANEL_KEYS.map((p) => (
@@ -89,8 +89,8 @@ export function HorizontalFeatures() {
             <div>
               <span className="text-4xl">{p.icon}</span>
               <h3 className="font-display mt-4 text-2xl text-ink">{t(p.title)}</h3>
-              <p className="mt-2 text-sm font-medium text-ink/85">{t(p.desc)}</p>
-              <p className="mt-3 text-xs leading-relaxed text-ink/70">{t(p.detail)}</p>
+              <p className="mt-2 text-sm font-medium text-ink-muted">{t(p.desc)}</p>
+              <p className="mt-3 text-xs leading-relaxed text-ink-muted">{t(p.detail)}</p>
             </div>
             <span className="mt-6 inline-flex w-fit rounded-full bg-cream/90 px-4 py-2 text-sm font-medium text-ink shadow-sm">
               {t(p.cta)} {t("openFeatureArrow")}
@@ -99,18 +99,18 @@ export function HorizontalFeatures() {
         ))}
       </div>
 
-      <p className="mt-4 text-center text-xs text-ink/50 md:hidden">{t("journeySwipe")}</p>
+      <p className="mt-4 text-center text-xs text-ink-subtle md:hidden">{t("journeySwipe")}</p>
 
       <GlassCard className="mt-10 p-6 md:p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="max-w-xl">
-            <p className="text-xs font-semibold uppercase tracking-wide text-pink">
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent">
               {t("journeyHelpBadge")}
             </p>
             <p className="mt-1 font-display text-lg text-ink">{t("journeyHelpTitle")}</p>
-            <p className="mt-2 text-sm text-ink/70">{t("journeyHelpBody")}</p>
+            <p className="mt-2 text-sm text-ink-muted">{t("journeyHelpBody")}</p>
           </div>
-          <ul className="flex flex-wrap gap-3 text-sm text-ink/85">
+          <ul className="flex flex-wrap gap-3 text-sm text-ink-muted">
             <li className="rounded-full bg-peach/40 px-3 py-1.5">
               {t("helplineCyber")}: 1930
             </li>
