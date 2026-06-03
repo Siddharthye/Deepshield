@@ -89,8 +89,6 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         className="transition-opacity duration-300 ease-out"
         style={{
           opacity: contentVisible ? 1 : 0,
-          visibility: contentVisible ? "visible" : "hidden",
-          pointerEvents: contentVisible ? "auto" : "none",
         }}
         aria-hidden={!contentVisible}
       >

@@ -17,7 +17,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -30,7 +30,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="relative flex min-h-full flex-col pb-28 md:pb-12">
+      <body className="relative min-h-screen pb-16 md:pb-0">
         <AmbientBackground />
         <ScrollProgress />
         <LanguageProvider>

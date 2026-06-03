@@ -9,17 +9,22 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+    const lenis = new Lenis({
+      autoRaf: true,
+      smoothWheel: true,
+      syncTouch: false,
+    });
+
     lenis.on("scroll", ScrollTrigger.update);
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
+    const onRefresh = () => lenis.resize();
+    ScrollTrigger.addEventListener("refresh", onRefresh);
+    ScrollTrigger.refresh();
 
     return () => {
+      ScrollTrigger.removeEventListener("refresh", onRefresh);
       lenis.destroy();
+      ScrollTrigger.refresh();
     };
   }, []);
 

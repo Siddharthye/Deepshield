@@ -7,7 +7,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { PageTransition } from "@/components/layout/PageTransition";
-import { SafetyRibbon } from "@/components/layout/SafetyRibbon";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 import { IntroLoader } from "@/components/ui/IntroLoader";
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -31,8 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           <LanguageMenu />
         </header>
-        <main className="relative z-10 flex-1 pt-14">{children}</main>
-        <SafetyRibbon variant="login" />
+        <main className="relative z-10 pt-14">{children}</main>
       </>
     );
   }
@@ -46,7 +44,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </PageTransition>
       <MobileNav />
       <SiteFooter />
-      <SafetyRibbon />
     </>
   );
 }

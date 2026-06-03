@@ -100,6 +100,16 @@
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
+html {
+  height: auto;
+  overflow-y: scroll;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
 body {
   background: var(--color-earth);
   background-image: var(--gradient-soft);
@@ -111,6 +121,8 @@ body {
   overflow-wrap: normal;
   word-break: normal;
   hyphens: none;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 h1,

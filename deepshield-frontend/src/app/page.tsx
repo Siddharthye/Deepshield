@@ -27,7 +27,7 @@ export default function HomePage() {
   const { t, language } = useLanguage();
 
   return (
-    <div key={language} className="relative overflow-hidden pt-16">
+    <div key={language} className="relative overflow-x-hidden pt-16">
       <HeroParticles />
 
       <section className="relative mx-auto max-w-6xl px-4 py-12 md:py-16">
