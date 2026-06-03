@@ -9,6 +9,7 @@ import { fetchReverseTrace } from "@/lib/api";
 import {
   openTraceSearchEngines,
   parseTraceUrlsFromText,
+  publishTraceImage,
 } from "@/lib/reverseTrace";
 import { appendTraceHits, type TraceHit } from "@/lib/traceStorage";
 import { tryAddToVault } from "@/lib/vaultHelpers";
@@ -41,8 +42,15 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         payload: preview,
       });
 
-      const result = await fetchReverseTrace({ imageBase64: preview });
-      setPublicUrl(result.publicImageUrl);
+      setStatus(t("traceAutoHosting"));
+      const hosted = await publishTraceImage(preview);
+      if (!hosted) {
+        setStatus(t("traceAutoPublishFailed"));
+        return;
+      }
+      setPublicUrl(hosted);
+
+      const result = await fetchReverseTrace({ imageUrl: hosted });
 
       if (result.sources?.length) {
         setStatus(
@@ -59,8 +67,13 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
       } else {
         setStatus(t("traceAutoNoResults"));
       }
-    } catch {
-      setStatus(t("traceAutoFailed"));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      setStatus(
+        msg && msg.length < 120
+          ? `${t("traceAutoFailed")} (${msg})`
+          : t("traceAutoFailed"),
+      );
     } finally {
       setRunning(false);
     }

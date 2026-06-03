@@ -95,16 +95,46 @@ export const TRACE_SEARCH_ENGINES: TraceSearchEngine[] = [
   },
 ];
 
+async function uploadTraceBlob(blob: Blob, filename: string): Promise<string | null> {
+  const catbox = new FormData();
+  catbox.append("reqtype", "fileupload");
+  catbox.append("fileToUpload", blob, filename);
+  try {
+    const res = await fetch("https://catbox.moe/user/api.php", {
+      method: "POST",
+      body: catbox,
+    });
+    if (res.ok) {
+      const url = (await res.text()).trim();
+      if (url.startsWith("http")) return url;
+    }
+  } catch {
+    /* try next host */
+  }
+
+  const ox = new FormData();
+  ox.append("file", blob, filename);
+  try {
+    const res = await fetch("https://0x0.st", { method: "POST", body: ox });
+    if (res.ok) {
+      const url = (await res.text()).trim();
+      if (url.startsWith("http")) return url;
+    }
+  } catch {
+    /* exhausted */
+  }
+  return null;
+}
+
 /** Best-effort public URL for reverse search-by-URL engines. */
 export async function publishTraceImage(dataUrl: string): Promise<string | null> {
   try {
-    const blob = await (await fetch(dataUrl)).blob();
-    const fd = new FormData();
-    fd.append("file", blob, "deepshield-trace.jpg");
-    const res = await fetch("https://0x0.st", { method: "POST", body: fd });
-    if (!res.ok) return null;
-    const url = (await res.text()).trim();
-    return url.startsWith("http") ? url : null;
+    const { resizeDataUrlForTrace } = await import("./resizeImage");
+    const resized = await resizeDataUrlForTrace(dataUrl);
+    const blob = await (await fetch(resized)).blob();
+    const type = blob.type || "image/jpeg";
+    const ext = type.includes("png") ? "png" : "jpg";
+    return uploadTraceBlob(blob, `deepshield-trace.${ext}`);
   } catch {
     return null;
   }

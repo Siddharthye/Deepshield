@@ -181,17 +181,60 @@ export async function lookupReverseImage(imageUrl: string): Promise<{
   return { hits: merged.slice(0, 40), sources };
 }
 
-export async function publishImageBase64(dataUrl: string): Promise<string | null> {
+function parseDataUrl(dataUrl: string): { bytes: Buffer; mime: string; ext: string } | null {
+  const match = /^data:([\w/+.-]+);base64,([\s\S]+)$/i.exec(dataUrl.trim());
+  if (!match) return null;
+  const mime = match[1];
+  const bytes = Buffer.from(match[2].replace(/\s/g, ""), "base64");
+  if (bytes.length === 0 || bytes.length > 3_500_000) return null;
+  const ext = mime.includes("png") ? "png" : mime.includes("webp") ? "webp" : "jpg";
+  return { bytes, mime, ext };
+}
+
+async function uploadTraceBuffer(
+  bytes: Buffer,
+  mime: string,
+  filename: string,
+): Promise<string | null> {
+  const blob = new Blob([new Uint8Array(bytes)], { type: mime });
+
+  const catbox = new FormData();
+  catbox.append("reqtype", "fileupload");
+  catbox.append("fileToUpload", blob, filename);
   try {
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-    const fd = new FormData();
-    fd.append("file", blob, "deepshield-trace.jpg");
-    const up = await fetch("https://0x0.st", { method: "POST", body: fd });
-    if (!up.ok) return null;
-    const url = (await up.text()).trim();
-    return url.startsWith("http") ? url : null;
+    const res = await fetch("https://catbox.moe/user/api.php", {
+      method: "POST",
+      body: catbox,
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (res.ok) {
+      const url = (await res.text()).trim();
+      if (url.startsWith("http")) return url;
+    }
   } catch {
-    return null;
+    /* next */
   }
+
+  const ox = new FormData();
+  ox.append("file", blob, filename);
+  try {
+    const res = await fetch("https://0x0.st", {
+      method: "POST",
+      body: ox,
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (res.ok) {
+      const url = (await res.text()).trim();
+      if (url.startsWith("http")) return url;
+    }
+  } catch {
+    /* exhausted */
+  }
+  return null;
+}
+
+export async function publishImageBase64(dataUrl: string): Promise<string | null> {
+  const parsed = parseDataUrl(dataUrl);
+  if (!parsed) return null;
+  return uploadTraceBuffer(parsed.bytes, parsed.mime, `deepshield-trace.${parsed.ext}`);
 }

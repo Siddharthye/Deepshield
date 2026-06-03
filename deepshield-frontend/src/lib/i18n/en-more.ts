@@ -208,6 +208,9 @@ export const EN_MORE = {
     "Full UI in English and Hindi. Tamil, Telugu, Bengali, Marathi, Kannada, and Malayalam use English content for now.",
   traceAutoStart: "Run automatic reverse trace",
   traceAutoRunning: "Searching the web for matches…",
+  traceAutoHosting: "Preparing a public search link for your image…",
+  traceAutoPublishFailed:
+    "Could not host the image for search. Use manual search tabs below, then paste URLs.",
   traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
   traceAutoFound: "Found {n} match(es) — saved to your trace log.",
   traceAutoNoResults: "No public matches found yet. Paste URLs below or open manual search.",

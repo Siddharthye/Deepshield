@@ -210,6 +210,9 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
     "पूर्ण UI अंग्रेज़ी और हिंदी में। तमिल, तेलुगु, बंगाली, मराठी, कन्नड़, मलयालम अभी अंग्रेज़ी सामग्री दिखाते हैं।",
   traceAutoStart: "स्वचालित रिवर्स ट्रेस चलाएँ",
   traceAutoRunning: "वेब पर मिलान खोज रहे हैं…",
+  traceAutoHosting: "आपकी छवि के लिए सार्वजनिक खोज लिंक तैयार हो रहा है…",
+  traceAutoPublishFailed:
+    "खोज के लिए छवि होस्ट नहीं हो सकी। नीचे मैन्युअल खोज खोलें, फिर URL चिपकाएँ।",
   traceAutoSearching: "Yandex, Bing और Google पर आपकी छवि खोज रहे हैं…",
   traceAutoFound: "{n} मिलान मिले — ट्रेस लॉग में सहेजे।",
   traceAutoNoResults: "अभी कोई सार्वजनिक मिलान नहीं। नीचे URL चिपकाएँ या मैन्युअल खोज खोलें।",
