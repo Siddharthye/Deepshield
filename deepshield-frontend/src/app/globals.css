@@ -1,57 +1,68 @@
 @import "tailwindcss";
 
-/* June palette — richer pastels (same hues, slightly deeper surfaces) */
+/* Florist palette — Linen, Lavender, Seaweed, Pistachio, Candyfloss */
 :root {
-  --color-cream: #fdf6eb;
-  --color-pink: #fdc8c2;
-  --color-peach: #fdd6c1;
-  --color-sage: #c5ccad;
-  --color-blue: #d6e8f2;
-  --color-pink-deep: #f4b0a8;
-  --color-peach-deep: #f8c9ad;
-  --color-sage-deep: #b3baa0;
-  --color-blue-deep: #c2dae8;
-  --color-cream-deep: #f5ead8;
-  --color-ink: #3d2417;
-  --color-ink-muted: #523528;
-  --color-ink-subtle: #6d4a3e;
-  --color-accent: #6b3428;
-  --color-link: #4a2618;
+  --color-linen: #f4f0e0;
+  --color-lavender: #9f7cef;
+  --color-seaweed: #3d524c;
+  --color-pistachio: #c6cd85;
+  --color-candyfloss: #f1cde2;
+  /* Semantic aliases (Tailwind utilities) */
+  --color-cream: var(--color-linen);
+  --color-pink: var(--color-candyfloss);
+  --color-peach: #e8d4f4;
+  --color-sage: var(--color-pistachio);
+  --color-blue: var(--color-lavender);
+  --color-pink-deep: #e5b5d4;
+  --color-peach-deep: #d4b8ec;
+  --color-sage-deep: #a8ae6e;
+  --color-blue-deep: #b5a0eb;
+  --color-cream-deep: #e8e4d0;
+  --color-ink: var(--color-seaweed);
+  --color-ink-muted: #4a625c;
+  --color-ink-subtle: #5c726c;
+  --color-accent: #2d3f3a;
+  --color-link: #355048;
   --color-danger: #8b3a3a;
   --gradient-soft: linear-gradient(
     165deg,
-    var(--color-cream) 0%,
-    color-mix(in srgb, var(--color-blue-deep) 42%, var(--color-cream)) 35%,
-    color-mix(in srgb, var(--color-sage-deep) 32%, var(--color-cream)) 70%,
-    color-mix(in srgb, var(--color-peach-deep) 28%, var(--color-cream)) 100%
+    var(--color-linen) 0%,
+    color-mix(in srgb, var(--color-blue-deep) 38%, var(--color-linen)) 35%,
+    color-mix(in srgb, var(--color-sage-deep) 28%, var(--color-linen)) 70%,
+    color-mix(in srgb, var(--color-pink-deep) 32%, var(--color-linen)) 100%
   );
   --gradient-cta: linear-gradient(
     135deg,
-    var(--color-blue) 0%,
-    var(--color-sage) 45%,
-    var(--color-peach) 85%
+    var(--color-lavender) 0%,
+    var(--color-pistachio) 48%,
+    var(--color-candyfloss) 100%
   );
-  --gradient-accent: linear-gradient(135deg, var(--color-sage) 0%, var(--color-blue) 100%);
-  --shadow-soft: 0 8px 32px rgba(61, 36, 23, 0.08);
-  --shadow-glow: 0 4px 24px rgba(214, 232, 242, 0.65);
+  --gradient-accent: linear-gradient(135deg, var(--color-pistachio) 0%, var(--color-lavender) 100%);
+  --shadow-soft: 0 8px 32px rgba(61, 82, 76, 0.1);
+  --shadow-glow: 0 4px 24px rgba(159, 124, 239, 0.35);
 }
 
 @theme inline {
-  --color-cream: #fdf6eb;
-  --color-pink: #fdc8c2;
-  --color-peach: #fdd6c1;
-  --color-sage: #c5ccad;
-  --color-blue: #d6e8f2;
-  --color-pink-deep: #f4b0a8;
-  --color-peach-deep: #f8c9ad;
-  --color-sage-deep: #b3baa0;
-  --color-blue-deep: #c2dae8;
-  --color-cream-deep: #f5ead8;
-  --color-ink: #3d2417;
-  --color-ink-muted: #523528;
-  --color-ink-subtle: #6d4a3e;
-  --color-accent: #6b3428;
-  --color-link: #4a2618;
+  --color-linen: #f4f0e0;
+  --color-lavender: #9f7cef;
+  --color-seaweed: #3d524c;
+  --color-pistachio: #c6cd85;
+  --color-candyfloss: #f1cde2;
+  --color-cream: #f4f0e0;
+  --color-pink: #f1cde2;
+  --color-peach: #e8d4f4;
+  --color-sage: #c6cd85;
+  --color-blue: #9f7cef;
+  --color-pink-deep: #e5b5d4;
+  --color-peach-deep: #d4b8ec;
+  --color-sage-deep: #a8ae6e;
+  --color-blue-deep: #b5a0eb;
+  --color-cream-deep: #e8e4d0;
+  --color-ink: #3d524c;
+  --color-ink-muted: #4a625c;
+  --color-ink-subtle: #5c726c;
+  --color-accent: #2d3f3a;
+  --color-link: #355048;
   --color-danger: #8b3a3a;
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 }
