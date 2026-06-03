@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { LanguageMenu } from "@/components/layout/LanguageMenu";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { ClientProviders } from "@/components/layout/ClientProviders";
 import { IntroLoader } from "@/components/ui/IntroLoader";
@@ -43,13 +44,16 @@ export default function RootLayout({
               <main className="relative z-10 flex-1">{children}</main>
             </PageTransition>
             <MobileNav />
-            <footer className="site-footer relative z-10 hidden py-8 text-center md:block">
+            <footer className="site-footer relative z-10 py-8 text-center">
               <p className="text-sm font-medium text-ink/80">
                 You are not alone. You have rights.
               </p>
               <p className="mt-2 text-xs text-ink/55">
                 Cyber Crime Helpline 1930 · NCW 181 · iCall 9152987821
               </p>
+              <div className="mt-4 flex justify-center md:hidden">
+                <LanguageMenu />
+              </div>
             </footer>
           </ClientProviders>
         </LanguageProvider>

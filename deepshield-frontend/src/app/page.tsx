@@ -9,6 +9,9 @@ import { AnimatedShield } from "@/components/ui/AnimatedShield";
 import { HowItWorksPinned } from "@/components/sections/HowItWorksPinned";
 import { FeatureOrbs } from "@/components/sections/FeatureOrbs";
 import { HorizontalFeatures } from "@/components/sections/HorizontalFeatures";
+import { HomeCrisisStrip } from "@/components/sections/HomeCrisisStrip";
+import { HomeWhySection } from "@/components/sections/HomeWhySection";
+import { HomeQuickActions } from "@/components/sections/HomeQuickActions";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { CtaStrip } from "@/components/sections/CtaStrip";
 import { WaveDivider } from "@/components/sections/WaveDivider";
@@ -17,9 +20,15 @@ import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
 const STATS = [
-  { value: 11, label: "Core features" },
-  { value: 3, label: "Detection signals" },
-  { value: 8, label: "Languages" },
+  { value: 11, label: "Core features", hint: "Scan through vault & Asha" },
+  { value: 3, label: "Detection signals", hint: "Model · face · artifacts" },
+  { value: 8, label: "Languages", hint: "Major Indian languages" },
+];
+
+const TRUST = [
+  "Browser-first privacy",
+  "No account required",
+  "Free for survivors",
 ];
 
 export default function HomePage() {
@@ -54,6 +63,16 @@ export default function HomePage() {
             </h1>
             <TypewriterSubtitle />
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink/70">{t("homeHero")}</p>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {TRUST.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-full bg-sage/35 px-3 py-1 text-xs font-medium text-ink/80"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
             <div className="mt-9 flex flex-wrap gap-3">
               <ButtonLink href="/scan">{t("scanNow")}</ButtonLink>
               <ButtonLink href="/asha" variant="secondary">
@@ -64,22 +83,28 @@ export default function HomePage() {
         </motion.div>
       </section>
 
+      <HomeCrisisStrip />
       <WaveDivider />
 
-      <section className="mx-auto max-w-6xl px-4 pb-12">
+      <section className="mx-auto max-w-6xl px-4 pb-8">
         <div className="grid gap-4 sm:grid-cols-3">
           {STATS.map((s) => (
             <GlassCard key={s.label} className="py-8 text-center" tilt>
               <p className="font-display text-4xl text-pink">
                 <OdometerNumber value={s.value} />
               </p>
-              <p className="mt-1 text-sm text-ink/70">{s.label}</p>
+              <p className="mt-1 text-sm font-medium text-ink/80">{s.label}</p>
+              <p className="mt-1 text-xs text-ink/55">{s.hint}</p>
             </GlassCard>
           ))}
         </div>
       </section>
 
+      <HomeQuickActions />
+      <WaveDivider />
       <FeatureOrbs />
+      <WaveDivider />
+      <HomeWhySection />
       <WaveDivider />
       <HowItWorksPinned />
       <HorizontalFeatures />

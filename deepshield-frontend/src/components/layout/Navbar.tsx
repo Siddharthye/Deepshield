@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { LANGUAGES } from "@/lib/i18n";
 import { useLanguage } from "@/context/LanguageContext";
+import { LanguageMenu } from "@/components/layout/LanguageMenu";
 
 const LINKS = [
   { href: "/scan", key: "navScan" },
@@ -19,7 +19,7 @@ const LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   const { scrollY } = useScroll();
   const bg = useTransform(
     scrollY,
@@ -79,18 +79,7 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
-        <select
-          aria-label="Language"
-          value={language}
-          onChange={(e) => void setLanguage(e.target.value as typeof language)}
-          className="input-field w-auto max-w-[5.5rem] rounded-full py-1 text-xs md:max-w-none md:text-sm"
-        >
-          {LANGUAGES.map((l) => (
-            <option key={l.code} value={l.code}>
-              {l.label}
-            </option>
-          ))}
-        </select>
+        <LanguageMenu />
       </div>
     </motion.header>
   );
