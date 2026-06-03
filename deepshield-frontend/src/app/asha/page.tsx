@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { AshaChat } from "@/components/asha/AshaChat";
 import { BasicRights } from "@/components/asha/BasicRights";
+import { RightsExplainer } from "@/components/asha/RightsExplainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function AshaPage() {
@@ -32,9 +33,12 @@ export default function AshaPage() {
 
       <div className="mb-12">
         <BasicRights />
+        <RightsExplainer />
       </div>
 
-      <AshaChat />
+      <div className="min-h-[70vh]">
+        <AshaChat />
+      </div>
     </div>
   );
 }

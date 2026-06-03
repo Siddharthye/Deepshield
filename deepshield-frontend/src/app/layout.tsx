@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Navbar } from "@/components/layout/Navbar";
+import { MobileNav } from "@/components/layout/MobileNav";
+import { PageTransition } from "@/components/layout/PageTransition";
+import { IntroLoader } from "@/components/ui/IntroLoader";
 import { AmbientBackground } from "@/components/ui/AmbientBackground";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import "./globals.css";
@@ -28,13 +31,17 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="relative flex min-h-full flex-col">
+      <body className="relative flex min-h-full flex-col pb-16 md:pb-0">
+        <IntroLoader />
         <AmbientBackground />
         <ScrollProgress />
         <LanguageProvider>
           <Navbar />
-          <main className="relative z-10 flex-1">{children}</main>
-          <footer className="site-footer relative z-10 py-8 text-center">
+          <PageTransition>
+            <main className="relative z-10 flex-1">{children}</main>
+          </PageTransition>
+          <MobileNav />
+          <footer className="site-footer relative z-10 hidden py-8 text-center md:block">
             <p className="text-sm font-medium text-ink/80">
               You are not alone. You have rights.
             </p>

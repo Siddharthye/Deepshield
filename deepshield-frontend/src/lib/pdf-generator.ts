@@ -6,14 +6,32 @@ const INK = rgb(0.35, 0.33, 0.3);
 const PINK = rgb(0.99, 0.79, 0.76);
 const PEACH = rgb(0.99, 0.84, 0.76);
 
-export async function generateEvidencePdf(scan: ScanSession, traceUrls: string[]) {
+async function embedScanImage(doc: PDFDocument, dataUrl: string) {
+  const base64 = dataUrl.split(",")[1];
+  if (!base64) return null;
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  if (dataUrl.includes("image/png")) {
+    return doc.embedPng(bytes);
+  }
+  return doc.embedJpg(bytes);
+}
+
+export async function generateEvidencePdf(
+  scan: ScanSession,
+  traceUrls: string[],
+  legalSummary?: string,
+) {
   const doc = await PDFDocument.create();
-  const page = doc.addPage([595, 842]);
+  let page = doc.addPage([595, 842]);
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
 
   let y = 800;
   const draw = (text: string, size = 11, useBold = false) => {
+    if (y < 80) {
+      page = doc.addPage([595, 842]);
+      y = 800;
+    }
     page.drawText(text, {
       x: 50,
       y,
@@ -41,40 +59,47 @@ export async function generateEvidencePdf(scan: ScanSession, traceUrls: string[]
     12,
     true,
   );
-  y -= 4;
-  draw(`Model signal: ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}%`);
-  draw(`Artifact signal: ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}%`);
-  draw(`Symmetry signal: ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`);
 
-  if (scan.explain) {
-    y -= 8;
+  try {
+    const img = await embedScanImage(doc, scan.imageDataUrl);
+    if (img) {
+      const dims = img.scale(0.35);
+      if (y - dims.height < 60) {
+        page = doc.addPage([595, 842]);
+        y = 750;
+      }
+      page.drawImage(img, { x: 50, y: y - dims.height, width: dims.width, height: dims.height });
+      y -= dims.height + 16;
+      draw("Annotated scan capture (evidence exhibit)", 9);
+    }
+  } catch {
+    /* skip image if embed fails */
+  }
+
+  draw(`Model: ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}% · Artifacts: ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}% · Symmetry: ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`);
+
+  if (legalSummary) {
+    y -= 6;
+    draw("Legal summary (for authorities)", 13, true);
+    draw(legalSummary);
+  } else if (scan.explain) {
+    y -= 6;
     draw("Summary", 13, true);
     draw(scan.explain.explanation);
     draw(`Recommendation: ${scan.explain.recommendation}`, 10, true);
   }
 
-  y -= 8;
+  y -= 6;
   draw("Applicable laws (India)", 13, true);
-  draw("IT Act §66E (privacy), §67, §67A · IPC §354C (voyeurism)");
+  draw("IT Act §66E, §67, §67A · IPC §354C");
 
   if (traceUrls.length) {
-    y -= 8;
+    y -= 6;
     draw("URLs found (reverse trace)", 13, true);
     traceUrls.slice(0, 12).forEach((u) => draw(`• ${u}`, 9));
   }
 
-  y -= 8;
-  draw("Filing instructions", 13, true);
-  draw("Report at https://cybercrime.gov.in/ · Helpline 1930 · NCW 181");
-
-  page.drawRectangle({ x: 50, y: 60, width: 495, height: 36, color: PINK, borderOpacity: 0 });
-  page.drawText("DeepShield — Detect · Report · Educate", {
-    x: 50,
-    y: 72,
-    size: 9,
-    font,
-    color: INK,
-  });
+  draw("File at https://cybercrime.gov.in/ · Helpline 1930", 10, true);
 
   const bytes = await doc.save();
   return new Blob([new Uint8Array(bytes)], { type: "application/pdf" });

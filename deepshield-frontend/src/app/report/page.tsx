@@ -5,89 +5,67 @@ import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { CyberReportForm } from "@/components/report/CyberReportForm";
+import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
+import { fetchLegalReportSummary } from "@/lib/api";
 import { loadScanSession } from "@/lib/scanSession";
 import { verdictLabel } from "@/lib/riskScoring";
 import { generateEvidencePdf, downloadBlob } from "@/lib/pdf-generator";
+import { useLanguage } from "@/context/LanguageContext";
 import type { ScanSession } from "@/lib/types";
 
-const STEPS = [
-  "Review your scan summary and risk score below.",
-  "Download the branded PDF evidence report.",
-  "Open cybercrime.gov.in — no need to identify yourself in DeepShield.",
-  "Call 1930 if you need immediate cyber crime support.",
-];
-
 export default function ReportPage() {
+  const { language } = useLanguage();
   const [scan, setScan] = useState<ScanSession | null>(null);
+  const [legalSummary, setLegalSummary] = useState<string | null>(null);
+  const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [step, setStep] = useState(0);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [shield, setShield] = useState(false);
 
   useEffect(() => {
     setScan(loadScanSession());
   }, []);
 
-  async function downloadPdf() {
+  async function buildPdf() {
     if (!scan) return;
     setPdfLoading(true);
     try {
+      let summary = legalSummary;
+      if (!summary) {
+        setSummaryLoading(true);
+        summary = await fetchLegalReportSummary(scan, language);
+        setLegalSummary(summary);
+        setSummaryLoading(false);
+      }
       const traceRaw = localStorage.getItem("deepshield_trace_urls");
       const traceUrls = traceRaw ? (JSON.parse(traceRaw) as string[]) : [];
-      const blob = await generateEvidencePdf(scan, traceUrls);
-      downloadBlob(blob, `deepshield_evidence_${Date.now()}.pdf`);
+      const blob = await generateEvidencePdf(scan, traceUrls, summary);
+      if (pdfPreview) URL.revokeObjectURL(pdfPreview);
+      setPdfPreview(URL.createObjectURL(blob));
+      return blob;
     } finally {
       setPdfLoading(false);
     }
   }
 
-  function downloadTxt() {
-    if (!scan) return;
-    const lines = [
-      "DeepShield Evidence Summary",
-      `Date: ${scan.scannedAt}`,
-      `Risk: ${scan.risk.finalRisk}% — ${verdictLabel(scan.risk.verdict)}`,
-      scan.explain?.explanation ?? "",
-      scan.explain?.recommendation ?? "",
-    ];
-    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
-    downloadBlob(blob, `deepshield_evidence_${Date.now()}.txt`);
+  async function downloadPdf() {
+    const blob = await buildPdf();
+    if (blob) {
+      downloadBlob(blob, `deepshield_evidence_${Date.now()}.pdf`);
+      setShield(true);
+      setTimeout(() => setShield(false), 900);
+    }
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
+    <div className="mx-auto max-w-3xl px-4 py-10 md:py-14 pb-24 md:pb-14">
+      <ShieldOverlay show={shield} />
       <PageHeader
         badge="Evidence"
         title="Legal evidence report"
-        subtitle="Case builder with PDF export and guided steps toward filing at the National Cyber Crime Portal."
+        subtitle="LLM legal summary, PDF with scan image, trace URLs, and cybercrime filing prep."
       />
-
-      <GlassCard className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-wide text-pink">Filing guide</p>
-        <ol className="mt-4 space-y-3">
-          {STEPS.map((s, i) => (
-            <li
-              key={s}
-              className={`flex gap-3 text-sm ${i === step ? "font-medium text-ink" : "text-ink/65"}`}
-            >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink/40 text-xs">
-                {i + 1}
-              </span>
-              {s}
-            </li>
-          ))}
-        </ol>
-        <div className="mt-4 flex gap-2">
-          <Button variant="secondary" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>
-            Back
-          </Button>
-          <Button
-            variant="primary"
-            disabled={step >= STEPS.length - 1}
-            onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
-          >
-            Next step
-          </Button>
-        </div>
-      </GlassCard>
 
       {!scan ? (
         <GlassCard>
@@ -100,40 +78,58 @@ export default function ReportPage() {
           </p>
         </GlassCard>
       ) : (
-        <GlassCard className="space-y-5">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-pink">Preview</p>
-            <p className="font-display mt-1 text-2xl text-ink">
+        <div className="space-y-8">
+          <GlassCard className="space-y-4">
+            <p className="font-display text-2xl text-ink">
               {verdictLabel(scan.risk.verdict)} · {scan.risk.finalRisk}%
             </p>
-          </div>
-          {scan.explain && (
-            <>
+            {scan.explain && (
               <p className="text-sm leading-relaxed">{scan.explain.explanation}</p>
-              <p className="rounded-xl bg-peach/35 px-4 py-3 text-sm font-medium">
-                {scan.explain.recommendation}
-              </p>
-            </>
-          )}
-          <p className="text-xs text-ink/55">Laws: IT Act 66E, 67, 67A · IPC 354C</p>
-          <div className="flex flex-wrap gap-3">
-            <Button variant="primary" onClick={downloadPdf} disabled={pdfLoading}>
-              {pdfLoading ? "Building PDF…" : "Download PDF report"}
-            </Button>
-            <Button variant="secondary" onClick={downloadTxt}>
-              Text summary
-            </Button>
-            <a
-              href="https://cybercrime.gov.in/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-full border border-sage/60 bg-blue/40 px-5 py-2.5 text-sm font-medium text-ink"
+            )}
+            <Button
+              variant="secondary"
+              disabled={summaryLoading}
+              onClick={async () => {
+                setSummaryLoading(true);
+                try {
+                  const s = await fetchLegalReportSummary(scan, language);
+                  setLegalSummary(s);
+                } finally {
+                  setSummaryLoading(false);
+                }
+              }}
             >
-              Open cybercrime.gov.in
-            </a>
-          </div>
-        </GlassCard>
+              {summaryLoading ? "Generating legal summary…" : "Generate LLM legal summary"}
+            </Button>
+            {legalSummary && (
+              <p className="rounded-xl bg-blue/30 p-4 text-sm leading-relaxed">{legalSummary}</p>
+            )}
+            <div className="flex flex-wrap gap-3">
+              <Button variant="primary" onClick={() => void downloadPdf()} disabled={pdfLoading}>
+                {pdfLoading ? "Building PDF…" : "Download PDF"}
+              </Button>
+              <Button variant="secondary" onClick={() => void buildPdf()} disabled={pdfLoading}>
+                Preview PDF
+              </Button>
+            </div>
+          </GlassCard>
+
+          {pdfPreview && (
+            <GlassCard>
+              <p className="mb-3 text-sm font-medium text-ink">PDF preview</p>
+              <iframe
+                src={pdfPreview}
+                title="Evidence PDF preview"
+                className="h-[min(520px,70vh)] w-full rounded-xl border border-sage/40 bg-cream"
+              />
+            </GlassCard>
+          )}
+        </div>
       )}
+
+      <div className="mt-10">
+        <CyberReportForm />
+      </div>
     </div>
   );
 }

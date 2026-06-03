@@ -19,22 +19,24 @@ export const LANGUAGES: { code: LanguageCode; label: string }[] = [
   { code: "ml", label: "മലയാളം" },
 ];
 
+export const STRINGS_EN = {
+  tagline: "AI armor against deepfakes & digital violence",
+  scanNow: "Scan an image",
+  talkToAsha: "Talk to Asha",
+  knowRights: "Support & rights",
+  homeHero:
+    "Detect deepfakes, build legal proof, and find support — privately, in your browser.",
+  navScan: "Scan",
+  navTrace: "Trace",
+  navReport: "Report",
+  navVault: "Vault",
+  navCommunity: "Community",
+  navAsha: "Asha",
+  navLearn: "Learn",
+};
+
 const STRINGS: Record<LanguageCode, Record<string, string>> = {
-  en: {
-    tagline: "AI armor against deepfakes & digital violence",
-    scanNow: "Scan an image",
-    talkToAsha: "Talk to Asha",
-    knowRights: "Support & rights",
-    homeHero:
-      "Detect deepfakes, build legal proof, and find support — privately, in your browser.",
-    navScan: "Scan",
-    navTrace: "Trace",
-    navReport: "Report",
-    navVault: "Vault",
-    navCommunity: "Community",
-    navAsha: "Asha",
-    navLearn: "Learn",
-  },
+  en: STRINGS_EN,
   hi: {
     tagline: "डीपफेक और डिजिटल हिंसा के खिलाफ AI कवच",
     scanNow: "छवि स्कैन करें",

@@ -3,26 +3,41 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { CompareSlider } from "@/components/ui/CompareSlider";
 import { HeatmapOverlay } from "@/components/scan/HeatmapOverlay";
+import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { explainRisk, scanImage } from "@/lib/api";
-import {
-  analyzeArtifactScore,
-  analyzeSymmetryScore,
-  buildArtifactHeatmap,
-  type HeatmapCell,
-} from "@/lib/clientAnalysis";
+import { analyzeFaceSymmetryScore } from "@/lib/faceAnalysis";
+import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
+import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
 import { computeRisk, verdictLabel } from "@/lib/riskScoring";
 import { saveScanSession } from "@/lib/scanSession";
+import { tryAddToVault } from "@/lib/vaultHelpers";
 import { useLanguage } from "@/context/LanguageContext";
 import type { ExplainResult, RiskResult } from "@/lib/types";
 
 const SCAN_STEPS = [
-  "Analyzing facial geometry…",
-  "Checking compression artifacts…",
+  "Analyzing facial geometry (face-api)…",
+  "OpenCV artifact pass…",
   "Running deepfake model…",
   "Building heatmap…",
-  "Preparing your explanation…",
+  "Preparing explanation…",
 ];
+
+function AnimatedRisk({ value }: { value: number }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const t0 = performance.now();
+    const run = (now: number) => {
+      const p = Math.min(1, (now - t0) / 1400);
+      setN(Math.round(value * p));
+      if (p < 1) requestAnimationFrame(run);
+    };
+    requestAnimationFrame(run);
+  }, [value]);
+  return <span className="font-display text-5xl text-ink">{n}%</span>;
+}
 
 export function ImageScanner() {
   const { language } = useLanguage();
@@ -34,13 +49,11 @@ export function ImageScanner() {
   const [risk, setRisk] = useState<RiskResult | null>(null);
   const [explain, setExplain] = useState<ExplainResult | null>(null);
   const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
-  const [showHeatmap, setShowHeatmap] = useState(true);
+  const [shield, setShield] = useState(false);
 
   useEffect(() => {
     if (!loading) return;
-    const id = setInterval(() => {
-      setStepIndex((i) => (i + 1) % SCAN_STEPS.length);
-    }, 1200);
+    const id = setInterval(() => setStepIndex((i) => (i + 1) % SCAN_STEPS.length), 1100);
     return () => clearInterval(id);
   }, [loading]);
 
@@ -60,37 +73,38 @@ export function ImageScanner() {
       setPreview(dataUrl);
       setLoading(true);
       try {
-        const [artifactScore, symmetryScore, cells] = await Promise.all([
-          analyzeArtifactScore(dataUrl),
-          analyzeSymmetryScore(dataUrl),
+        const [symmetryScore, artifactScore, cells] = await Promise.all([
+          analyzeFaceSymmetryScore(dataUrl),
+          analyzeOpenCvArtifactScore(dataUrl),
           buildArtifactHeatmap(dataUrl),
         ]);
         setHeatmap(cells);
 
-        const { modelScore } = await scanImage({
-          imageBase64: dataUrl,
-          mimeType: mt,
-        });
-        const riskResult = computeRisk({
-          modelScore,
-          artifactScore,
-          symmetryScore,
-        });
+        const { modelScore } = await scanImage({ imageBase64: dataUrl, mimeType: mt });
+        const riskResult = computeRisk({ modelScore, artifactScore, symmetryScore });
         setRisk(riskResult);
 
-        const explanation = await explainRisk({
-          risk: riskResult,
-          language,
-        });
+        const explanation = await explainRisk({ risk: riskResult, language });
         setExplain(explanation);
 
-        saveScanSession({
+        const session = {
           imageDataUrl: dataUrl,
           mimeType: mt,
           risk: riskResult,
           explain: explanation,
           scannedAt: new Date().toISOString(),
+        };
+        saveScanSession(session);
+
+        tryAddToVault({
+          name: `scan_${Date.now()}.jpg`,
+          kind: "scan",
+          sizeBytes: file.size,
+          payload: dataUrl,
         });
+
+        setShield(true);
+        setTimeout(() => setShield(false), 900);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Scan failed");
       } finally {
@@ -102,10 +116,12 @@ export function ImageScanner() {
 
   return (
     <div className="space-y-6">
+      <ShieldOverlay show={shield} />
+
       <GlassCard>
         <label className="upload-zone">
           <span className="font-display text-lg text-ink">Upload JPG or PNG</span>
-          <span className="mt-2 text-sm text-ink/60">Max 8MB · analyzed in your browser</span>
+          <span className="mt-2 text-sm text-ink/60">face-api · OpenCV · HF model</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
@@ -120,17 +136,30 @@ export function ImageScanner() {
 
       <AnimatePresence>
         {loading && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <GlassCard>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 flex items-center justify-center bg-ink/50 p-6 backdrop-blur-sm"
+          >
+            <GlassCard className="max-w-lg w-full">
               {preview && (
                 <div className="relative mb-4 aspect-video overflow-hidden rounded-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={preview} alt="" className="h-full w-full object-contain opacity-90" />
+                  <img src={preview} alt="" className="h-full w-full object-contain" />
                   <motion.div
-                    className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-pink to-transparent"
+                    className="absolute inset-x-0 h-1 bg-pink shadow-[0_0_24px_rgba(253,200,194,0.9)]"
                     animate={{ top: ["0%", "100%", "0%"] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
+                  {[0, 1, 2].map((r) => (
+                    <motion.span
+                      key={r}
+                      className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-pink/60"
+                      animate={{ scale: [1, 2.2], opacity: [0.5, 0] }}
+                      transition={{ duration: 1.6, repeat: Infinity, delay: r * 0.35 }}
+                    />
+                  ))}
                 </div>
               )}
               <p className="text-center text-sm text-ink">{SCAN_STEPS[stepIndex]}</p>
@@ -147,62 +176,42 @@ export function ImageScanner() {
 
       {preview && risk && !loading && (
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="grid gap-6 lg:grid-cols-2"
         >
           <GlassCard>
-            <div className="mb-3 flex gap-2">
-              <button
-                type="button"
-                onClick={() => setShowHeatmap(false)}
-                className={`rounded-full px-3 py-1 text-xs ${!showHeatmap ? "bg-pink/50" : "bg-blue/40"}`}
-              >
-                Original
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowHeatmap(true)}
-                className={`rounded-full px-3 py-1 text-xs ${showHeatmap ? "bg-pink/50" : "bg-blue/40"}`}
-              >
-                Heatmap
-              </button>
-            </div>
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-peach/50">
-              {showHeatmap && heatmap.length > 0 ? (
-                <HeatmapOverlay imageSrc={preview} cells={heatmap} />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={preview} alt="Uploaded" className="h-full w-full object-contain" />
-              )}
-            </div>
+            {heatmap.length > 0 ? (
+              <CompareSlider
+                originalSrc={preview}
+                overlay={<HeatmapOverlay imageSrc={preview} cells={heatmap} />}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="Scan" className="w-full rounded-xl object-contain" />
+            )}
           </GlassCard>
           <GlassCard>
             <p className="text-sm text-ink/70">Manipulation risk</p>
-            <p className="font-display text-5xl text-ink">{risk.finalRisk}%</p>
+            <AnimatedRisk value={risk.finalRisk} />
             <p className="mt-2 text-xl font-medium text-pink">{verdictLabel(risk.verdict)}</p>
             <ul className="mt-4 space-y-2 text-sm text-ink/80">
               <li className="flex justify-between">
-                <span>Model</span>
+                <span>HF model</span>
                 <span>{(risk.breakdown.modelScore * 100).toFixed(0)}%</span>
               </li>
               <li className="flex justify-between">
-                <span>Artifacts</span>
+                <span>OpenCV artifacts</span>
                 <span>{(risk.breakdown.artifactScore * 100).toFixed(0)}%</span>
               </li>
               <li className="flex justify-between">
-                <span>Symmetry</span>
+                <span>face-api symmetry</span>
                 <span>{(risk.breakdown.symmetryScore * 100).toFixed(0)}%</span>
               </li>
             </ul>
             {explain && (
               <div className="mt-6 space-y-3 border-t border-peach/40 pt-4 text-sm">
                 <p>{explain.explanation}</p>
-                <ul className="list-disc pl-5 text-ink/80">
-                  {explain.key_signals.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
                 <p className="rounded-xl bg-peach/35 px-4 py-3 font-medium">{explain.recommendation}</p>
               </div>
             )}

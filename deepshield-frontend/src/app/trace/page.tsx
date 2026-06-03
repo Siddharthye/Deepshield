@@ -5,6 +5,7 @@ import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { tryAddToVault } from "@/lib/vaultHelpers";
 
 const REPORT_LINKS = [
   { name: "Meta (Facebook/Instagram)", url: "https://www.facebook.com/help/contact/571927962448785" },
@@ -15,6 +16,7 @@ const REPORT_LINKS = [
 export default function TracePage() {
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
+  const [vaultSaved, setVaultSaved] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
   function onImage(file: File) {
@@ -48,6 +50,11 @@ export default function TracePage() {
           <div className="relative mx-auto aspect-video max-h-48 w-full overflow-hidden rounded-xl">
             <Image src={preview} alt="Trace preview" fill className="object-contain" unoptimized />
           </div>
+        )}
+        {preview && (
+          <p className="text-center text-xs text-ink/55">
+            Upload this image in Lens/TinEye manually, or use TinEye URL search if available.
+          </p>
         )}
         <a
           href="https://lens.google.com/"
@@ -84,17 +91,29 @@ export default function TracePage() {
               localStorage.getItem("deepshield_trace_urls") || "[]",
             ) as string[];
             const added = note.split("\n").map((s) => s.trim()).filter(Boolean);
+            const payload = added.join("\n");
             localStorage.setItem(
               "deepshield_trace_urls",
               JSON.stringify([...existing, ...added]),
             );
             setNote("");
             setSaved(true);
+            const ok = tryAddToVault({
+              name: `trace_urls_${Date.now()}.txt`,
+              kind: "trace",
+              sizeBytes: payload.length,
+              payload,
+            });
+            setVaultSaved(ok);
           }}
         >
           Save URLs for report
         </Button>
-        {saved && <p className="text-center text-sm text-pink">Saved locally.</p>}
+        {saved && (
+          <p className="text-center text-sm text-pink">
+            Saved locally.{vaultSaved ? " Added to vault." : " Unlock vault to auto-save."}
+          </p>
+        )}
       </GlassCard>
 
       <h2 className="font-display mb-4 text-xl text-ink">Report to platforms</h2>

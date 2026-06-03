@@ -7,6 +7,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { CtaStrip } from "@/components/sections/CtaStrip";
+import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
+import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
 const FEATURES = [
@@ -52,7 +54,8 @@ export default function HomePage() {
             <h1 className="font-display max-w-3xl text-4xl leading-tight text-ink md:text-5xl lg:text-[3.25rem]">
               Your armor against digital violence
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink/75">{t("homeHero")}</p>
+            <TypewriterSubtitle />
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink/70">{t("homeHero")}</p>
             <div className="mt-9 flex flex-wrap gap-3">
               <ButtonLink href="/scan">{t("scanNow")}</ButtonLink>
               <ButtonLink href="/asha" variant="secondary">
@@ -67,7 +70,9 @@ export default function HomePage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {STATS.map((s) => (
             <GlassCard key={s.label} className="text-center py-8">
-              <p className="font-display text-4xl text-pink">{s.value}</p>
+              <p className="font-display text-4xl text-pink">
+                <OdometerNumber value={s.value} />
+              </p>
               <p className="mt-1 text-sm text-ink/70">{s.label}</p>
             </GlassCard>
           ))}

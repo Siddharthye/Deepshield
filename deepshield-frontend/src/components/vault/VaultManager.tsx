@@ -59,13 +59,25 @@ export function VaultManager() {
     reader.readAsDataURL(file);
   }
 
-  function exportAll() {
+  async function exportAll() {
+    const JSZip = (await import("jszip")).default;
+    const zip = new JSZip();
     records.forEach((r) => {
-      const a = document.createElement("a");
-      a.href = r.payload.startsWith("data:") ? r.payload : `data:text/plain;base64,${r.payload}`;
-      a.download = r.name;
-      a.click();
+      if (r.payload.startsWith("data:")) {
+        const [meta, b64] = r.payload.split(",");
+        const ext = meta.includes("png") ? "png" : meta.includes("pdf") ? "pdf" : "jpg";
+        zip.file(`${r.name.replace(/\.[^.]+$/, "")}.${ext}`, b64, { base64: true });
+      } else {
+        zip.file(r.name, r.payload);
+      }
     });
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `deepshield_vault_${Date.now()}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function deleteAll() {
@@ -109,8 +121,12 @@ export function VaultManager() {
           <Button variant="primary" onClick={() => fileRef.current?.click()}>
             Add file
           </Button>
-          <Button variant="secondary" onClick={exportAll} disabled={!records.length}>
-            Export all
+          <Button
+            variant="secondary"
+            onClick={() => void exportAll()}
+            disabled={!records.length}
+          >
+            Export ZIP
           </Button>
           <Button variant="ghost" onClick={deleteAll} disabled={!records.length}>
             Delete all
