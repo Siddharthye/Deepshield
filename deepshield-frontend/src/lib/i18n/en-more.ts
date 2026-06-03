@@ -213,12 +213,12 @@ export const EN_MORE = {
     "Could not host the image for search. Use manual search tabs below, then paste URLs.",
   traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
   traceAutoFound: "Found {n} match(es) — saved to your trace log.",
-  traceAutoNoResults: "No public matches found yet. Paste URLs below or open manual search.",
-  traceAutoNoResultsOpened:
-    "Image hosted successfully. Opened Lens, TinEye, Bing, and Yandex in new tabs — paste any links you find below to log them.",
+  traceAutoNoResults:
+    "Image hosted — automatic search found no matches (common on cloud servers). Open Bing search below or paste URLs you find.",
+  traceAutoOpenAllEngines: "Open all engines",
   traceAutoFailed: "Automatic lookup failed — paste URLs from search results below.",
   traceAutoSources: "Checked: {sources}",
-  traceAutoManualFallback: "Open manual search tabs",
+  traceAutoManualFallback: "Open Bing search",
   traceAutoCopied: "Image copied — paste into Lens if prompted.",
   traceAutoCopyFailed: "Could not copy image; upload manually in each search tab.",
   traceAutoHosted: "Public search link ready.",

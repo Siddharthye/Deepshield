@@ -69,7 +69,10 @@ export const TRACE_SEARCH_ENGINES: TraceSearchEngine[] = [
   {
     id: "lens",
     labelKey: "traceOpenLens",
-    buildUrl: () => "https://lens.google.com/",
+    buildUrl: (url) =>
+      url
+        ? `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(url)}`
+        : "https://lens.google.com/",
   },
   {
     id: "tineye",
@@ -118,7 +121,15 @@ export async function copyImageToClipboard(dataUrl: string): Promise<boolean> {
   }
 }
 
+/** Opens one reverse-search tab (Bing) — avoids popup spam. */
 export function openTraceSearchEngines(publicImageUrl?: string) {
+  const bing = TRACE_SEARCH_ENGINES.find((e) => e.id === "bing");
+  const url = bing?.buildUrl(publicImageUrl) ?? "https://www.bing.com/visualsearch";
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+/** Optional: open TinEye, Yandex, and Lens as well (user-initiated). */
+export function openAllTraceSearchEngines(publicImageUrl?: string) {
   for (const engine of TRACE_SEARCH_ENGINES) {
     window.open(engine.buildUrl(publicImageUrl), "_blank", "noopener,noreferrer");
   }

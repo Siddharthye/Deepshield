@@ -215,12 +215,12 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
     "खोज के लिए छवि होस्ट नहीं हो सकी। नीचे मैन्युअल खोज खोलें, फिर URL चिपकाएँ।",
   traceAutoSearching: "Yandex, Bing और Google पर आपकी छवि खोज रहे हैं…",
   traceAutoFound: "{n} मिलान मिले — ट्रेस लॉग में सहेजे।",
-  traceAutoNoResults: "अभी कोई सार्वजनिक मिलान नहीं। नीचे URL चिपकाएँ या मैन्युअल खोज खोलें।",
-  traceAutoNoResultsOpened:
-    "छवि होस्ट हो गई। Lens, TinEye, Bing और Yandex नए टैब में खोले — मिले लिंक नीचे चिपकाकर लॉग करें।",
+  traceAutoNoResults:
+    "छवि होस्ट हो गई — स्वचालित खोज में मिलान नहीं (क्लाउड सर्वर पर सामान्य)। नीचे Bing खोलें या मिले URL चिपकाएँ।",
+  traceAutoOpenAllEngines: "सभी इंजन खोलें",
   traceAutoFailed: "स्वचालित खोज विफल — नीचे खोज परिणाम से URL चिपकाएँ।",
   traceAutoSources: "जाँचा: {sources}",
-  traceAutoManualFallback: "मैन्युअल खोज टैब खोलें",
+  traceAutoManualFallback: "Bing खोज खोलें",
   traceAutoCopied: "छवि कॉपी हो गई — Lens में पेस्ट करें यदि पूछे।",
   traceAutoCopyFailed: "छवि कॉपी नहीं हुई; प्रत्येक टैब में मैन्युअल अपलोड करें।",
   traceAutoHosted: "सार्वजनिक खोज लिंक तैयार।",

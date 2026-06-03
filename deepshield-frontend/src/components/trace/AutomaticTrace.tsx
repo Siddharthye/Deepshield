@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { fetchReverseTrace } from "@/lib/api";
 import {
+  openAllTraceSearchEngines,
   openTraceSearchEngines,
   parseTraceUrlsFromText,
   publishTraceImage,
@@ -72,8 +73,7 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         onHitsImported?.();
         setStatus(t("traceAutoFound").replace("{n}", String(result.hits.length)));
       } else {
-        openTraceSearchEngines(hosted);
-        setStatus(t("traceAutoNoResultsOpened"));
+        setStatus(t("traceAutoNoResults"));
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";
@@ -131,14 +131,24 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         </ul>
       )}
 
-      <Button
-        variant="ghost"
-        className="w-full text-sm"
-        disabled={running}
-        onClick={() => openTraceSearchEngines(publicUrl ?? undefined)}
-      >
-        {t("traceAutoManualFallback")}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="ghost"
+          className="flex-1 text-sm"
+          disabled={running || !publicUrl}
+          onClick={() => openTraceSearchEngines(publicUrl ?? undefined)}
+        >
+          {t("traceAutoManualFallback")}
+        </Button>
+        <Button
+          variant="ghost"
+          className="flex-1 text-sm"
+          disabled={running || !publicUrl}
+          onClick={() => openAllTraceSearchEngines(publicUrl ?? undefined)}
+        >
+          {t("traceAutoOpenAllEngines")}
+        </Button>
+      </div>
 
       <p className="text-xs text-ink-subtle">{t("traceAutoPasteHint")}</p>
       <textarea
