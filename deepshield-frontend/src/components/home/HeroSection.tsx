@@ -17,6 +17,8 @@ const INFO: { titleKey: I18nKey; bodyKey: I18nKey }[] = [
 
 const TRUST_KEYS = ["trust1", "trust2", "trust3"] as const;
 
+const HERO_PHRASES: I18nKey[] = ["typewriter4", "typewriter1"];
+
 export function HeroSection() {
   const { t } = useLanguage();
 
@@ -61,7 +63,7 @@ export function HeroSection() {
         </h1>
 
         <div className="mt-5 w-full max-w-xl">
-          <TypewriterSubtitle phrases={["typewriter4", "typewriter1"]} />
+          <TypewriterSubtitle phrases={HERO_PHRASES} />
         </div>
 
         <div className="mt-8 max-w-2xl space-y-4 text-base font-normal leading-relaxed text-ink-muted md:text-lg md:leading-relaxed">

@@ -1,20 +1,22 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useRef, useState } from "react";
 import * as THREE from "three";
+
+function randomPositions(count: number) {
+  const arr = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    arr[i * 3] = (Math.random() - 0.5) * 12;
+    arr[i * 3 + 1] = (Math.random() - 0.5) * 8;
+    arr[i * 3 + 2] = (Math.random() - 0.5) * 6;
+  }
+  return arr;
+}
 
 function Points({ count = 600 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 12;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 8;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 6;
-    }
-    return arr;
-  }, [count]);
+  const [positions] = useState(() => randomPositions(count));
 
   useFrame((state) => {
     if (!ref.current) return;

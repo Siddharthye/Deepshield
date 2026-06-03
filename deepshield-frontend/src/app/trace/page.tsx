@@ -5,7 +5,6 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
-import { resizeImageForScan } from "@/lib/resizeImage";
 import { TraceResults } from "@/components/trace/TraceResults";
 import { AutomaticTrace } from "@/components/trace/AutomaticTrace";
 import { useLanguage } from "@/context/LanguageContext";

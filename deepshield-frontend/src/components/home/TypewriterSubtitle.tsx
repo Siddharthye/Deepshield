@@ -24,7 +24,7 @@ export function TypewriterSubtitle({ phrases = DEFAULT_PHRASE_KEYS }: { phrases?
   }, [language]);
 
   useEffect(() => {
-    const phrase = t(PHRASE_KEYS[phraseIdx]);
+    const phrase = t(phrases[phraseIdx]);
     const doneTyping = text === phrase;
     const doneDeleting = text === "";
 
@@ -38,7 +38,7 @@ export function TypewriterSubtitle({ phrases = DEFAULT_PHRASE_KEYS }: { phrases?
       }
       if (doneDeleting && deleting) {
         setDeleting(false);
-        setPhraseIdx((i) => (i + 1) % PHRASE_KEYS.length);
+        setPhraseIdx((i) => (i + 1) % phrases.length);
         return;
       }
       setText(
@@ -47,7 +47,7 @@ export function TypewriterSubtitle({ phrases = DEFAULT_PHRASE_KEYS }: { phrases?
     }, pause);
 
     return () => clearTimeout(timer);
-  }, [text, deleting, phraseIdx, t]);
+  }, [text, deleting, phraseIdx, t, phrases]);
 
   return (
     <p className="min-h-[1.75rem] text-center text-xl font-normal leading-snug tracking-tight text-ink-muted md:min-h-[2rem] md:text-2xl">
