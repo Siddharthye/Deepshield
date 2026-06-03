@@ -19,7 +19,7 @@ import { CtaStrip } from "@/components/sections/CtaStrip";
 import { WaveDivider } from "@/components/sections/WaveDivider";
 import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
 import { HeroPanel } from "@/components/home/HeroPanel";
-import { HeroSignals } from "@/components/home/HeroSignals";
+import { HeroGuidance } from "@/components/home/HeroGuidance";
 import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -78,7 +78,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            <HeroSignals />
+            <HeroGuidance />
           </motion.div>
           <HeroPanel />
         </div>
