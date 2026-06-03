@@ -3,6 +3,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { ClientProviders } from "@/components/layout/ClientProviders";
 import { IntroLoader } from "@/components/ui/IntroLoader";
 import { AmbientBackground } from "@/components/ui/AmbientBackground";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
@@ -36,19 +37,21 @@ export default function RootLayout({
         <AmbientBackground />
         <ScrollProgress />
         <LanguageProvider>
-          <Navbar />
-          <PageTransition>
-            <main className="relative z-10 flex-1">{children}</main>
-          </PageTransition>
-          <MobileNav />
-          <footer className="site-footer relative z-10 hidden py-8 text-center md:block">
-            <p className="text-sm font-medium text-ink/80">
-              You are not alone. You have rights.
-            </p>
-            <p className="mt-2 text-xs text-ink/55">
-              Cyber Crime Helpline 1930 · NCW 181 · iCall 9152987821
-            </p>
-          </footer>
+          <ClientProviders>
+            <Navbar />
+            <PageTransition>
+              <main className="relative z-10 flex-1">{children}</main>
+            </PageTransition>
+            <MobileNav />
+            <footer className="site-footer relative z-10 hidden py-8 text-center md:block">
+              <p className="text-sm font-medium text-ink/80">
+                You are not alone. You have rights.
+              </p>
+              <p className="mt-2 text-xs text-ink/55">
+                Cyber Crime Helpline 1930 · NCW 181 · iCall 9152987821
+              </p>
+            </footer>
+          </ClientProviders>
         </LanguageProvider>
       </body>
     </html>

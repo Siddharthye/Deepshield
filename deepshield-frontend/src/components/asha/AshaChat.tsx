@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { streamAshaChat } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
@@ -100,8 +101,8 @@ export function AshaChat({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <GlassCard className="flex flex-col overflow-hidden p-0">
+    <div className="flex h-full min-h-[min(72vh,720px)] flex-col gap-4">
+      <GlassCard className="flex h-full flex-col overflow-hidden p-0">
         <div className="flex items-center gap-4 border-b border-white/30 bg-peach/30 px-6 py-4">
           <Image
             src="/images/asha-logo.jpeg"
@@ -140,44 +141,54 @@ export function AshaChat({
           </div>
         </div>
 
-        <div className="max-h-[min(420px,50vh)] flex-1 space-y-3 overflow-y-auto p-6">
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                m.role === "user"
-                  ? "ml-auto bg-pink/40 text-ink"
-                  : "bg-cream/90 text-ink shadow-sm"
-              }`}
-            >
-              {m.content}
-              {streaming &&
-                i === messages.length - 1 &&
-                m.role === "assistant" &&
-                !m.content && (
-                  <span className="flex items-center gap-1 py-1">
-                    {[0, 1, 2].map((d) => (
-                      <span
-                        key={d}
-                        className="inline-block h-2 w-2 animate-pulse rounded-full bg-pink"
-                        style={{ animationDelay: `${d * 150}ms` }}
-                      />
-                    ))}
-                    <span className="ml-2 text-xs text-ink/60">
-                      Asha is thinking…
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-6">
+          <AnimatePresence initial={false}>
+            {messages.map((m, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  m.role === "user"
+                    ? "ml-auto bg-pink/40 text-ink"
+                    : "bg-cream/90 text-ink shadow-sm"
+                }`}
+              >
+                {m.content}
+                {streaming &&
+                  i === messages.length - 1 &&
+                  m.role === "assistant" &&
+                  !m.content && (
+                    <span className="flex items-center gap-1 py-1">
+                      {[0, 1, 2].map((d) => (
+                        <motion.span
+                          key={d}
+                          className="inline-block h-2 w-2 rounded-full bg-pink"
+                          animate={{ scale: [1, 1.35, 1], opacity: [0.5, 1, 0.5] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: d * 0.12,
+                          }}
+                        />
+                      ))}
+                      <span className="ml-2 text-xs text-ink/60">
+                        Asha is thinking…
+                      </span>
                     </span>
-                  </span>
-                )}
-              {streaming &&
-                i === messages.length - 1 &&
-                m.role === "assistant" &&
-                m.content && (
-                  <span className="ml-1 inline-block animate-pulse text-pink">
-                    ▍
-                  </span>
-                )}
-            </div>
-          ))}
+                  )}
+                {streaming &&
+                  i === messages.length - 1 &&
+                  m.role === "assistant" &&
+                  m.content && (
+                    <span className="ml-1 inline-block animate-pulse text-pink">
+                      ▍
+                    </span>
+                  )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
           <div ref={bottomRef} />
         </div>
 

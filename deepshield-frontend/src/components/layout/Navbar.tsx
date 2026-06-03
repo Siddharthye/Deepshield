@@ -21,45 +21,55 @@ export function Navbar() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
   const { scrollY } = useScroll();
-  const headerBg = useTransform(
+  const bg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(253, 246, 235, 0)", "rgba(253, 214, 193, 0.92)"],
+    ["rgba(253, 246, 235, 0)", "rgba(253, 214, 193, 0.94)"],
   );
-  const headerBlur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(20px)"]);
-  const headerBorder = useTransform(
+  const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(18px)"]);
+  const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(197, 204, 173, 0)", "rgba(197, 204, 173, 0.55)"],
+    ["rgba(197, 204, 173, 0)", "rgba(197, 204, 173, 0.5)"],
   );
+  const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
+  const radius = useTransform(scrollY, [0, 80], [0, 9999]);
+  const top = useTransform(scrollY, [0, 80], [0, 10]);
+  const left = useTransform(scrollY, [0, 80], ["0%", "50%"]);
+  const x = useTransform(scrollY, [0, 80], ["0%", "-50%"]);
 
   return (
     <motion.header
       style={{
-        backgroundColor: headerBg,
-        backdropFilter: headerBlur,
-        borderBottomColor: headerBorder,
+        backgroundColor: bg,
+        backdropFilter: blur,
+        borderColor: border,
+        maxWidth: maxW,
+        borderRadius: radius,
+        top,
+        left,
+        x,
       }}
-      className="sticky top-0 z-50 border-b"
+      className="fixed z-50 w-full border-b border-transparent shadow-sm"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2.5">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2.5 md:gap-3 md:py-3">
+        <Link href="/" className="flex items-center gap-2">
           <Image
             src="/images/ds-logo.jpeg"
             alt="DeepShield"
-            width={40}
-            height={40}
-            className="rounded-xl object-contain"
+            width={36}
+            height={36}
+            className="rounded-lg object-contain"
             unoptimized
           />
-          <span className="font-display text-lg text-ink">DeepShield</span>
+          <span className="font-display hidden text-ink sm:inline">DeepShield</span>
         </Link>
-        <nav className="flex flex-wrap items-center gap-0.5 text-sm">
+        <nav className="flex flex-wrap items-center justify-center gap-0.5 text-xs md:text-sm">
           {LINKS.map(({ href, key }) => (
             <Link
               key={href}
               href={href}
-              className={`rounded-full px-3 py-1.5 transition ${
+              className={`rounded-full px-2 py-1.5 md:px-3 ${
                 pathname === href
                   ? "bg-pink/55 font-medium text-ink"
                   : "text-ink/70 hover:bg-blue/45"
@@ -72,8 +82,8 @@ export function Navbar() {
         <select
           aria-label="Language"
           value={language}
-          onChange={(e) => setLanguage(e.target.value as typeof language)}
-          className="input-field w-auto rounded-full py-1.5 text-sm"
+          onChange={(e) => void setLanguage(e.target.value as typeof language)}
+          className="input-field w-auto max-w-[5.5rem] rounded-full py-1 text-xs md:max-w-none md:text-sm"
         >
           {LANGUAGES.map((l) => (
             <option key={l.code} value={l.code}>

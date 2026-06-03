@@ -1,5 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { ScanSession } from "./types";
+import type { TraceHit } from "./traceStorage";
 import { verdictLabel } from "./riskScoring";
 
 const INK = rgb(0.35, 0.33, 0.3);
@@ -20,6 +21,7 @@ export async function generateEvidencePdf(
   scan: ScanSession,
   traceUrls: string[],
   legalSummary?: string,
+  traceHits: TraceHit[] = [],
 ) {
   const doc = await PDFDocument.create();
   let page = doc.addPage([595, 842]);
@@ -93,7 +95,15 @@ export async function generateEvidencePdf(
   draw("Applicable laws (India)", 13, true);
   draw("IT Act §66E, §67, §67A · IPC §354C");
 
-  if (traceUrls.length) {
+  if (traceHits.length) {
+    y -= 6;
+    draw("Reverse trace log", 13, true);
+    traceHits.slice(0, 10).forEach((h) => {
+      draw(`${h.platform} — ${h.title}`, 10, true);
+      draw(h.url, 9);
+      draw(`First seen: ${h.firstSeen}`, 9);
+    });
+  } else if (traceUrls.length) {
     y -= 6;
     draw("URLs found (reverse trace)", 13, true);
     traceUrls.slice(0, 12).forEach((u) => draw(`• ${u}`, 9));

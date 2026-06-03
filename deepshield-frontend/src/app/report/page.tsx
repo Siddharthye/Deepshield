@@ -11,6 +11,7 @@ import { fetchLegalReportSummary } from "@/lib/api";
 import { loadScanSession } from "@/lib/scanSession";
 import { verdictLabel } from "@/lib/riskScoring";
 import { generateEvidencePdf, downloadBlob } from "@/lib/pdf-generator";
+import { loadTraceHits, loadTraceUrls } from "@/lib/traceStorage";
 import { useLanguage } from "@/context/LanguageContext";
 import type { ScanSession } from "@/lib/types";
 
@@ -38,9 +39,9 @@ export default function ReportPage() {
         setLegalSummary(summary);
         setSummaryLoading(false);
       }
-      const traceRaw = localStorage.getItem("deepshield_trace_urls");
-      const traceUrls = traceRaw ? (JSON.parse(traceRaw) as string[]) : [];
-      const blob = await generateEvidencePdf(scan, traceUrls, summary);
+      const traceHits = loadTraceHits();
+      const traceUrls = loadTraceUrls();
+      const blob = await generateEvidencePdf(scan, traceUrls, summary, traceHits);
       if (pdfPreview) URL.revokeObjectURL(pdfPreview);
       setPdfPreview(URL.createObjectURL(blob));
       return blob;

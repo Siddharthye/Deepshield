@@ -6,6 +6,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
+import { TraceResults } from "@/components/trace/TraceResults";
 
 const REPORT_LINKS = [
   { name: "Meta (Facebook/Instagram)", url: "https://www.facebook.com/help/contact/571927962448785" },
@@ -116,7 +117,9 @@ export default function TracePage() {
         )}
       </GlassCard>
 
-      <h2 className="font-display mb-4 text-xl text-ink">Report to platforms</h2>
+      <TraceResults />
+
+      <h2 className="font-display mb-4 mt-12 text-xl text-ink">Report to platforms</h2>
       <div className="space-y-3">
         {REPORT_LINKS.map((l) => (
           <GlassCard key={l.name}>

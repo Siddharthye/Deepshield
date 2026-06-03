@@ -248,10 +248,33 @@ body::before {
   transform: scaleY(1.4);
 }
 
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--color-pink);
   outline-offset: 2px;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-12deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-card-mobile-flip {
+    transition: transform 0.4s ease;
+  }
+  .glass-card-mobile-flip:active {
+    transform: rotateY(8deg);
+  }
 }

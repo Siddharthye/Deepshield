@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import {
   loadVaultRecords,
   saveVaultRecords,
@@ -15,7 +16,14 @@ export function VaultManager() {
   const [pin, setPin] = useState<string | null>(null);
   const [records, setRecords] = useState<VaultRecord[]>([]);
   const [shake, setShake] = useState(false);
+  const [shield, setShield] = useState(false);
+  const [burst, setBurst] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  function flashShield() {
+    setShield(true);
+    setTimeout(() => setShield(false), 900);
+  }
 
   function unlock(entered: string) {
     try {
@@ -23,6 +31,9 @@ export function VaultManager() {
       setPin(entered);
       setRecords(list);
       sessionStorage.setItem("deepshield_vault_pin", entered);
+      setBurst(true);
+      setTimeout(() => setBurst(false), 600);
+      flashShield();
     } catch {
       setShake(true);
       setTimeout(() => setShake(false), 500);
@@ -78,6 +89,7 @@ export function VaultManager() {
     a.download = `deepshield_vault_${Date.now()}.zip`;
     a.click();
     URL.revokeObjectURL(url);
+    flashShield();
   }
 
   function deleteAll() {
@@ -87,6 +99,8 @@ export function VaultManager() {
 
   if (!pin) {
     return (
+      <>
+      <ShieldOverlay show={shield} />
       <GlassCard className="mx-auto max-w-sm">
         <p className="mb-6 text-center text-sm text-ink/75">Enter a 4-digit PIN (AES-256 encrypted)</p>
         <motion.div
@@ -94,9 +108,13 @@ export function VaultManager() {
           className="mb-6 flex justify-center gap-3"
         >
           {digits.map((d, i) => (
-            <div key={i} className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}>
+            <motion.div
+              key={i}
+              animate={burst ? { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] } : {}}
+              className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
+            >
               {d ? "•" : ""}
-            </div>
+            </motion.div>
           ))}
         </motion.div>
         <input
@@ -111,11 +129,13 @@ export function VaultManager() {
           Unlock vault
         </Button>
       </GlassCard>
+      </>
     );
   }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <ShieldOverlay show={shield} />
       <GlassCard>
         <div className="flex flex-wrap gap-3">
           <Button variant="primary" onClick={() => fileRef.current?.click()}>

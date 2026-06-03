@@ -9,10 +9,12 @@ import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { explainRisk, scanImage } from "@/lib/api";
 import { analyzeFaceSymmetryScore } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
-import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
+import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
+import type { HeatmapCell } from "@/lib/clientAnalysis";
 import { computeRisk, verdictLabel } from "@/lib/riskScoring";
 import { saveScanSession } from "@/lib/scanSession";
 import { tryAddToVault } from "@/lib/vaultHelpers";
+import { playScanChime } from "@/lib/ambientSound";
 import { useLanguage } from "@/context/LanguageContext";
 import type { ExplainResult, RiskResult } from "@/lib/types";
 
@@ -73,14 +75,13 @@ export function ImageScanner() {
       setPreview(dataUrl);
       setLoading(true);
       try {
-        const [symmetryScore, artifactScore, cells] = await Promise.all([
-          analyzeFaceSymmetryScore(dataUrl),
-          analyzeOpenCvArtifactScore(dataUrl),
-          buildArtifactHeatmap(dataUrl),
-        ]);
-        setHeatmap(cells);
+        const symmetryScore = await analyzeFaceSymmetryScore(dataUrl);
+        const artifactScore = await analyzeOpenCvArtifactScore(dataUrl);
 
         const { modelScore } = await scanImage({ imageBase64: dataUrl, mimeType: mt });
+        const cells = await buildModelGuidedHeatmap(dataUrl, modelScore);
+        setHeatmap(cells);
+
         const riskResult = computeRisk({ modelScore, artifactScore, symmetryScore });
         setRisk(riskResult);
 
@@ -104,6 +105,7 @@ export function ImageScanner() {
         });
 
         setShield(true);
+        playScanChime();
         setTimeout(() => setShield(false), 900);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Scan failed");
@@ -185,6 +187,7 @@ export function ImageScanner() {
               <CompareSlider
                 originalSrc={preview}
                 overlay={<HeatmapOverlay imageSrc={preview} cells={heatmap} />}
+                overlayLabel="Model-guided"
               />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element

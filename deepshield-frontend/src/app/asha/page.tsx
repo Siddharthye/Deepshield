@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function AshaPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
+    <div className="mx-auto flex max-w-6xl flex-col px-4 py-10 md:py-14">
       <PageHeader
         badge="Companion"
         title="Asha"
@@ -14,10 +14,7 @@ export default function AshaPage() {
       >
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div
-              className="absolute -inset-2 rounded-2xl bg-pink/30 blur-lg"
-              aria-hidden
-            />
+            <div className="absolute -inset-2 rounded-2xl bg-pink/30 blur-lg" aria-hidden />
             <Image
               src="/images/asha-logo.jpeg"
               alt="Asha companion"
@@ -31,14 +28,17 @@ export default function AshaPage() {
         </div>
       </PageHeader>
 
-      <div className="mb-12">
+      <div className="mb-10 space-y-10">
         <BasicRights />
         <RightsExplainer />
       </div>
 
-      <div className="min-h-[70vh]">
+      <section
+        aria-label="Chat with Asha"
+        className="flex min-h-[calc(100vh-12rem)] flex-col rounded-3xl border border-white/40 bg-gradient-to-b from-peach/20 to-blue/15 p-1 shadow-lg md:min-h-[calc(100vh-10rem)]"
+      >
         <AshaChat />
-      </div>
+      </section>
     </div>
   );
 }
