@@ -25,6 +25,21 @@ export type ScanSession = {
   risk: RiskResult;
   explain?: ExplainResult;
   scannedAt: string;
+  heatmapDataUrl?: string;
+};
+
+export type VideoFrameResult = {
+  timeSec: number;
+  dataUrl: string;
+  finalRisk: number;
+  verdict: Verdict;
+};
+
+export type VideoScanSession = {
+  fileName: string;
+  overallRisk: number;
+  frames: VideoFrameResult[];
+  scannedAt: string;
 };
 
 export type ChatMessage = {

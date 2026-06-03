@@ -11,6 +11,7 @@ import { analyzeFaceSymmetryScore } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
 import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
+import { exportHeatmapDataUrl } from "@/lib/heatmapExport";
 import { computeRisk, verdictLabelKey } from "@/lib/riskScoring";
 import { saveScanSession } from "@/lib/scanSession";
 import { tryAddToVault } from "@/lib/vaultHelpers";
@@ -110,12 +111,20 @@ export function ImageScanner() {
         const explanation = await explainRisk({ risk: riskResult, language });
         setExplain(explanation);
 
+        let heatmapDataUrl: string | undefined;
+        try {
+          heatmapDataUrl = await exportHeatmapDataUrl(dataUrl, cells);
+        } catch {
+          /* optional */
+        }
+
         const session = {
           imageDataUrl: dataUrl,
           mimeType: mt,
           risk: riskResult,
           explain: explanation,
           scannedAt: new Date().toISOString(),
+          heatmapDataUrl,
         };
         saveScanSession(session);
 
@@ -216,6 +225,7 @@ export function ImageScanner() {
                   imageSrc={preview}
                   cells={heatmap}
                   showBaseImage
+                  animateReveal
                 />
               }
               originalLabel={t("originalLabel")}
@@ -228,6 +238,7 @@ export function ImageScanner() {
                   imageSrc={preview}
                   cells={heatmap}
                   showBaseImage
+                  animateReveal
                 />
               </div>
               <p className="mt-2 text-xs text-ink-subtle">{t("heatmapFullHint")}</p>

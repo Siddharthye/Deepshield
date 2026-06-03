@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
+import { parseTraceUrlsFromText } from "@/lib/reverseTrace";
 import { useLanguage } from "@/context/LanguageContext";
-import type { TraceHit } from "@/lib/traceStorage";
+import { appendTraceHits, loadTraceHits, saveTraceHits, type TraceHit } from "@/lib/traceStorage";
 
-const STORAGE = "deepshield_trace_results";
-
-export function TraceResults() {
+export function TraceResults({ refreshKey = 0 }: { refreshKey?: number }) {
   const { t } = useLanguage();
   const [hits, setHits] = useState<TraceHit[]>([]);
   const [platform, setPlatform] = useState("");
@@ -18,21 +17,33 @@ export function TraceResults() {
   const [firstSeen, setFirstSeen] = useState("");
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE);
-    if (raw) setHits(JSON.parse(raw) as TraceHit[]);
-  }, []);
+    setHits(loadTraceHits());
+  }, [refreshKey]);
 
   function persist(next: TraceHit[]) {
     setHits(next);
-    localStorage.setItem(STORAGE, JSON.stringify(next));
-    const urls = next.map((h) => h.url);
-    localStorage.setItem("deepshield_trace_urls", JSON.stringify(urls));
+    saveTraceHits(next);
     tryAddToVault({
       name: `trace_results_${Date.now()}.json`,
       kind: "trace",
       sizeBytes: JSON.stringify(next).length,
       payload: JSON.stringify(next),
     });
+  }
+
+  function bulkImport() {
+    const text = [platform, title, url].filter(Boolean).join("\n");
+    const parsed = parseTraceUrlsFromText(text || url);
+    if (parsed.length) {
+      const merged = appendTraceHits(parsed);
+      setHits(merged);
+      setPlatform("");
+      setTitle("");
+      setUrl("");
+      setFirstSeen("");
+      return;
+    }
+    add();
   }
 
   function add() {
@@ -79,7 +90,7 @@ export function TraceResults() {
           value={firstSeen}
           onChange={(e) => setFirstSeen(e.target.value)}
         />
-        <Button variant="primary" className="w-full" onClick={add}>
+        <Button variant="primary" className="w-full" onClick={bulkImport}>
           {t("traceAddResult")}
         </Button>
       </GlassCard>

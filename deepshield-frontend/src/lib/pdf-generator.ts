@@ -80,6 +80,24 @@ export async function generateEvidencePdf(
     /* skip image if embed fails */
   }
 
+  if (scan.heatmapDataUrl) {
+    try {
+      const hm = await embedScanImage(doc, scan.heatmapDataUrl);
+      if (hm) {
+        const dims = hm.scale(0.35);
+        if (y - dims.height < 60) {
+          page = doc.addPage([595, 842]);
+          y = 750;
+        }
+        page.drawImage(hm, { x: 50, y: y - dims.height, width: dims.width, height: dims.height });
+        y -= dims.height + 16;
+        draw(L("pdfHeatmapCapture"), 9);
+      }
+    } catch {
+      /* skip heatmap if embed fails */
+    }
+  }
+
   draw(
     `${L("pdfModelLine")} ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}% · ${L("pdfArtifacts")} ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}% · ${L("pdfSymmetry")} ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`,
   );

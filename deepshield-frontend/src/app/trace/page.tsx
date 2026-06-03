@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 import { TraceResults } from "@/components/trace/TraceResults";
+import { AutomaticTrace } from "@/components/trace/AutomaticTrace";
 import { useLanguage } from "@/context/LanguageContext";
 import type { I18nKey } from "@/lib/i18n";
 
 const REPORT_LINKS: { nameKey: I18nKey; url: string }[] = [
   { nameKey: "tracePlatformMeta", url: "https://www.facebook.com/help/contact/571927962448785" },
+  { nameKey: "tracePlatformInstagram", url: "https://help.instagram.com/" },
   { nameKey: "tracePlatformX", url: "https://help.twitter.com/forms/privacy" },
   { nameKey: "tracePlatformTelegram", url: "https://telegram.org/support" },
 ];
@@ -22,8 +23,11 @@ export default function TracePage() {
   const [saved, setSaved] = useState(false);
   const [vaultSaved, setVaultSaved] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | undefined>();
+  const [resultsKey, setResultsKey] = useState(0);
 
   function onImage(file: File) {
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -37,7 +41,7 @@ export default function TracePage() {
         subtitle={t("tracePageSubtitle")}
       />
 
-      <GlassCard className="mb-6 space-y-4">
+      <GlassCard className="mb-6">
         <label className="upload-zone py-8">
           <span className="text-sm font-medium text-ink">{t("traceUploadLabel")}</span>
           <input
@@ -50,34 +54,20 @@ export default function TracePage() {
             }}
           />
         </label>
-        {preview && (
-          <div className="relative mx-auto aspect-video max-h-48 w-full overflow-hidden rounded-xl">
-            <Image
-              src={preview}
-              alt={t("tracePreviewAlt")}
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </div>
-        )}
-        {preview && <p className="text-center text-xs text-ink-subtle">{t("traceLensHint")}</p>}
-        <a
-          href="https://lens.google.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block rounded-2xl bg-gradient-to-r from-pink/55 to-peach/60 py-3.5 text-center text-sm font-medium text-ink"
-        >
-          {t("traceOpenLens")}
-        </a>
-        <a
-          href="https://tineye.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block rounded-2xl border border-sage/50 bg-blue/45 py-3.5 text-center text-sm font-medium text-ink"
-        >
-          {t("traceOpenTinEye")}
-        </a>
+      </GlassCard>
+
+      {preview && (
+        <div className="mb-6">
+          <AutomaticTrace
+            preview={preview}
+            fileName={fileName}
+            onHitsImported={() => setResultsKey((k) => k + 1)}
+          />
+        </div>
+      )}
+
+      <GlassCard className="mb-6 space-y-4">
+        <p className="text-sm font-medium text-ink">{t("traceManualUrls")}</p>
         <textarea
           value={note}
           onChange={(e) => {
@@ -123,7 +113,7 @@ export default function TracePage() {
         )}
       </GlassCard>
 
-      <TraceResults />
+      <TraceResults refreshKey={resultsKey} />
 
       <h2 className="font-display mb-4 mt-12 text-xl text-ink">{t("traceReportPlatforms")}</h2>
       <div className="space-y-3">
