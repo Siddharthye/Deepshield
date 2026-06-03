@@ -24,7 +24,7 @@ export function AnimatedShield({ className = "" }: { className?: string }) {
       <motion.path
         d="M22 38 L30 46 L44 28"
         fill="none"
-        stroke="#3d524c"
+        stroke="#9f7cef"
         strokeWidth="2.5"
         strokeLinecap="round"
         variants={{

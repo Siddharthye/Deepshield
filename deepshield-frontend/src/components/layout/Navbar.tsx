@@ -31,7 +31,7 @@ export function Navbar() {
   const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(61, 82, 76, 0)", "rgba(61, 82, 76, 0.18)"],
+    ["rgba(159, 124, 239, 0)", "rgba(159, 124, 239, 0.2)"],
   );
   const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
   const radius = useTransform(scrollY, [0, 80], [0, 9999]);
