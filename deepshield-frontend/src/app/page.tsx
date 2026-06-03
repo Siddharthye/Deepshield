@@ -32,7 +32,7 @@ export default function HomePage() {
       <HeroParticles />
 
       <section className="relative mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <div className="grid items-stretch gap-10 lg:grid-cols-[1fr_minmax(280px,380px)]">
+        <div className="grid items-start gap-10 lg:grid-cols-[1fr_minmax(280px,380px)]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
