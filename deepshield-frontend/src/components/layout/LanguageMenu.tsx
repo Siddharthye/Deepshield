@@ -12,21 +12,27 @@ export function LanguageMenu() {
   const current = LANGUAGES.find((l) => l.code === language) ?? LANGUAGES[0];
 
   useEffect(() => {
-    function onDoc(e: MouseEvent) {
+    function onDoc(e: PointerEvent) {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     }
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("pointerdown", onDoc);
+    return () => document.removeEventListener("pointerdown", onDoc);
   }, []);
 
+  function pick(code: LanguageCode) {
+    setLanguage(code);
+    setOpen(false);
+  }
+
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative z-[80]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex h-9 w-9 items-center justify-center rounded-full border border-sage/50 bg-cream/80 text-sm text-ink shadow-sm backdrop-blur hover:bg-blue/40"
         aria-label={`Language: ${current.label}`}
         aria-expanded={open}
+        aria-haspopup="listbox"
         title={current.label}
       >
         <span aria-hidden>🌐</span>
@@ -34,7 +40,8 @@ export function LanguageMenu() {
       {open && (
         <ul
           role="listbox"
-          className="glass-card absolute right-0 top-full z-[60] mt-2 max-h-64 w-40 overflow-y-auto py-1 shadow-lg"
+          className="glass-card absolute right-0 top-full z-[80] mt-2 w-40 py-1 shadow-lg"
+          onPointerDown={(e) => e.stopPropagation()}
         >
           {LANGUAGES.map((l) => (
             <li key={l.code}>
@@ -42,12 +49,13 @@ export function LanguageMenu() {
                 type="button"
                 role="option"
                 aria-selected={language === l.code}
-                onClick={() => {
-                  setLanguage(l.code as LanguageCode);
-                  setOpen(false);
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  pick(l.code);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm transition hover:bg-peach/40 ${
-                  language === l.code ? "bg-pink/35 font-medium text-ink" : "text-ink-muted"
+                className={`w-full px-3 py-2 text-left text-sm transition hover:bg-peach/50 ${
+                  language === l.code ? "bg-pink/45 font-medium text-ink" : "text-ink-muted"
                 }`}
               >
                 {l.label}

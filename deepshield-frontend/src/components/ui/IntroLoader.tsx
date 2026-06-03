@@ -25,7 +25,7 @@ export function IntroLoader() {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ink"
+          className="intro-pink-bg fixed inset-0 z-[100] flex flex-col items-center justify-center"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, y: -40 }}
           transition={{ duration: 0.5 }}
@@ -45,7 +45,7 @@ export function IntroLoader() {
             />
           </motion.div>
           <motion.p
-            className="mt-6 max-w-xs text-center text-lg text-cream"
+            className="mt-6 max-w-xs text-center text-lg text-ink"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}

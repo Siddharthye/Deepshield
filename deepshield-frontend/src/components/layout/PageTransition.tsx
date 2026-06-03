@@ -55,7 +55,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
             transition={{ duration: 0.2 }}
           >
             <motion.div
-              className="absolute inset-0 bg-cream/94 backdrop-blur-2xl"
+              className="intro-pink-bg absolute inset-0 backdrop-blur-2xl"
               animate={{ opacity: phase === "exit" ? 0 : 1 }}
               transition={{ duration: 0.38, ease: [0.4, 0, 0.2, 1] }}
             />

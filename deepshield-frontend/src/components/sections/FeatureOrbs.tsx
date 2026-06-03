@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useLanguage } from "@/context/LanguageContext";
+import { LANGUAGES, type LanguageCode } from "@/lib/i18n";
 import { ORB_FEATURE_META, orbKeys } from "@/lib/i18n/orbKeys";
 
 const ORB_SIZE = 52;
@@ -21,7 +22,7 @@ function orbStyle(index: number, total: number) {
 }
 
 export function FeatureOrbs() {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const [active, setActive] = useState(ORB_FEATURE_META[0].id);
   const current = ORB_FEATURE_META.find((f) => f.id === active) ?? ORB_FEATURE_META[0];
   const keys = orbKeys(current.id);
@@ -34,7 +35,7 @@ export function FeatureOrbs() {
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start">
         <div
-          className="relative mx-auto shrink-0 rounded-full border border-dashed border-sage/50 bg-blue/15"
+          className="relative mx-auto shrink-0 rounded-full border border-dashed border-sage/60 bg-blue-deep/25"
           style={{ width: BOX, height: BOX }}
         >
           <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center">
@@ -98,12 +99,32 @@ export function FeatureOrbs() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={current.href}
-                className="mt-6 inline-flex rounded-full bg-gradient-to-r from-pink to-peach px-5 py-2.5 text-sm font-medium text-ink shadow-md hover:brightness-105"
-              >
-                {t("openFeature")} {t(keys.label)} {t("openFeatureArrow")}
-              </Link>
+              {current.id === "i18n" ? (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {LANGUAGES.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => setLanguage(l.code as LanguageCode)}
+                      className={`rounded-full px-5 py-2.5 text-sm font-medium shadow-md transition ${
+                        language === l.code
+                          ? "bg-gradient-to-r from-pink to-peach text-ink ring-2 ring-sage/50"
+                          : "border border-sage/50 bg-cream/90 text-ink-muted hover:bg-blue/35"
+                      }`}
+                      aria-pressed={language === l.code}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <Link
+                  href={current.href}
+                  className="mt-6 inline-flex rounded-full bg-gradient-to-r from-pink to-peach px-5 py-2.5 text-sm font-medium text-ink shadow-md hover:brightness-105"
+                >
+                  {t("openFeature")} {t(keys.label)} {t("openFeatureArrow")}
+                </Link>
+              )}
             </GlassCard>
           </motion.div>
         </AnimatePresence>

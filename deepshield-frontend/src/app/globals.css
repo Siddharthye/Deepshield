@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
-/* June palette — balanced pastels: cream, blue, sage, peach, pink accents */
+/* June palette — richer pastels (same hues, slightly deeper surfaces) */
 :root {
   --color-cream: #fdf6eb;
   --color-pink: #fdc8c2;
   --color-peach: #fdd6c1;
   --color-sage: #c5ccad;
   --color-blue: #d6e8f2;
+  --color-pink-deep: #f4b0a8;
+  --color-peach-deep: #f8c9ad;
+  --color-sage-deep: #b3baa0;
+  --color-blue-deep: #c2dae8;
+  --color-cream-deep: #f5ead8;
   --color-ink: #3d2417;
   --color-ink-muted: #523528;
   --color-ink-subtle: #6d4a3e;
@@ -16,9 +21,9 @@
   --gradient-soft: linear-gradient(
     165deg,
     var(--color-cream) 0%,
-    color-mix(in srgb, var(--color-blue) 50%, var(--color-cream)) 35%,
-    color-mix(in srgb, var(--color-sage) 35%, var(--color-cream)) 70%,
-    color-mix(in srgb, var(--color-peach) 25%, var(--color-cream)) 100%
+    color-mix(in srgb, var(--color-blue-deep) 42%, var(--color-cream)) 35%,
+    color-mix(in srgb, var(--color-sage-deep) 32%, var(--color-cream)) 70%,
+    color-mix(in srgb, var(--color-peach-deep) 28%, var(--color-cream)) 100%
   );
   --gradient-cta: linear-gradient(
     135deg,
@@ -37,6 +42,11 @@
   --color-peach: #fdd6c1;
   --color-sage: #c5ccad;
   --color-blue: #d6e8f2;
+  --color-pink-deep: #f4b0a8;
+  --color-peach-deep: #f8c9ad;
+  --color-sage-deep: #b3baa0;
+  --color-blue-deep: #c2dae8;
+  --color-cream-deep: #f5ead8;
   --color-ink: #3d2417;
   --color-ink-muted: #523528;
   --color-ink-subtle: #6d4a3e;
@@ -74,7 +84,11 @@ body::before {
 
 .glass-card {
   backdrop-filter: blur(20px);
-  background: color-mix(in srgb, var(--color-blue) 22%, color-mix(in srgb, var(--color-cream) 88%, white));
+  background: color-mix(
+    in srgb,
+    var(--color-blue-deep) 32%,
+    color-mix(in srgb, var(--color-cream-deep) 78%, white)
+  );
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
@@ -91,22 +105,22 @@ body::before {
 }
 
 .glass-card-tint-sage {
-  background: color-mix(in srgb, var(--color-sage) 28%, transparent);
+  background: color-mix(in srgb, var(--color-sage-deep) 38%, transparent);
 }
 
 .glass-card-tint-blue {
-  background: color-mix(in srgb, var(--color-blue) 35%, transparent);
+  background: color-mix(in srgb, var(--color-blue-deep) 45%, transparent);
 }
 
 .glass-card-tint-peach {
-  background: color-mix(in srgb, var(--color-peach) 22%, transparent);
+  background: color-mix(in srgb, var(--color-peach-deep) 32%, transparent);
 }
 
 .page-badge {
   display: inline-block;
   margin-bottom: 0.75rem;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--color-sage) 45%, white);
+  background: color-mix(in srgb, var(--color-sage-deep) 52%, var(--color-cream-deep));
   padding: 0.25rem 0.875rem;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -143,7 +157,7 @@ body::before {
   height: 480px;
   top: 4%;
   left: -4%;
-  background: color-mix(in srgb, var(--color-blue) 55%, transparent);
+  background: color-mix(in srgb, var(--color-blue-deep) 62%, transparent);
   animation: drift-blue 26s ease-in-out infinite;
 }
 
@@ -152,7 +166,7 @@ body::before {
   height: 440px;
   right: -6%;
   top: 28%;
-  background: color-mix(in srgb, var(--color-sage) 50%, transparent);
+  background: color-mix(in srgb, var(--color-sage-deep) 58%, transparent);
   animation: drift-sage 24s ease-in-out infinite;
 }
 
@@ -161,7 +175,7 @@ body::before {
   height: 360px;
   bottom: 6%;
   left: 30%;
-  background: color-mix(in srgb, var(--color-peach) 35%, transparent);
+  background: color-mix(in srgb, var(--color-peach-deep) 44%, transparent);
   animation: drift-peach 28s ease-in-out infinite reverse;
 }
 
@@ -170,7 +184,7 @@ body::before {
   height: 280px;
   bottom: 20%;
   right: 20%;
-  background: color-mix(in srgb, var(--color-pink) 28%, transparent);
+  background: color-mix(in srgb, var(--color-pink-deep) 38%, transparent);
   animation: drift-pink 22s ease-in-out infinite;
 }
 
@@ -212,8 +226,8 @@ body::before {
 .input-field {
   width: 100%;
   border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--color-sage) 55%, transparent);
-  background: color-mix(in srgb, var(--color-cream) 92%, white);
+  border: 1px solid color-mix(in srgb, var(--color-sage-deep) 62%, transparent);
+  background: color-mix(in srgb, var(--color-cream-deep) 88%, white);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: var(--color-ink);
@@ -263,8 +277,8 @@ a.text-link:hover,
   align-items: center;
   justify-content: center;
   border-radius: 1.25rem;
-  border: 2px dashed color-mix(in srgb, var(--color-sage) 55%, var(--color-blue));
-  background: color-mix(in srgb, var(--color-blue) 25%, var(--color-cream));
+  border: 2px dashed color-mix(in srgb, var(--color-sage-deep) 62%, var(--color-blue-deep));
+  background: color-mix(in srgb, var(--color-blue-deep) 32%, var(--color-cream-deep));
   padding: 3rem 1.5rem;
   transition:
     border-color 0.25s ease,
@@ -273,8 +287,8 @@ a.text-link:hover,
 }
 
 .upload-zone:hover {
-  border-color: color-mix(in srgb, var(--color-sage) 70%, var(--color-blue));
-  background: color-mix(in srgb, var(--color-sage) 30%, var(--color-cream));
+  border-color: color-mix(in srgb, var(--color-sage-deep) 75%, var(--color-blue-deep));
+  background: color-mix(in srgb, var(--color-sage-deep) 38%, var(--color-cream-deep));
   transform: translateY(-2px);
 }
 
@@ -301,8 +315,8 @@ a.text-link:hover,
 }
 
 .site-footer {
-  border-top: 1px solid color-mix(in srgb, var(--color-sage) 45%, transparent);
-  background: color-mix(in srgb, var(--color-blue) 35%, var(--color-cream));
+  border-top: 1px solid color-mix(in srgb, var(--color-sage-deep) 52%, transparent);
+  background: color-mix(in srgb, var(--color-blue-deep) 42%, var(--color-cream-deep));
   backdrop-filter: blur(12px);
 }
 
@@ -312,11 +326,20 @@ a.text-link:hover,
 }
 
 .section-alt-blue {
-  background: color-mix(in srgb, var(--color-blue) 18%, transparent);
+  background: color-mix(in srgb, var(--color-blue-deep) 28%, transparent);
 }
 
 .section-alt-sage {
-  background: color-mix(in srgb, var(--color-sage) 15%, transparent);
+  background: color-mix(in srgb, var(--color-sage-deep) 24%, transparent);
+}
+
+.intro-pink-bg {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-pink-deep) 88%, var(--color-cream)) 0%,
+    color-mix(in srgb, var(--color-peach-deep) 75%, var(--color-cream)) 48%,
+    var(--color-cream) 100%
+  );
 }
 
 .timeline-segment {
