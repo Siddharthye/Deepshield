@@ -96,8 +96,8 @@ export function VaultManager() {
   const fileRef = useRef<HTMLInputElement>(null);
   const pinInputRef = useRef<HTMLInputElement>(null);
   const confirmInputRef = useRef<HTMLInputElement>(null);
-  const pinAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const confirmAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pinAdvanceTimer = useRef<number | null>(null);
+  const confirmAdvanceTimer = useRef<number | null>(null);
 
   function clearPinAdvanceTimer() {
     if (pinAdvanceTimer.current) {
