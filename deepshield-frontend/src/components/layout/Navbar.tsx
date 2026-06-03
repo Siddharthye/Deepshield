@@ -7,6 +7,7 @@ import { useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
+import { useAuth } from "@/context/AuthContext";
 
 const LINKS = [
   { href: "/", key: "navHome" as const },
@@ -22,6 +23,7 @@ const LINKS = [
 export function Navbar() {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const { user, signOut } = useAuth();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 48));
@@ -95,7 +97,37 @@ export function Navbar() {
             );
           })}
         </nav>
-        <LanguageMenu scrolled={scrolled} />
+        <div className="flex shrink-0 items-center gap-1.5">
+          {user ? (
+            <button
+              type="button"
+              onClick={signOut}
+              className={`ui-nowrap hidden rounded-full px-2.5 py-1.5 text-xs font-medium sm:inline md:text-sm ${
+                scrolled
+                  ? "text-cream-deep/90 hover:bg-cream-deep/12"
+                  : "text-ink-muted hover:bg-secondary/8"
+              }`}
+            >
+              {t("navSignOut")}
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className={`ui-nowrap rounded-full px-2.5 py-1.5 text-xs font-medium md:text-sm ${
+                pathname === "/login"
+                  ? scrolled
+                    ? "bg-cream-deep/20 text-cream-deep ring-1 ring-cream-deep/35"
+                    : "bg-secondary/12 text-ink ring-1 ring-secondary/30"
+                  : scrolled
+                    ? "text-cream-deep/90 hover:bg-cream-deep/12"
+                    : "text-ink-muted hover:bg-secondary/8"
+              }`}
+            >
+              {t("navLogin")}
+            </Link>
+          )}
+          <LanguageMenu scrolled={scrolled} />
+        </div>
       </div>
     </motion.header>
   );

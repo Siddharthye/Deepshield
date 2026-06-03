@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { SafetyRibbon } from "@/components/layout/SafetyRibbon";
 import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -33,19 +35,22 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="relative flex min-h-full flex-col pb-16 md:pb-0">
+      <body className="relative flex min-h-full flex-col pb-28 md:pb-12">
         <AmbientBackground />
         <ScrollProgress />
         <LanguageProvider>
-          <IntroLoader />
-          <ClientProviders>
-            <Navbar />
-            <PageTransition>
-              <main className="relative z-10 flex-1">{children}</main>
-            </PageTransition>
-            <MobileNav />
-            <SiteFooter />
-          </ClientProviders>
+          <AuthProvider>
+            <IntroLoader />
+            <ClientProviders>
+              <Navbar />
+              <PageTransition>
+                <main className="relative z-10 flex-1">{children}</main>
+              </PageTransition>
+              <MobileNav />
+              <SiteFooter />
+              <SafetyRibbon />
+            </ClientProviders>
+          </AuthProvider>
         </LanguageProvider>
       </body>
     </html>
