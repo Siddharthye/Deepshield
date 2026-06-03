@@ -6,6 +6,19 @@
   --color-sage: #c2c6b9;
   --color-rose: #dba1a2;
   --color-espresso: #422b23;
+  --gradient-soft: linear-gradient(
+    160deg,
+    var(--color-fantasy) 0%,
+    color-mix(in srgb, var(--color-blush) 55%, var(--color-fantasy)) 45%,
+    color-mix(in srgb, var(--color-rose) 18%, var(--color-fantasy)) 100%
+  );
+  --gradient-cta: linear-gradient(
+    135deg,
+    var(--color-rose) 0%,
+    var(--color-blush) 100%
+  );
+  --shadow-soft: 0 8px 32px rgba(66, 43, 35, 0.06);
+  --shadow-glow: 0 4px 24px rgba(219, 161, 162, 0.35);
 }
 
 @theme inline {
@@ -15,28 +28,223 @@
   --color-rose: #dba1a2;
   --color-espresso: #422b23;
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-cormorant);
 }
 
 body {
-  background: var(--color-fantasy);
+  background: var(--gradient-soft);
+  background-attachment: fixed;
   color: var(--color-espresso);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   min-height: 100vh;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.font-display {
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+}
+
 .glass-card {
   backdrop-filter: blur(20px);
-  background: rgba(239, 216, 214, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(239, 216, 214, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  transition:
+    backdrop-filter 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
   backdrop-filter: blur(28px);
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-glow);
 }
 
-/* PRD palette only — no extra brand colors */
+.page-badge {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-blush) 70%, white);
+  padding: 0.25rem 0.875rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-espresso) 75%, var(--color-rose));
+}
+
+.page-header::after {
+  content: "";
+  display: block;
+  margin-top: 1.25rem;
+  height: 2px;
+  width: 4rem;
+  border-radius: 2px;
+  background: var(--gradient-cta);
+}
+
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.ambient-orb-rose {
+  width: 420px;
+  height: 420px;
+  top: 8%;
+  left: -8%;
+  background: color-mix(in srgb, var(--color-rose) 28%, transparent);
+  animation: drift-rose 22s ease-in-out infinite;
+}
+
+.ambient-orb-sage {
+  width: 380px;
+  height: 380px;
+  right: -6%;
+  bottom: 12%;
+  background: color-mix(in srgb, var(--color-sage) 22%, transparent);
+  animation: drift-sage 26s ease-in-out infinite;
+}
+
+.ambient-orb-blush {
+  width: 320px;
+  height: 320px;
+  top: 45%;
+  left: 40%;
+  background: color-mix(in srgb, var(--color-blush) 35%, transparent);
+  animation: drift-blush 20s ease-in-out infinite reverse;
+}
+
+@keyframes drift-rose {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(48px, 32px) scale(1.08);
+  }
+}
+
+@keyframes drift-sage {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-40px, -24px);
+  }
+}
+
+@keyframes drift-blush {
+  0%,
+  100% {
+    transform: translate(-20px, 20px);
+  }
+  50% {
+    transform: translate(30px, -30px);
+  }
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--gradient-cta);
+  transform: scaleX(0);
+}
+
+.input-field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-sage) 55%, transparent);
+  background: color-mix(in srgb, var(--color-fantasy) 90%, white);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-espresso);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-rose);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-rose) 25%, transparent);
+}
+
+.upload-zone {
+  display: flex;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.25rem;
+  border: 2px dashed color-mix(in srgb, var(--color-rose) 45%, var(--color-sage));
+  background: color-mix(in srgb, var(--color-fantasy) 85%, var(--color-blush));
+  padding: 3rem 1.5rem;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.2s ease;
+}
+
+.upload-zone:hover {
+  border-color: var(--color-rose);
+  background: color-mix(in srgb, var(--color-blush) 40%, var(--color-fantasy));
+  transform: translateY(-2px);
+}
+
+.pin-dot {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--color-sage) 60%, transparent);
+  background: color-mix(in srgb, var(--color-fantasy) 95%, white);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-espresso);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.pin-dot.filled {
+  border-color: var(--color-rose);
+  background: var(--gradient-cta);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow);
+}
+
+.site-footer {
+  border-top: 1px solid color-mix(in srgb, var(--color-sage) 35%, transparent);
+  background: color-mix(in srgb, var(--color-blush) 25%, var(--color-fantasy));
+  backdrop-filter: blur(12px);
+}
+
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,

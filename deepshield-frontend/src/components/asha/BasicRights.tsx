@@ -41,7 +41,7 @@ export function BasicRights() {
     <section aria-labelledby="basic-rights-heading">
       <h2
         id="basic-rights-heading"
-        className="mb-4 text-xl font-semibold text-espresso"
+        className="font-display mb-4 text-2xl font-semibold text-espresso"
       >
         Know your basic rights
       </h2>

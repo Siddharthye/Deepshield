@@ -112,7 +112,9 @@ export function AshaChat({
             unoptimized
           />
           <div>
-            <h2 className="text-lg font-semibold text-espresso">Chat with Asha</h2>
+            <h2 className="font-display text-lg font-semibold text-espresso">
+              Chat with Asha
+            </h2>
             <p className="text-xs text-espresso/70">
               Emotional support & legal rights questions only
             </p>
@@ -130,7 +132,7 @@ export function AshaChat({
                 type="button"
                 onClick={() => handleQuick(q)}
                 disabled={streaming}
-                className="rounded-full bg-blush/80 px-3 py-1.5 text-xs text-espresso transition hover:bg-rose/40 disabled:opacity-50"
+                className="rounded-full bg-blush/80 px-3 py-1.5 text-xs text-espresso transition hover:bg-rose/50 disabled:opacity-50"
               >
                 {q}
               </button>
@@ -186,13 +188,13 @@ export function AshaChat({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
               placeholder="Share how you feel, or ask about your rights…"
-              className="flex-1 rounded-full border border-sage/50 bg-fantasy px-4 py-2.5 text-sm text-espresso outline-none focus:border-rose"
+              className="input-field flex-1 rounded-full"
             />
             <button
               type="button"
               onClick={() => send()}
               disabled={streaming}
-              className="rounded-full bg-espresso px-5 py-2.5 text-sm font-medium text-fantasy transition hover:bg-espresso/90 disabled:opacity-50"
+              className="rounded-full bg-gradient-to-r from-rose to-blush px-5 py-2.5 text-sm font-medium text-espresso shadow-md transition hover:brightness-105 disabled:opacity-50"
             >
               Send
             </button>
@@ -204,7 +206,7 @@ export function AshaChat({
         <button
           type="button"
           onClick={() => setCrisisOpen((o) => !o)}
-          className="w-full rounded-full border border-rose/50 bg-rose/30 px-5 py-3 text-sm font-semibold text-espresso transition hover:bg-blush"
+          className="w-full rounded-full border border-rose/50 bg-gradient-to-r from-rose/40 to-blush/50 px-5 py-3 text-sm font-semibold text-espresso transition hover:from-rose/55 hover:to-blush/60"
         >
           I need immediate help
         </button>

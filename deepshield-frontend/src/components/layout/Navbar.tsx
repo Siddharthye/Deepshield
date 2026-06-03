@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { LANGUAGES } from "@/lib/i18n";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -19,30 +20,51 @@ const LINKS = [
 export function Navbar() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
+  const { scrollY } = useScroll();
+  const headerBg = useTransform(
+    scrollY,
+    [0, 80],
+    ["rgba(247, 243, 237, 0)", "rgba(239, 216, 214, 0.92)"],
+  );
+  const headerBlur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(20px)"]);
+  const headerBorder = useTransform(
+    scrollY,
+    [0, 80],
+    ["rgba(194, 198, 185, 0)", "rgba(194, 198, 185, 0.5)"],
+  );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-sage/30 bg-blush/50 backdrop-blur-xl">
+    <motion.header
+      style={{
+        backgroundColor: headerBg,
+        backdropFilter: headerBlur,
+        borderBottomColor: headerBorder,
+      }}
+      className="sticky top-0 z-50 border-b"
+    >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2.5">
           <Image
             src="/images/ds-logo.jpeg"
             alt="DeepShield"
-            width={40}
-            height={40}
-            className="rounded-lg object-contain"
+            width={44}
+            height={44}
+            className="rounded-xl object-contain shadow-sm"
             unoptimized
           />
-          <span className="text-lg font-semibold text-espresso">DeepShield</span>
+          <span className="font-display text-xl font-semibold text-espresso">
+            DeepShield
+          </span>
         </Link>
-        <nav className="flex flex-wrap items-center gap-1 text-sm">
+        <nav className="flex flex-wrap items-center gap-0.5 text-sm">
           {LINKS.map(({ href, key }) => (
             <Link
               key={href}
               href={href}
               className={`rounded-full px-3 py-1.5 transition ${
                 pathname === href
-                  ? "bg-rose/40 text-espresso"
-                  : "text-espresso/80 hover:bg-blush"
+                  ? "bg-rose/50 font-medium text-espresso shadow-sm"
+                  : "text-espresso/75 hover:bg-blush/70"
               }`}
             >
               {t(key)}
@@ -53,7 +75,7 @@ export function Navbar() {
           aria-label="Language"
           value={language}
           onChange={(e) => setLanguage(e.target.value as typeof language)}
-          className="rounded-full border border-sage/50 bg-fantasy px-3 py-1.5 text-sm text-espresso"
+          className="input-field w-auto rounded-full py-1.5 text-sm"
         >
           {LANGUAGES.map((l) => (
             <option key={l.code} value={l.code}>
@@ -62,6 +84,6 @@ export function Navbar() {
           ))}
         </select>
       </div>
-    </header>
+    </motion.header>
   );
 }

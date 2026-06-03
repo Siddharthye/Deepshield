@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
 import { moderatePost } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -68,14 +70,18 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-2 text-3xl font-semibold text-espresso">Community shield</h1>
-      <p className="mb-8 text-espresso/70">Anonymous stories — stored only on your device.</p>
-      <GlassCard className="mb-8 space-y-3">
+    <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
+      <PageHeader
+        badge="Community"
+        title="Community shield"
+        subtitle="Anonymous stories and solidarity — stored only on your device."
+      />
+
+      <GlassCard className="mb-8 space-y-4">
         <select
           value={tag}
           onChange={(e) => setTag(e.target.value)}
-          className="rounded-lg border border-sage/40 bg-fantasy px-3 py-2 text-sm"
+          className="input-field"
         >
           {TAGS.map((t) => (
             <option key={t}>{t}</option>
@@ -86,25 +92,28 @@ export default function CommunityPage() {
           onChange={(e) => setText(e.target.value.slice(0, 300))}
           rows={3}
           placeholder="Share advice or solidarity (max 300 chars)…"
-          className="w-full rounded-xl border border-sage/40 bg-fantasy p-3 text-sm"
+          className="input-field"
         />
-        <button
-          type="button"
-          onClick={publish}
-          disabled={posting}
-          className="rounded-full bg-rose px-5 py-2 text-sm font-medium text-espresso"
-        >
+        <p className="text-right text-xs text-espresso/50">{text.length}/300</p>
+        <Button variant="primary" onClick={publish} disabled={posting} className="w-full">
           {posting ? "Checking…" : "Post anonymously"}
-        </button>
+        </Button>
         {error && <p className="text-sm text-rose">{error}</p>}
       </GlassCard>
+
       <div className="space-y-4">
+        {posts.length === 0 && (
+          <p className="text-center text-sm text-espresso/60">
+            No posts yet. You can be the first voice of support.
+          </p>
+        )}
         {posts.map((p) => (
           <GlassCard key={p.id}>
-            <p className="text-xs text-espresso/60">
-              {p.author} · {p.tag}
-            </p>
-            <p className="mt-2 text-sm">{p.text}</p>
+            <p className="text-xs font-medium text-rose">{p.author}</p>
+            <span className="mt-1 inline-block rounded-full bg-blush/50 px-2 py-0.5 text-xs text-espresso/70">
+              {p.tag}
+            </span>
+            <p className="mt-3 text-sm leading-relaxed">{p.text}</p>
             <button
               type="button"
               onClick={() =>
@@ -114,7 +123,7 @@ export default function CommunityPage() {
                   ),
                 )
               }
-              className="mt-3 text-sm text-rose"
+              className="mt-4 text-sm font-medium text-rose transition hover:text-espresso"
             >
               ♥ {p.hearts}
             </button>
