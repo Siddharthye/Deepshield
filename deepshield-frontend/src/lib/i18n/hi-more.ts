@@ -215,6 +215,9 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
     "खोज के लिए छवि होस्ट नहीं हो सकी। नीचे मैन्युअल खोज खोलें, फिर URL चिपकाएँ।",
   traceAutoSearching: "Yandex, Bing और Google पर आपकी छवि खोज रहे हैं…",
   traceAutoFound: "{n} मिलान मिले — ट्रेस लॉग में सहेजे।",
+  traceDemoPhotoBtn: "डेमो फ़ोटो आज़माएँ (1 गारंटीड मिलान)",
+  traceDemoPhotoHint: "प्रस्तुति के लिए — API key के बिना एक नमूना Wikipedia मिलान लॉग होगा।",
+  traceAutoDemoFound: "डेमो: ट्रेस लॉग में {n} नमूना मिलान दर्ज किया।",
   traceAutoNoApiKey:
     "छवि होस्ट हो गई। इन-ऐप मिलान के लिए backend पर SERPAPI_API_KEY या SERPER_API_KEY चाहिए (Vercel → deepshield-xi → Environment)।",
   traceAutoNoResults:

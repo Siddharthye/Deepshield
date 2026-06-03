@@ -213,6 +213,9 @@ export const EN_MORE = {
     "Could not host the image for search. Use manual search tabs below, then paste URLs.",
   traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
   traceAutoFound: "Found {n} match(es) — saved to your trace log.",
+  traceDemoPhotoBtn: "Try demo photo (1 guaranteed match)",
+  traceDemoPhotoHint: "For presentations — logs one sample Wikipedia match without an API key.",
+  traceAutoDemoFound: "Demo: logged {n} sample match to your trace log.",
   traceAutoNoApiKey:
     "Image hosted. In-app matching needs SERPAPI_API_KEY or SERPER_API_KEY on the backend (Vercel → deepshield-xi → Environment). Free tiers: serpapi.com or serper.dev.",
   traceAutoNoResults:

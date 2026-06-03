@@ -5,7 +5,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
-import { resizeImageForScan } from "@/lib/resizeImage";
+import { DEMO_TRACE_IMAGE_URL } from "@/lib/traceDemo";
 import { TraceResults } from "@/components/trace/TraceResults";
 import { AutomaticTrace } from "@/components/trace/AutomaticTrace";
 import { useLanguage } from "@/context/LanguageContext";
@@ -26,12 +26,20 @@ export default function TracePage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | undefined>();
   const [resultsKey, setResultsKey] = useState(0);
+  const [demoMode, setDemoMode] = useState(false);
 
   function onImage(file: File) {
+    setDemoMode(false);
     setFileName(file.name);
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
+  }
+
+  function loadDemoPhoto() {
+    setDemoMode(true);
+    setFileName("demo-trace.jpg");
+    setPreview(DEMO_TRACE_IMAGE_URL);
   }
 
   return (
@@ -42,8 +50,8 @@ export default function TracePage() {
         subtitle={t("tracePageSubtitle")}
       />
 
-      <GlassCard className="mb-6">
-        <label className="upload-zone py-8">
+      <GlassCard className="mb-6 space-y-4">
+        <label className="upload-zone block py-8">
           <span className="text-sm font-medium text-ink">{t("traceUploadLabel")}</span>
           <input
             type="file"
@@ -51,10 +59,14 @@ export default function TracePage() {
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) void onImage(f);
+              if (f) onImage(f);
             }}
           />
         </label>
+        <Button variant="secondary" className="w-full" onClick={loadDemoPhoto}>
+          {t("traceDemoPhotoBtn")}
+        </Button>
+        <p className="text-center text-xs text-ink-subtle">{t("traceDemoPhotoHint")}</p>
       </GlassCard>
 
       {preview && (
@@ -62,6 +74,7 @@ export default function TracePage() {
           <AutomaticTrace
             preview={preview}
             fileName={fileName}
+            demoMode={demoMode}
             onHitsImported={() => setResultsKey((k) => k + 1)}
           />
         </div>

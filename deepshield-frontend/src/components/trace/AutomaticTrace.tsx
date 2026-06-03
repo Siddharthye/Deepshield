@@ -12,16 +12,19 @@ import {
   parseTraceUrlsFromText,
   publishTraceImage,
 } from "@/lib/reverseTrace";
+import { DEMO_TRACE_IMAGE_URL, getDemoTraceHits } from "@/lib/traceDemo";
 import { appendTraceHits, type TraceHit } from "@/lib/traceStorage";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 
 type Props = {
   preview: string;
   fileName?: string;
+  /** Skip API lookup and log one guaranteed demo hit (for presentations). */
+  demoMode?: boolean;
   onHitsImported?: () => void;
 };
 
-export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
+export function AutomaticTrace({ preview, fileName, demoMode = false, onHitsImported }: Props) {
   const { t } = useLanguage();
   const [running, setRunning] = useState(false);
   const [paste, setPaste] = useState("");
@@ -42,6 +45,17 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         sizeBytes: preview.length,
         payload: preview,
       });
+
+      if (demoMode) {
+        const hits = getDemoTraceHits();
+        appendTraceHits(hits);
+        setImported(hits.length);
+        setPreviewHits(hits);
+        setPublicUrl(preview.startsWith("http") ? preview : DEMO_TRACE_IMAGE_URL);
+        onHitsImported?.();
+        setStatus(t("traceAutoDemoFound").replace("{n}", String(hits.length)));
+        return;
+      }
 
       setStatus(t("traceAutoHosting"));
       let hosted: string;
