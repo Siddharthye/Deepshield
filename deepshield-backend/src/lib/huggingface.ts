@@ -1,6 +1,9 @@
-import { apiError, type ApiErrorCode, type ApiErrorResponse } from "./apiError";
-
 type HfJson = unknown;
+
+const HF_ROUTER_CHAT_URL =
+  "https://router.huggingface.co/v1/chat/completions";
+const HF_ROUTER_INFERENCE_BASE =
+  "https://router.huggingface.co/hf-inference/models";
 
 function hfToken() {
   const token = process.env.HF_API_TOKEN;
@@ -8,22 +11,34 @@ function hfToken() {
   return token;
 }
 
-function hfDeepfakeModelUrl() {
-  const url = process.env.HF_DEEPFAKE_MODEL_URL;
-  if (!url) throw new Error("HF_DEEPFAKE_MODEL_URL missing");
-  return url;
-}
-
-function hfLlmModelUrl() {
-  const url = process.env.HF_LLM_MODEL_URL;
-  if (!url) throw new Error("HF_LLM_MODEL_URL missing");
-  return url;
-}
-
 function hfTimeoutMs() {
   const raw = process.env.HF_TIMEOUT_MS;
   const n = raw ? Number(raw) : 30000;
   return Number.isFinite(n) ? n : 30000;
+}
+
+/** Extract model id from env (plain id or legacy full URL). */
+function resolveModelId(envValue: string | undefined, fallback: string): string {
+  const v = (envValue ?? "").trim();
+  if (!v) return fallback;
+  if (!v.includes("://") && !v.startsWith("http")) return v;
+  const match = v.match(/\/models\/([^/?#]+)/);
+  return match?.[1] ?? fallback;
+}
+
+function hfDeepfakeInferenceUrl() {
+  const modelId = resolveModelId(
+    process.env.HF_DEEPFAKE_MODEL_URL,
+    "dima806/deepfake_vs_real_image_detection",
+  );
+  return `${HF_ROUTER_INFERENCE_BASE}/${modelId}`;
+}
+
+function hfLlmModelId() {
+  return resolveModelId(
+    process.env.HF_LLM_MODEL_URL,
+    "mistralai/Mistral-7B-Instruct-v0.3",
+  );
 }
 
 function clamp01(n: number) {
@@ -46,55 +61,144 @@ function safeJsonParse<T>(text: string): T | null {
   }
 }
 
-export async function callHfDeepfakeModelBase64(args: {
-  base64: string; // raw base64 (no data: prefix)
-}): Promise<number> {
-  const url = hfDeepfakeModelUrl();
-
+async function hfFetch(
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), hfTimeoutMs());
-
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${hfToken()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ inputs: args.base64 }),
-      signal: ctrl.signal,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HF deepfake model http ${res.status}`);
-    }
-
-    const data: HfJson = await res.json();
-    // Expected: array of { label, score }
-    if (Array.isArray(data)) {
-      const arr = data as Array<{ label?: string; score?: number }>;
-      const fake = arr.find((x) => {
-        const label = (x.label ?? "").toLowerCase();
-        return label.includes("fake") || label.includes("deepfake");
-      });
-      if (fake && typeof fake.score === "number") return clamp01(fake.score);
-
-      // Fallback: REAL/FAKE label
-      const byLabel = (label: string) =>
-        arr.find((x) => (x.label ?? "").toUpperCase() === label && typeof x.score === "number");
-      const fake2 = byLabel("FAKE") ?? byLabel("DEEPFAKE");
-      if (fake2) return clamp01(fake2.score as number);
-
-      // Else: first with score
-      const first = arr.find((x) => typeof x.score === "number");
-      if (first) return clamp01(first.score as number);
-    }
-
-    // Unknown shape → best-effort return 0
-    return 0;
+    const res = await fetch(url, { ...init, signal: ctrl.signal });
+    return res;
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "fetch failed";
+    const err = new Error(msg);
+    (err as { code?: string }).code = "UPSTREAM_ERROR";
+    throw err;
   } finally {
     clearTimeout(t);
   }
+}
+
+async function readUpstreamError(res: Response): Promise<string> {
+  try {
+    const text = await res.text();
+    return text.slice(0, 500);
+  } catch {
+    return "";
+  }
+}
+
+export async function callHfDeepfakeModelBase64(args: {
+  base64: string;
+}): Promise<number> {
+  const url = hfDeepfakeInferenceUrl();
+
+  const res = await hfFetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${hfToken()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ inputs: args.base64 }),
+  });
+
+  if (!res.ok) {
+    const detail = await readUpstreamError(res);
+    throw new Error(
+      `HF deepfake model http ${res.status}${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  const data: HfJson = await res.json();
+  if (Array.isArray(data)) {
+    const arr = data as Array<{ label?: string; score?: number }>;
+    const fake = arr.find((x) => {
+      const label = (x.label ?? "").toLowerCase();
+      return label.includes("fake") || label.includes("deepfake");
+    });
+    if (fake && typeof fake.score === "number") return clamp01(fake.score);
+
+    const byLabel = (label: string) =>
+      arr.find(
+        (x) =>
+          (x.label ?? "").toUpperCase() === label && typeof x.score === "number",
+      );
+    const fake2 = byLabel("FAKE") ?? byLabel("DEEPFAKE");
+    if (fake2) return clamp01(fake2.score as number);
+
+    const first = arr.find((x) => typeof x.score === "number");
+    if (first) return clamp01(first.score as number);
+  }
+
+  return 0;
+}
+
+function parseSystemUserPrompt(prompt: string): {
+  system?: string;
+  user: string;
+} {
+  const match = prompt.match(
+    /^System:\n([\s\S]*?)\n\nUser:\n([\s\S]*?)\n\nAssistant:\s*$/,
+  );
+  if (match) {
+    return { system: match[1], user: match[2] };
+  }
+  return { user: prompt };
+}
+
+function buildChatMessages(prompt: string): Array<{
+  role: "system" | "user" | "assistant";
+  content: string;
+}> {
+  const { system, user } = parseSystemUserPrompt(prompt);
+  const messages: Array<{
+    role: "system" | "user" | "assistant";
+    content: string;
+  }> = [];
+  if (system) messages.push({ role: "system", content: system });
+  messages.push({ role: "user", content: user });
+  return messages;
+}
+
+function extractChatCompletionText(data: unknown): string {
+  const d = data as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const content = d?.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content;
+  throw new Error("HF LLM returned unexpected chat completion shape");
+}
+
+async function hfChatCompletion(args: {
+  prompt: string;
+  maxTokens: number;
+  temperature: number;
+  stream?: boolean;
+}): Promise<Response> {
+  const res = await hfFetch(HF_ROUTER_CHAT_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${hfToken()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: hfLlmModelId(),
+      messages: buildChatMessages(args.prompt),
+      max_tokens: args.maxTokens,
+      temperature: args.temperature,
+      stream: args.stream ?? false,
+    }),
+  });
+
+  if (!res.ok) {
+    const detail = await readUpstreamError(res);
+    throw new Error(
+      `HF LLM http ${res.status}${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return res;
 }
 
 async function hfTextGen(args: {
@@ -102,49 +206,9 @@ async function hfTextGen(args: {
   maxTokens: number;
   temperature: number;
 }): Promise<string> {
-  const url = hfLlmModelUrl();
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), hfTimeoutMs());
-
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${hfToken()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: args.prompt,
-        parameters: {
-          max_new_tokens: args.maxTokens,
-          temperature: args.temperature,
-          return_full_text: false,
-        },
-        options: { wait_for_model: true },
-      }),
-      signal: ctrl.signal,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HF LLM http ${res.status}`);
-    }
-
-    const data: any = await res.json();
-
-    // Common patterns across text-generation models:
-    // - [{ generated_text: "..." }]
-    // - { generated_text: "..." }
-    if (Array.isArray(data) && data.length > 0 && typeof data[0]?.generated_text === "string") {
-      return data[0].generated_text;
-    }
-    if (typeof data?.generated_text === "string") return data.generated_text;
-    if (typeof data?.text === "string") return data.text;
-
-    // Unknown: stringify for best-effort parsing.
-    return typeof data === "string" ? data : JSON.stringify(data);
-  } finally {
-    clearTimeout(t);
-  }
+  const res = await hfChatCompletion({ ...args, stream: false });
+  const data = await res.json();
+  return extractChatCompletionText(data);
 }
 
 export async function callHfTextGenJson<T>(args: {
@@ -171,25 +235,23 @@ export async function callHfTextGenText(args: {
   return text.trim();
 }
 
-function tokenFromUnknownChunk(chunkText: string): string | null {
-  // HF streaming is SSE-ish. We try to parse `data:` payloads if present.
-  // If we can't parse JSON, we fall back to returning raw chunk text.
+function tokenFromOpenAiChunk(chunkText: string): string | null {
   const trimmed = chunkText.trim();
-  if (!trimmed) return null;
+  if (!trimmed || trimmed === "[DONE]") return null;
 
-  // Some SSE payloads look like: {"token": {"text": "H"}}
-  const asObj = safeJsonParse<any>(trimmed);
-  if (asObj) {
-    const t = asObj?.token?.text;
-    if (typeof t === "string") return t;
-    const text = asObj?.token?.content;
-    if (typeof text === "string") return text;
-    if (typeof asObj?.generated_text === "string") return asObj.generated_text;
-    if (typeof asObj?.text === "string") return asObj.text;
+  const asObj = safeJsonParse<{
+    choices?: Array<{ delta?: { content?: string } }>;
+    token?: { text?: string };
+    generated_text?: string;
+  }>(trimmed);
+
+  if (asObj?.choices?.[0]?.delta?.content) {
+    return asObj.choices[0].delta.content;
   }
+  if (asObj?.token?.text) return asObj.token.text;
+  if (asObj?.generated_text) return asObj.generated_text;
 
-  // Sometimes the payload is plain token text.
-  return trimmed;
+  return null;
 }
 
 export async function* streamHfTextGenTokens(args: {
@@ -197,45 +259,20 @@ export async function* streamHfTextGenTokens(args: {
   maxTokens: number;
   temperature: number;
 }): AsyncGenerator<string> {
-  const url = hfLlmModelUrl();
-  const ctrl = new AbortController();
-  const timeout = hfTimeoutMs();
-  const t = setTimeout(() => ctrl.abort(), timeout);
+  const res = await hfChatCompletion({ ...args, stream: true });
 
+  const decoder = new TextDecoder("utf-8");
+  let buffer = "";
+  const body = res.body;
+  if (!body) throw new Error("HF LLM streaming has no body");
+
+  const reader = body.getReader();
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${hfToken()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: args.prompt,
-        parameters: {
-          max_new_tokens: args.maxTokens,
-          temperature: args.temperature,
-        },
-        stream: true,
-        options: { wait_for_model: true },
-      }),
-      signal: ctrl.signal,
-    });
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
 
-    if (!res.ok) {
-      throw new Error(`HF LLM streaming http ${res.status}`);
-    }
-
-    // Parse SSE stream. We don't assume a strict format; we extract `data:` lines.
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
-
-    const body = res.body;
-    if (!body) throw new Error("HF LLM streaming has no body");
-
-    for await (const chunk of body as any) {
-      buffer += decoder.decode(chunk, { stream: true });
-
-      // SSE events separated by blank line.
       const parts = buffer.split("\n\n");
       buffer = parts.pop() ?? "";
 
@@ -244,20 +281,19 @@ export async function* streamHfTextGenTokens(args: {
           const trimmed = line.trim();
           if (!trimmed.startsWith("data:")) continue;
           const payload = trimmed.slice("data:".length).trim();
-          if (!payload || payload === "[DONE]") continue;
-
-          const maybeToken = tokenFromUnknownChunk(payload);
-          if (maybeToken) yield maybeToken;
+          const token = tokenFromOpenAiChunk(payload);
+          if (token) yield token;
         }
       }
     }
   } finally {
-    clearTimeout(t);
+    reader.releaseLock();
   }
 }
 
-export function formatLlmPromptSystemUser(args: { system: string; user: string }) {
-  // Generic text-generation prompt wrapper that works for many instruct models.
+export function formatLlmPromptSystemUser(args: {
+  system: string;
+  user: string;
+}) {
   return `System:\n${args.system}\n\nUser:\n${args.user}\n\nAssistant:`;
 }
-
