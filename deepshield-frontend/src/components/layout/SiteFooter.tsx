@@ -11,7 +11,7 @@ export function SiteFooter() {
       <p className="text-sm font-medium text-ink-muted">{t("footerLine1")}</p>
       <p className="mt-2 text-xs text-ink-subtle">{t("footerLine2")}</p>
       <div className="mt-4 flex justify-center md:hidden">
-        <LanguageMenu />
+        <LanguageMenu onDark />
       </div>
     </footer>
   );

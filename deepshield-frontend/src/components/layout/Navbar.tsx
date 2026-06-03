@@ -56,7 +56,7 @@ export function Navbar() {
       }}
       className="fixed z-50 w-full border-b border-transparent shadow-sm"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2.5 md:gap-3 md:py-3">
+      <div className="mx-auto flex max-w-6xl flex-nowrap items-center justify-between gap-2 px-4 py-2.5 md:gap-3 md:py-3">
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/images/ds-logo.jpeg"
@@ -72,7 +72,7 @@ export function Navbar() {
             DeepShield
           </span>
         </Link>
-        <nav className="flex flex-wrap items-center justify-center gap-0.5 text-xs md:text-sm">
+        <nav className="flex min-w-0 flex-1 flex-nowrap items-center justify-center gap-0.5 overflow-x-auto text-xs md:text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {LINKS.map(({ href, key }) => {
             const active =
               href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
@@ -80,7 +80,7 @@ export function Navbar() {
               <Link
                 key={href}
                 href={href}
-                className={`rounded-full px-2 py-1.5 md:px-3 ${
+                className={`ui-nowrap shrink-0 rounded-full px-2 py-1.5 md:px-3 ${
                   active
                     ? scrolled
                       ? "bg-cream-deep/20 font-medium text-cream-deep ring-1 ring-cream-deep/35"
@@ -95,7 +95,7 @@ export function Navbar() {
             );
           })}
         </nav>
-        <LanguageMenu />
+        <LanguageMenu scrolled={scrolled} />
       </div>
     </motion.header>
   );

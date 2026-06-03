@@ -15,6 +15,8 @@ import {
   type VaultRecord,
 } from "@/lib/encryption";
 
+const PIN_COMPLETE_DELAY_MS = 500;
+
 const KIND_KEYS: Record<VaultRecord["kind"], I18nKey> = {
   scan: "vaultKindScan",
   trace: "vaultKindTrace",
@@ -94,6 +96,29 @@ export function VaultManager() {
   const fileRef = useRef<HTMLInputElement>(null);
   const pinInputRef = useRef<HTMLInputElement>(null);
   const confirmInputRef = useRef<HTMLInputElement>(null);
+  const pinAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const confirmAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function clearPinAdvanceTimer() {
+    if (pinAdvanceTimer.current) {
+      clearTimeout(pinAdvanceTimer.current);
+      pinAdvanceTimer.current = null;
+    }
+  }
+
+  function clearConfirmAdvanceTimer() {
+    if (confirmAdvanceTimer.current) {
+      clearTimeout(confirmAdvanceTimer.current);
+      confirmAdvanceTimer.current = null;
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      clearPinAdvanceTimer();
+      clearConfirmAdvanceTimer();
+    };
+  }, []);
 
   useEffect(() => {
     setMode(vaultExists() ? "unlock" : "setup");
@@ -147,8 +172,16 @@ export function VaultManager() {
     }
   }
 
+  function goToConfirmStep(entered: string) {
+    setDraftPin(entered);
+    setSetupStep("confirm");
+    setConfirmValue("");
+    window.setTimeout(() => confirmInputRef.current?.focus(), 50);
+  }
+
   function setupVault(entered: string, confirm: string) {
     if (entered !== confirm) {
+      clearConfirmAdvanceTimer();
       setPinMismatch(true);
       setShake(true);
       setConfirmValue("");
@@ -165,25 +198,34 @@ export function VaultManager() {
 
   function onPinValueChange(value: string) {
     setPinValue(value);
-    if (mode === "unlock" && value.length === 4) {
-      unlock(value);
-    }
-    if (mode === "setup" && setupStep === "create" && value.length === 4) {
-      setDraftPin(value);
-      setSetupStep("confirm");
-      setConfirmValue("");
-      window.setTimeout(() => confirmInputRef.current?.focus(), 50);
-    }
+    clearPinAdvanceTimer();
+    if (value.length !== 4) return;
+
+    pinAdvanceTimer.current = window.setTimeout(() => {
+      pinAdvanceTimer.current = null;
+      if (mode === "unlock") {
+        unlock(value);
+      } else if (mode === "setup" && setupStep === "create") {
+        goToConfirmStep(value);
+      }
+    }, PIN_COMPLETE_DELAY_MS);
   }
 
   function onConfirmValueChange(value: string) {
     setConfirmValue(value);
-    if (value.length === 4) {
-      setupVault(draftPin, value);
-    }
+    clearConfirmAdvanceTimer();
+    if (value.length !== 4) return;
+
+    const pin = draftPin;
+    confirmAdvanceTimer.current = window.setTimeout(() => {
+      confirmAdvanceTimer.current = null;
+      setupVault(pin, value);
+    }, PIN_COMPLETE_DELAY_MS);
   }
 
   function lockVault() {
+    clearPinAdvanceTimer();
+    clearConfirmAdvanceTimer();
     setPin(null);
     setRecords([]);
     sessionStorage.removeItem("deepshield_vault_pin");
@@ -328,14 +370,11 @@ export function VaultManager() {
             onClick={() => {
               if (mode === "setup") {
                 if (setupStep === "create" && pinValue.length === 4) {
-                  setDraftPin(pinValue);
-                  setSetupStep("confirm");
-                  setConfirmValue("");
-                  confirmInputRef.current?.focus();
-                } else if (setupStep === "confirm") {
+                  goToConfirmStep(pinValue);
+                } else if (setupStep === "confirm" && confirmValue.length === 4) {
                   setupVault(draftPin, confirmValue);
                 }
-              } else {
+              } else if (pinValue.length === 4) {
                 unlock(pinValue);
               }
             }}

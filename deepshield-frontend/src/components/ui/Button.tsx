@@ -16,7 +16,7 @@ const variants = {
 type Variant = keyof typeof variants;
 
 function baseClasses(variant: Variant, className = "") {
-  return `relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium ${variants[variant]} ${className}`;
+  return `ui-nowrap relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium ${variants[variant]} ${className}`;
 }
 
 type ButtonProps = {

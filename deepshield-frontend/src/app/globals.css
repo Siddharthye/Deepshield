@@ -108,6 +108,24 @@ body {
   font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+p,
+li,
+blockquote {
+  text-wrap: pretty;
 }
 
 body::before {
@@ -168,6 +186,12 @@ body::before {
   font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--color-parchment);
+  text-wrap: nowrap;
+}
+
+/* Short labels: stay on one line when space allows */
+.ui-nowrap {
+  text-wrap: nowrap;
 }
 
 .page-header::after {

@@ -15,7 +15,6 @@ import { HomeProblem } from "@/components/sections/HomeProblem";
 import { HomeMission } from "@/components/sections/HomeMission";
 import { HomeFaq } from "@/components/sections/HomeFaq";
 import { Testimonials } from "@/components/sections/Testimonials";
-import { CtaStrip } from "@/components/sections/CtaStrip";
 import { WaveDivider } from "@/components/sections/WaveDivider";
 import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
 import { HeroPanel } from "@/components/home/HeroPanel";
@@ -50,7 +49,7 @@ export default function HomePage() {
                 unoptimized
               />
             </div>
-            <div className="min-w-0 flex-1">
+            <div className="flex-1">
               <p className="page-badge">{t("tagline")}</p>
               <h1 className="font-display text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem]">
                 {t("heroTitle")}
@@ -62,7 +61,7 @@ export default function HomePage() {
                 {TRUST_KEYS.map((key) => (
                   <li
                     key={key}
-                    className="rounded-full bg-cream-tan/80 px-3 py-1 text-xs font-medium text-ink-muted ring-1 ring-secondary/15"
+                    className="ui-nowrap rounded-full bg-cream-tan/80 px-3 py-1 text-xs font-medium text-ink-muted ring-1 ring-secondary/15"
                   >
                     {t(key)}
                   </li>
@@ -121,7 +120,6 @@ export default function HomePage() {
       <HowItWorksPinned />
       <Testimonials />
       <HomeFaq />
-      <CtaStrip />
     </div>
   );
 }
