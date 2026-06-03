@@ -41,22 +41,22 @@ export function BasicRights() {
     <section aria-labelledby="basic-rights-heading">
       <h2
         id="basic-rights-heading"
-        className="font-display mb-4 text-2xl font-semibold text-espresso"
+        className="font-display mb-4 text-2xl font-semibold text-ink"
       >
         Know your basic rights
       </h2>
-      <p className="mb-6 text-sm text-espresso/75">
+      <p className="mb-6 text-sm text-ink/75">
         These summaries are for quick reference. Ask Asha below for personalised
         guidance in plain language.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         {BASIC_RIGHTS.map((law) => (
           <GlassCard key={law.title}>
-            <p className="text-xs font-medium uppercase tracking-wide text-rose">
+            <p className="text-xs font-medium uppercase tracking-wide text-pink">
               {law.subtitle}
             </p>
-            <h3 className="mt-1 font-semibold text-espresso">{law.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-espresso/85">
+            <h3 className="mt-1 font-semibold text-ink">{law.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink/85">
               {law.body}
             </p>
           </GlassCard>

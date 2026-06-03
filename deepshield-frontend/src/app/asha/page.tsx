@@ -14,7 +14,7 @@ export default function AshaPage() {
         <div className="flex items-center gap-4">
           <div className="relative">
             <div
-              className="absolute -inset-2 rounded-2xl bg-rose/30 blur-lg"
+              className="absolute -inset-2 rounded-2xl bg-pink/30 blur-lg"
               aria-hidden
             />
             <Image
@@ -22,7 +22,7 @@ export default function AshaPage() {
               alt="Asha companion"
               width={80}
               height={80}
-              className="relative rounded-2xl object-cover shadow-md ring-2 ring-blush/60"
+              className="relative rounded-2xl object-cover shadow-md ring-2 ring-peach/60"
               priority
               unoptimized
             />

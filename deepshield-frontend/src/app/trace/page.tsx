@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -14,21 +15,45 @@ const REPORT_LINKS = [
 export default function TracePage() {
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  function onImage(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => setPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
       <PageHeader
         badge="Trace"
         title="Reverse image tracer"
-        subtitle="Use Google Lens and TinEye to find where your image appears online, then save links to your vault."
+        subtitle="Upload your photo, search with Lens or TinEye, and save URLs for your evidence report."
       />
 
-      <GlassCard className="space-y-4">
+      <GlassCard className="mb-6 space-y-4">
+        <label className="upload-zone py-8">
+          <span className="text-sm font-medium text-ink">Upload image to trace</span>
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onImage(f);
+            }}
+          />
+        </label>
+        {preview && (
+          <div className="relative mx-auto aspect-video max-h-48 w-full overflow-hidden rounded-xl">
+            <Image src={preview} alt="Trace preview" fill className="object-contain" unoptimized />
+          </div>
+        )}
         <a
           href="https://lens.google.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="block rounded-2xl bg-gradient-to-r from-rose/50 to-blush/60 px-4 py-4 text-center text-sm font-medium text-espresso transition hover:brightness-105"
+          className="block rounded-2xl bg-gradient-to-r from-pink/55 to-peach/60 py-3.5 text-center text-sm font-medium text-ink"
         >
           Open Google Lens
         </a>
@@ -36,7 +61,7 @@ export default function TracePage() {
           href="https://tineye.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="block rounded-2xl border border-sage/40 bg-blush/40 px-4 py-4 text-center text-sm font-medium text-espresso transition hover:bg-blush/70"
+          className="block rounded-2xl border border-sage/50 bg-blue/45 py-3.5 text-center text-sm font-medium text-ink"
         >
           Open TinEye
         </a>
@@ -67,18 +92,12 @@ export default function TracePage() {
             setSaved(true);
           }}
         >
-          Save URLs locally
+          Save URLs for report
         </Button>
-        {saved && (
-          <p className="text-center text-sm text-rose">
-            URLs saved for your report.
-          </p>
-        )}
+        {saved && <p className="text-center text-sm text-pink">Saved locally.</p>}
       </GlassCard>
 
-      <h2 className="font-display mb-4 mt-12 text-xl font-semibold text-espresso">
-        Report to platforms
-      </h2>
+      <h2 className="font-display mb-4 text-xl text-ink">Report to platforms</h2>
       <div className="space-y-3">
         {REPORT_LINKS.map((l) => (
           <GlassCard key={l.name}>
@@ -86,9 +105,9 @@ export default function TracePage() {
               href={l.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-rose underline decoration-blush underline-offset-4 hover:text-espresso"
+              className="text-sm font-medium text-pink underline underline-offset-4"
             >
-              {l.name} — takedown / privacy form
+              {l.name}
             </a>
           </GlassCard>
         ))}

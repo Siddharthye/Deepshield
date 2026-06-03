@@ -14,11 +14,11 @@ export function PageHeader({
   return (
     <header className="page-header mb-10">
       {badge && <p className="page-badge">{badge}</p>}
-      <h1 className="font-display text-3xl font-semibold text-espresso md:text-4xl">
+      <h1 className="font-display text-3xl font-semibold text-ink md:text-4xl">
         {title}
       </h1>
       {subtitle && (
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-espresso/75">
+        <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink/75">
           {subtitle}
         </p>
       )}

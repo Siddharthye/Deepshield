@@ -1,4 +1,4 @@
-import { ImageScanner } from "@/components/scan/ImageScanner";
+import { ScanCenter } from "@/components/scan/ScanCenter";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function ScanPage() {
@@ -7,9 +7,9 @@ export default function ScanPage() {
       <PageHeader
         badge="Detection"
         title="Scan center"
-        subtitle="Upload an image to run three-signal analysis and receive a trauma-informed, plain-language explanation."
+        subtitle="Image and video analysis with three combined signals — model, artifacts, and symmetry — plus a visual heatmap."
       />
-      <ImageScanner />
+      <ScanCenter />
     </div>
   );
 }

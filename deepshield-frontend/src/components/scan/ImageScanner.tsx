@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { HeatmapOverlay } from "@/components/scan/HeatmapOverlay";
 import { explainRisk, scanImage } from "@/lib/api";
+import {
+  analyzeArtifactScore,
+  analyzeSymmetryScore,
+  buildArtifactHeatmap,
+  type HeatmapCell,
+} from "@/lib/clientAnalysis";
 import { computeRisk, verdictLabel } from "@/lib/riskScoring";
 import { saveScanSession } from "@/lib/scanSession";
 import { useLanguage } from "@/context/LanguageContext";
@@ -14,12 +20,9 @@ const SCAN_STEPS = [
   "Analyzing facial geometry…",
   "Checking compression artifacts…",
   "Running deepfake model…",
+  "Building heatmap…",
   "Preparing your explanation…",
 ];
-
-function estimateClientScores(): { artifactScore: number; symmetryScore: number } {
-  return { artifactScore: 0.35, symmetryScore: 0.28 };
-}
 
 export function ImageScanner() {
   const { language } = useLanguage();
@@ -30,12 +33,14 @@ export function ImageScanner() {
   const [error, setError] = useState<string | null>(null);
   const [risk, setRisk] = useState<RiskResult | null>(null);
   const [explain, setExplain] = useState<ExplainResult | null>(null);
+  const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
+  const [showHeatmap, setShowHeatmap] = useState(true);
 
   useEffect(() => {
     if (!loading) return;
     const id = setInterval(() => {
       setStepIndex((i) => (i + 1) % SCAN_STEPS.length);
-    }, 1400);
+    }, 1200);
     return () => clearInterval(id);
   }, [loading]);
 
@@ -43,6 +48,7 @@ export function ImageScanner() {
     setError(null);
     setRisk(null);
     setExplain(null);
+    setHeatmap([]);
     setStepIndex(0);
 
     const mt = file.type || "image/jpeg";
@@ -54,15 +60,21 @@ export function ImageScanner() {
       setPreview(dataUrl);
       setLoading(true);
       try {
+        const [artifactScore, symmetryScore, cells] = await Promise.all([
+          analyzeArtifactScore(dataUrl),
+          analyzeSymmetryScore(dataUrl),
+          buildArtifactHeatmap(dataUrl),
+        ]);
+        setHeatmap(cells);
+
         const { modelScore } = await scanImage({
           imageBase64: dataUrl,
           mimeType: mt,
         });
-        const client = estimateClientScores();
         const riskResult = computeRisk({
           modelScore,
-          artifactScore: client.artifactScore,
-          symmetryScore: client.symmetryScore,
+          artifactScore,
+          symmetryScore,
         });
         setRisk(riskResult);
 
@@ -92,10 +104,8 @@ export function ImageScanner() {
     <div className="space-y-6">
       <GlassCard>
         <label className="upload-zone">
-          <span className="font-display text-lg font-medium text-espresso">
-            Upload JPG or PNG
-          </span>
-          <span className="mt-2 text-sm text-espresso/60">Max 8MB · stays in your browser</span>
+          <span className="font-display text-lg text-ink">Upload JPG or PNG</span>
+          <span className="mt-2 text-sm text-ink/60">Max 8MB · analyzed in your browser</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
@@ -110,108 +120,90 @@ export function ImageScanner() {
 
       <AnimatePresence>
         {loading && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            <GlassCard className="relative overflow-hidden">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <GlassCard>
               {preview && (
-                <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-xl">
-                  <Image
-                    src={preview}
-                    alt="Scanning"
-                    fill
-                    className="object-contain opacity-90"
-                    unoptimized
-                  />
+                <div className="relative mb-4 aspect-video overflow-hidden rounded-xl">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={preview} alt="" className="h-full w-full object-contain opacity-90" />
                   <motion.div
-                    className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-rose to-transparent shadow-[0_0_20px_rgba(219,161,162,0.8)]"
+                    className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-pink to-transparent"
                     animate={{ top: ["0%", "100%", "0%"] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{ duration: 2, repeat: Infinity }}
                   />
                 </div>
               )}
-              <p className="text-center text-sm font-medium text-espresso">
-                {SCAN_STEPS[stepIndex]}
-              </p>
-              <div className="mt-4 flex justify-center gap-1.5">
-                {SCAN_STEPS.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`h-1.5 w-6 rounded-full transition-colors ${
-                      i === stepIndex ? "bg-rose" : "bg-sage/40"
-                    }`}
-                  />
-                ))}
-              </div>
+              <p className="text-center text-sm text-ink">{SCAN_STEPS[stepIndex]}</p>
             </GlassCard>
           </motion.div>
         )}
       </AnimatePresence>
 
       {error && (
-        <GlassCard className="border-rose/50">
-          <p className="text-sm text-espresso">{error}</p>
+        <GlassCard>
+          <p className="text-sm text-ink">{error}</p>
         </GlassCard>
       )}
 
       {preview && risk && !loading && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
           className="grid gap-6 lg:grid-cols-2"
         >
           <GlassCard>
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-blush/50">
-              <Image
-                src={preview}
-                alt="Uploaded"
-                fill
-                className="object-contain"
-                unoptimized
-              />
+            <div className="mb-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowHeatmap(false)}
+                className={`rounded-full px-3 py-1 text-xs ${!showHeatmap ? "bg-pink/50" : "bg-blue/40"}`}
+              >
+                Original
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowHeatmap(true)}
+                className={`rounded-full px-3 py-1 text-xs ${showHeatmap ? "bg-pink/50" : "bg-blue/40"}`}
+              >
+                Heatmap
+              </button>
+            </div>
+            <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-peach/50">
+              {showHeatmap && heatmap.length > 0 ? (
+                <HeatmapOverlay imageSrc={preview} cells={heatmap} />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={preview} alt="Uploaded" className="h-full w-full object-contain" />
+              )}
             </div>
           </GlassCard>
           <GlassCard>
-            <p className="text-sm text-espresso/70">Manipulation risk</p>
-            <p className="font-display text-5xl font-semibold text-espresso">
-              {risk.finalRisk}%
-            </p>
-            <p className="mt-2 text-xl font-medium text-rose">
-              {verdictLabel(risk.verdict)}
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-espresso/80">
-              <li className="flex justify-between gap-4">
-                <span>Model signal</span>
-                <span className="font-medium">
-                  {(risk.breakdown.modelScore * 100).toFixed(0)}%
-                </span>
+            <p className="text-sm text-ink/70">Manipulation risk</p>
+            <p className="font-display text-5xl text-ink">{risk.finalRisk}%</p>
+            <p className="mt-2 text-xl font-medium text-pink">{verdictLabel(risk.verdict)}</p>
+            <ul className="mt-4 space-y-2 text-sm text-ink/80">
+              <li className="flex justify-between">
+                <span>Model</span>
+                <span>{(risk.breakdown.modelScore * 100).toFixed(0)}%</span>
               </li>
-              <li className="flex justify-between gap-4">
+              <li className="flex justify-between">
                 <span>Artifacts</span>
-                <span className="font-medium">
-                  {(risk.breakdown.artifactScore * 100).toFixed(0)}%
-                </span>
+                <span>{(risk.breakdown.artifactScore * 100).toFixed(0)}%</span>
               </li>
-              <li className="flex justify-between gap-4">
+              <li className="flex justify-between">
                 <span>Symmetry</span>
-                <span className="font-medium">
-                  {(risk.breakdown.symmetryScore * 100).toFixed(0)}%
-                </span>
+                <span>{(risk.breakdown.symmetryScore * 100).toFixed(0)}%</span>
               </li>
             </ul>
             {explain && (
-              <div className="mt-6 space-y-3 border-t border-blush/40 pt-4 text-sm leading-relaxed">
+              <div className="mt-6 space-y-3 border-t border-peach/40 pt-4 text-sm">
                 <p>{explain.explanation}</p>
-                <ul className="list-disc space-y-1 pl-5 text-espresso/80">
+                <ul className="list-disc pl-5 text-ink/80">
                   {explain.key_signals.map((s) => (
                     <li key={s}>{s}</li>
                   ))}
                 </ul>
-                <p className="rounded-xl bg-blush/30 px-4 py-3 font-medium text-espresso">
-                  {explain.recommendation}
-                </p>
+                <p className="rounded-xl bg-peach/35 px-4 py-3 font-medium">{explain.recommendation}</p>
               </div>
             )}
           </GlassCard>

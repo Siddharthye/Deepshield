@@ -94,23 +94,23 @@ export default function CommunityPage() {
           placeholder="Share advice or solidarity (max 300 chars)…"
           className="input-field"
         />
-        <p className="text-right text-xs text-espresso/50">{text.length}/300</p>
+        <p className="text-right text-xs text-ink/50">{text.length}/300</p>
         <Button variant="primary" onClick={publish} disabled={posting} className="w-full">
           {posting ? "Checking…" : "Post anonymously"}
         </Button>
-        {error && <p className="text-sm text-rose">{error}</p>}
+        {error && <p className="text-sm text-pink">{error}</p>}
       </GlassCard>
 
       <div className="space-y-4">
         {posts.length === 0 && (
-          <p className="text-center text-sm text-espresso/60">
+          <p className="text-center text-sm text-ink/60">
             No posts yet. You can be the first voice of support.
           </p>
         )}
         {posts.map((p) => (
           <GlassCard key={p.id}>
-            <p className="text-xs font-medium text-rose">{p.author}</p>
-            <span className="mt-1 inline-block rounded-full bg-blush/50 px-2 py-0.5 text-xs text-espresso/70">
+            <p className="text-xs font-medium text-pink">{p.author}</p>
+            <span className="mt-1 inline-block rounded-full bg-peach/50 px-2 py-0.5 text-xs text-ink/70">
               {p.tag}
             </span>
             <p className="mt-3 text-sm leading-relaxed">{p.text}</p>
@@ -123,7 +123,7 @@ export default function CommunityPage() {
                   ),
                 )
               }
-              className="mt-4 text-sm font-medium text-rose transition hover:text-espresso"
+              className="mt-4 text-sm font-medium text-pink transition hover:text-ink"
             >
               ♥ {p.hearts}
             </button>

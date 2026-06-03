@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 
 const variants = {
   primary:
-    "bg-gradient-to-r from-rose to-blush text-espresso shadow-[0_4px_20px_rgba(219,161,162,0.45)] hover:shadow-[0_6px_28px_rgba(219,161,162,0.55)] hover:brightness-105",
+    "bg-gradient-to-r from-pink to-peach text-ink shadow-[0_4px_20px_rgba(253,200,194,0.5)] hover:brightness-105",
   secondary:
-    "border border-sage/50 bg-blush/50 text-espresso hover:bg-blush hover:border-rose/40",
-  dark: "bg-espresso text-fantasy hover:bg-espresso/90",
-  ghost: "text-rose hover:bg-blush/40",
+    "border border-sage/60 bg-blue/40 text-ink hover:bg-blue/60",
+  dark: "bg-ink text-cream hover:opacity-90",
+  ghost: "text-pink hover:bg-peach/50",
 } as const;
 
 type Variant = keyof typeof variants;

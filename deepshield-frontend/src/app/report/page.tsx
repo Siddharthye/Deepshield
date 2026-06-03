@@ -1,41 +1,55 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { loadScanSession } from "@/lib/scanSession";
 import { verdictLabel } from "@/lib/riskScoring";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { generateEvidencePdf, downloadBlob } from "@/lib/pdf-generator";
 import type { ScanSession } from "@/lib/types";
+
+const STEPS = [
+  "Review your scan summary and risk score below.",
+  "Download the branded PDF evidence report.",
+  "Open cybercrime.gov.in — no need to identify yourself in DeepShield.",
+  "Call 1930 if you need immediate cyber crime support.",
+];
 
 export default function ReportPage() {
   const [scan, setScan] = useState<ScanSession | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     setScan(loadScanSession());
   }, []);
 
-  function downloadSummary() {
+  async function downloadPdf() {
+    if (!scan) return;
+    setPdfLoading(true);
+    try {
+      const traceRaw = localStorage.getItem("deepshield_trace_urls");
+      const traceUrls = traceRaw ? (JSON.parse(traceRaw) as string[]) : [];
+      const blob = await generateEvidencePdf(scan, traceUrls);
+      downloadBlob(blob, `deepshield_evidence_${Date.now()}.pdf`);
+    } finally {
+      setPdfLoading(false);
+    }
+  }
+
+  function downloadTxt() {
     if (!scan) return;
     const lines = [
       "DeepShield Evidence Summary",
       `Date: ${scan.scannedAt}`,
       `Risk: ${scan.risk.finalRisk}% — ${verdictLabel(scan.risk.verdict)}`,
-      `Model score: ${scan.risk.breakdown.modelScore}`,
       scan.explain?.explanation ?? "",
       scan.explain?.recommendation ?? "",
-      "",
-      "File at: cybercrime.gov.in",
-      "Helpline: 1930",
     ];
     const blob = new Blob([lines.join("\n")], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `deepshield_evidence_${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(blob, `deepshield_evidence_${Date.now()}.txt`);
   }
 
   return (
@@ -43,14 +57,43 @@ export default function ReportPage() {
       <PageHeader
         badge="Evidence"
         title="Legal evidence report"
-        subtitle="Build a case summary from your latest scan. Branded PDF export can be added next — text summary is available now."
+        subtitle="Case builder with PDF export and guided steps toward filing at the National Cyber Crime Portal."
       />
+
+      <GlassCard className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-wide text-pink">Filing guide</p>
+        <ol className="mt-4 space-y-3">
+          {STEPS.map((s, i) => (
+            <li
+              key={s}
+              className={`flex gap-3 text-sm ${i === step ? "font-medium text-ink" : "text-ink/65"}`}
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink/40 text-xs">
+                {i + 1}
+              </span>
+              {s}
+            </li>
+          ))}
+        </ol>
+        <div className="mt-4 flex gap-2">
+          <Button variant="secondary" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>
+            Back
+          </Button>
+          <Button
+            variant="primary"
+            disabled={step >= STEPS.length - 1}
+            onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
+          >
+            Next step
+          </Button>
+        </div>
+      </GlassCard>
 
       {!scan ? (
         <GlassCard>
-          <p className="text-sm text-espresso/80">
+          <p className="text-sm text-ink/80">
             No scan yet.{" "}
-            <Link href="/scan" className="font-medium text-rose underline">
+            <Link href="/scan" className="font-medium text-pink underline">
               Run a scan first
             </Link>
             .
@@ -59,35 +102,34 @@ export default function ReportPage() {
       ) : (
         <GlassCard className="space-y-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-rose">
-              Verdict
-            </p>
-            <p className="font-display mt-1 text-2xl font-semibold text-espresso">
+            <p className="text-xs font-semibold uppercase tracking-wide text-pink">Preview</p>
+            <p className="font-display mt-1 text-2xl text-ink">
               {verdictLabel(scan.risk.verdict)} · {scan.risk.finalRisk}%
             </p>
           </div>
           {scan.explain && (
             <>
               <p className="text-sm leading-relaxed">{scan.explain.explanation}</p>
-              <p className="rounded-xl bg-blush/35 px-4 py-3 text-sm font-medium">
+              <p className="rounded-xl bg-peach/35 px-4 py-3 text-sm font-medium">
                 {scan.explain.recommendation}
               </p>
             </>
           )}
-          <p className="text-xs text-espresso/60">
-            Laws referenced: IT Act 66E, 67, 67A · IPC 354C
-          </p>
+          <p className="text-xs text-ink/55">Laws: IT Act 66E, 67, 67A · IPC 354C</p>
           <div className="flex flex-wrap gap-3">
-            <Button variant="primary" onClick={downloadSummary}>
-              Download evidence summary
+            <Button variant="primary" onClick={downloadPdf} disabled={pdfLoading}>
+              {pdfLoading ? "Building PDF…" : "Download PDF report"}
+            </Button>
+            <Button variant="secondary" onClick={downloadTxt}>
+              Text summary
             </Button>
             <a
               href="https://cybercrime.gov.in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border border-sage/50 bg-blush/50 px-5 py-2.5 text-sm font-medium text-espresso transition hover:bg-blush"
+              className="inline-flex items-center rounded-full border border-sage/60 bg-blue/40 px-5 py-2.5 text-sm font-medium text-ink"
             >
-              File at cybercrime.gov.in
+              Open cybercrime.gov.in
             </a>
           </div>
         </GlassCard>

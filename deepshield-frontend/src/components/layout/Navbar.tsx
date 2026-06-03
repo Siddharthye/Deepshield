@@ -24,13 +24,13 @@ export function Navbar() {
   const headerBg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(247, 243, 237, 0)", "rgba(239, 216, 214, 0.92)"],
+    ["rgba(253, 246, 235, 0)", "rgba(253, 214, 193, 0.92)"],
   );
   const headerBlur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(20px)"]);
   const headerBorder = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(194, 198, 185, 0)", "rgba(194, 198, 185, 0.5)"],
+    ["rgba(197, 204, 173, 0)", "rgba(197, 204, 173, 0.55)"],
   );
 
   return (
@@ -47,14 +47,12 @@ export function Navbar() {
           <Image
             src="/images/ds-logo.jpeg"
             alt="DeepShield"
-            width={44}
-            height={44}
-            className="rounded-xl object-contain shadow-sm"
+            width={40}
+            height={40}
+            className="rounded-xl object-contain"
             unoptimized
           />
-          <span className="font-display text-xl font-semibold text-espresso">
-            DeepShield
-          </span>
+          <span className="font-display text-lg text-ink">DeepShield</span>
         </Link>
         <nav className="flex flex-wrap items-center gap-0.5 text-sm">
           {LINKS.map(({ href, key }) => (
@@ -63,8 +61,8 @@ export function Navbar() {
               href={href}
               className={`rounded-full px-3 py-1.5 transition ${
                 pathname === href
-                  ? "bg-rose/50 font-medium text-espresso shadow-sm"
-                  : "text-espresso/75 hover:bg-blush/70"
+                  ? "bg-pink/55 font-medium text-ink"
+                  : "text-ink/70 hover:bg-blue/45"
               }`}
             >
               {t(key)}

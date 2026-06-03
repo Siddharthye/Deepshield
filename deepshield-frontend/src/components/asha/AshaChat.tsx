@@ -102,7 +102,7 @@ export function AshaChat({
   return (
     <div className="flex flex-col gap-4">
       <GlassCard className="flex flex-col overflow-hidden p-0">
-        <div className="flex items-center gap-4 border-b border-white/30 bg-blush/30 px-6 py-4">
+        <div className="flex items-center gap-4 border-b border-white/30 bg-peach/30 px-6 py-4">
           <Image
             src="/images/asha-logo.jpeg"
             alt="Asha"
@@ -112,17 +112,17 @@ export function AshaChat({
             unoptimized
           />
           <div>
-            <h2 className="font-display text-lg font-semibold text-espresso">
+            <h2 className="font-display text-lg font-semibold text-ink">
               Chat with Asha
             </h2>
-            <p className="text-xs text-espresso/70">
+            <p className="text-xs text-ink/70">
               Emotional support & legal rights questions only
             </p>
           </div>
         </div>
 
         <div className="border-b border-white/20 px-4 py-3">
-          <p className="mb-2 text-xs font-medium text-espresso/70">
+          <p className="mb-2 text-xs font-medium text-ink/70">
             Quick rights questions
           </p>
           <div className="flex flex-wrap gap-2">
@@ -132,7 +132,7 @@ export function AshaChat({
                 type="button"
                 onClick={() => handleQuick(q)}
                 disabled={streaming}
-                className="rounded-full bg-blush/80 px-3 py-1.5 text-xs text-espresso transition hover:bg-rose/50 disabled:opacity-50"
+                className="rounded-full bg-peach/80 px-3 py-1.5 text-xs text-ink transition hover:bg-pink/50 disabled:opacity-50"
               >
                 {q}
               </button>
@@ -146,8 +146,8 @@ export function AshaChat({
               key={i}
               className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 m.role === "user"
-                  ? "ml-auto bg-rose/40 text-espresso"
-                  : "bg-fantasy/90 text-espresso shadow-sm"
+                  ? "ml-auto bg-pink/40 text-ink"
+                  : "bg-cream/90 text-ink shadow-sm"
               }`}
             >
               {m.content}
@@ -159,11 +159,11 @@ export function AshaChat({
                     {[0, 1, 2].map((d) => (
                       <span
                         key={d}
-                        className="inline-block h-2 w-2 animate-pulse rounded-full bg-rose"
+                        className="inline-block h-2 w-2 animate-pulse rounded-full bg-pink"
                         style={{ animationDelay: `${d * 150}ms` }}
                       />
                     ))}
-                    <span className="ml-2 text-xs text-espresso/60">
+                    <span className="ml-2 text-xs text-ink/60">
                       Asha is thinking…
                     </span>
                   </span>
@@ -172,7 +172,7 @@ export function AshaChat({
                 i === messages.length - 1 &&
                 m.role === "assistant" &&
                 m.content && (
-                  <span className="ml-1 inline-block animate-pulse text-rose">
+                  <span className="ml-1 inline-block animate-pulse text-pink">
                     ▍
                   </span>
                 )}
@@ -181,7 +181,7 @@ export function AshaChat({
           <div ref={bottomRef} />
         </div>
 
-        <div className="border-t border-white/30 bg-fantasy/50 p-4">
+        <div className="border-t border-white/30 bg-cream/50 p-4">
           <div className="flex gap-2">
             <input
               value={input}
@@ -194,7 +194,7 @@ export function AshaChat({
               type="button"
               onClick={() => send()}
               disabled={streaming}
-              className="rounded-full bg-gradient-to-r from-rose to-blush px-5 py-2.5 text-sm font-medium text-espresso shadow-md transition hover:brightness-105 disabled:opacity-50"
+              className="rounded-full bg-gradient-to-r from-pink to-peach px-5 py-2.5 text-sm font-medium text-ink shadow-md transition hover:brightness-105 disabled:opacity-50"
             >
               Send
             </button>
@@ -206,13 +206,13 @@ export function AshaChat({
         <button
           type="button"
           onClick={() => setCrisisOpen((o) => !o)}
-          className="w-full rounded-full border border-rose/50 bg-gradient-to-r from-rose/40 to-blush/50 px-5 py-3 text-sm font-semibold text-espresso transition hover:from-rose/55 hover:to-blush/60"
+          className="w-full rounded-full border border-pink/50 bg-gradient-to-r from-pink/40 to-peach/50 px-5 py-3 text-sm font-semibold text-ink transition hover:from-pink/55 hover:to-peach/60"
         >
           I need immediate help
         </button>
         {crisisOpen && (
-          <GlassCard className="mt-3 border-rose/30 bg-blush/20">
-            <ul className="space-y-1 text-sm text-espresso/85">
+          <GlassCard className="mt-3 border-pink/30 bg-peach/20">
+            <ul className="space-y-1 text-sm text-ink/85">
               {CRISIS.map((c) => (
                 <li key={c}>{c}</li>
               ))}
