@@ -33,4 +33,14 @@ body {
 
 .glass-card:hover {
   backdrop-filter: blur(28px);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* PRD palette only — no extra brand colors */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 2px;
 }

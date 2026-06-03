@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -8,10 +9,9 @@ import { useLanguage } from "@/context/LanguageContext";
 const FEATURES = [
   "Image deepfake detection (3-signal risk score)",
   "Reverse image trace & platform report links",
-  "Legal evidence PDF builder",
+  "Legal evidence report builder",
   "Encrypted evidence vault (browser-only)",
-  "Know Your Rights AI + law cards",
-  "Asha emotional support companion",
+  "Asha — support & legal rights companion",
   "Anonymous community shield",
   "Multilingual UI (8 languages)",
 ];
@@ -35,40 +35,48 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          className="flex flex-col items-start gap-8 md:flex-row md:items-center"
         >
-          <p className="mb-2 text-sm font-medium text-rose">{t("tagline")}</p>
-          <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-espresso md:text-5xl">
-            Your armor against digital violence
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-espresso/80">{t("homeHero")}</p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              href="/scan"
-              className="rounded-full bg-rose px-6 py-3 text-sm font-medium text-espresso shadow-md transition hover:bg-blush"
-            >
-              {t("scanNow")}
-            </Link>
-            <Link
-              href="/asha"
-              className="rounded-full border border-espresso/20 bg-white/50 px-6 py-3 text-sm font-medium text-espresso transition hover:bg-blush/50"
-            >
-              {t("talkToAsha")}
-            </Link>
-            <Link
-              href="/rights"
-              className="rounded-full border border-espresso/20 bg-white/50 px-6 py-3 text-sm font-medium text-espresso transition hover:bg-blush/50"
-            >
-              {t("knowRights")}
-            </Link>
+          <Image
+            src="/images/ds-logo.jpeg"
+            alt="DeepShield logo"
+            width={140}
+            height={140}
+            className="rounded-2xl object-contain shadow-sm"
+            priority
+            unoptimized
+          />
+          <div>
+            <p className="mb-2 text-sm font-medium text-rose">{t("tagline")}</p>
+            <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-espresso md:text-5xl">
+              Your armor against digital violence
+            </h1>
+            <p className="mt-4 max-w-2xl text-lg text-espresso/80">{t("homeHero")}</p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                href="/scan"
+                className="rounded-full bg-rose px-6 py-3 text-sm font-medium text-espresso shadow-md transition hover:bg-blush"
+              >
+                {t("scanNow")}
+              </Link>
+              <Link
+                href="/asha"
+                className="rounded-full border border-sage/50 bg-blush/60 px-6 py-3 text-sm font-medium text-espresso transition hover:bg-blush"
+              >
+                {t("talkToAsha")}
+              </Link>
+            </div>
           </div>
         </motion.div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-20">
-        <h2 className="mb-6 text-2xl font-semibold text-espresso">What DeepShield does</h2>
+        <h2 className="mb-6 text-2xl font-semibold text-espresso">
+          What DeepShield does
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f, i) => (
-            <GlassCard key={f} className={i % 2 === 0 ? "" : ""}>
+          {FEATURES.map((f) => (
+            <GlassCard key={f}>
               <p className="text-sm leading-relaxed text-espresso/90">{f}</p>
             </GlassCard>
           ))}
