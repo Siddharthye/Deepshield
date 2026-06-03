@@ -360,6 +360,25 @@ export type ReverseTraceHit = {
   firstSeen: string;
 };
 
+export async function uploadTraceImageFile(
+  blob: Blob,
+  filename = "deepshield-trace.jpg",
+): Promise<string | null> {
+  const fd = new FormData();
+  fd.append("image", blob, filename);
+  const res = await fetch(`${API_BASE}/api/trace-upload`, {
+    method: "POST",
+    body: fd,
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    publicImageUrl?: string;
+    error?: { message?: string };
+  };
+  if (!res.ok) return null;
+  const url = data.publicImageUrl?.trim();
+  return url?.startsWith("http") ? url : null;
+}
+
 export async function fetchReverseTrace(args: {
   imageUrl?: string;
   imageBase64?: string;

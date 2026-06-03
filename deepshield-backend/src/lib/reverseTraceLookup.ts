@@ -191,7 +191,7 @@ function parseDataUrl(dataUrl: string): { bytes: Buffer; mime: string; ext: stri
   return { bytes, mime, ext };
 }
 
-async function uploadTraceBuffer(
+export async function uploadTraceBuffer(
   bytes: Buffer,
   mime: string,
   filename: string,
