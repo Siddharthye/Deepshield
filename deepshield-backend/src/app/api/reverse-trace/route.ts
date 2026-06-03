@@ -48,13 +48,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const { hits, sources } = await lookupReverseImage(publicUrl);
+    const { hits, sources, autoLookupConfigured, lookupHint } =
+      await lookupReverseImage(publicUrl);
 
     return NextResponse.json({
       publicImageUrl: publicUrl,
       hits: hits.map((h) => ({ ...h, id: crypto.randomUUID() })),
       sources,
       count: hits.length,
+      autoLookupConfigured,
+      lookupHint,
       requestId,
     });
   } catch (e: unknown) {

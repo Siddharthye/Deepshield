@@ -72,8 +72,10 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         setPreviewHits(result.hits.slice(0, 6));
         onHitsImported?.();
         setStatus(t("traceAutoFound").replace("{n}", String(result.hits.length)));
+      } else if (!result.autoLookupConfigured) {
+        setStatus(result.lookupHint ?? t("traceAutoNoApiKey"));
       } else {
-        setStatus(t("traceAutoNoResults"));
+        setStatus(result.lookupHint ?? t("traceAutoNoResults"));
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";

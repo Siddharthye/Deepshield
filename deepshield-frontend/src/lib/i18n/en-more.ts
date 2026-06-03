@@ -213,8 +213,10 @@ export const EN_MORE = {
     "Could not host the image for search. Use manual search tabs below, then paste URLs.",
   traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
   traceAutoFound: "Found {n} match(es) — saved to your trace log.",
+  traceAutoNoApiKey:
+    "Image hosted. In-app matching needs SERPAPI_API_KEY or SERPER_API_KEY on the backend (Vercel → deepshield-xi → Environment). Free tiers: serpapi.com or serper.dev.",
   traceAutoNoResults:
-    "Image hosted — automatic search found no matches (common on cloud servers). Open Bing search below or paste URLs you find.",
+    "Image hosted — no matches for this image. Open Bing search below or paste URLs from Google Lens.",
   traceAutoOpenAllEngines: "Open all engines",
   traceAutoFailed: "Automatic lookup failed — paste URLs from search results below.",
   traceAutoSources: "Checked: {sources}",

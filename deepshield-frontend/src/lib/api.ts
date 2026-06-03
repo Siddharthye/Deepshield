@@ -391,6 +391,8 @@ export async function fetchReverseTrace(args: {
   hits: ReverseTraceHit[];
   sources: string[];
   count: number;
+  autoLookupConfigured?: boolean;
+  lookupHint?: string | null;
 }> {
   return postJson("/api/reverse-trace", args);
 }

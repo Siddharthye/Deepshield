@@ -99,6 +99,25 @@ async function fetchYandex(imageUrl: string): Promise<TraceLookupHit[]> {
   return hits;
 }
 
+export function getConfiguredLookupProviders(): string[] {
+  const providers: string[] = [];
+  if (process.env.SERPAPI_API_KEY?.trim()) providers.push("serpapi");
+  if (process.env.SERPER_API_KEY?.trim()) providers.push("serper");
+  return providers;
+}
+
+function addLensRows(
+  seen: Set<string>,
+  hits: TraceLookupHit[],
+  rows: Array<Record<string, unknown>>,
+) {
+  for (const row of rows) {
+    const link = row.link ?? row.url ?? row.imageUrl ?? row.image;
+    const title = row.title ?? row.source ?? row.name;
+    if (typeof link === "string") addHit(seen, hits, link, typeof title === "string" ? title : undefined);
+  }
+}
+
 async function fetchSerpApi(imageUrl: string): Promise<TraceLookupHit[]> {
   const key = process.env.SERPAPI_API_KEY?.trim();
   if (!key) return [];
@@ -108,21 +127,50 @@ async function fetchSerpApi(imageUrl: string): Promise<TraceLookupHit[]> {
   url.searchParams.set("url", imageUrl);
   url.searchParams.set("api_key", key);
 
-  const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+  const res = await fetch(url, { signal: AbortSignal.timeout(20_000) });
   if (!res.ok) return [];
 
   const data = (await res.json()) as {
-    visual_matches?: Array<{ title?: string; link?: string; source?: string }>;
-    exact_matches?: Array<{ title?: string; link?: string; source?: string }>;
+    visual_matches?: Array<Record<string, unknown>>;
+    exact_matches?: Array<Record<string, unknown>>;
+    image_results?: Array<Record<string, unknown>>;
   };
 
   const seen = new Set<string>();
   const hits: TraceLookupHit[] = [];
+  addLensRows(seen, hits, data.visual_matches ?? []);
+  addLensRows(seen, hits, data.exact_matches ?? []);
+  addLensRows(seen, hits, data.image_results ?? []);
+  return hits;
+}
 
-  for (const row of [...(data.visual_matches ?? []), ...(data.exact_matches ?? [])]) {
-    if (row.link) addHit(seen, hits, row.link, row.title ?? row.source);
+async function fetchSerperLens(imageUrl: string): Promise<TraceLookupHit[]> {
+  const key = process.env.SERPER_API_KEY?.trim();
+  if (!key) return [];
+
+  const res = await fetch("https://google.serper.dev/lens", {
+    method: "POST",
+    headers: {
+      "X-API-KEY": key,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ url: imageUrl }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!res.ok) return [];
+
+  const data = (await res.json()) as Record<string, unknown>;
+  const seen = new Set<string>();
+  const hits: TraceLookupHit[] = [];
+  const lists = [
+    data.visualMatches,
+    data.visual_matches,
+    data.organic,
+    data.images,
+  ];
+  for (const list of lists) {
+    if (Array.isArray(list)) addLensRows(seen, hits, list as Array<Record<string, unknown>>);
   }
-
   return hits;
 }
 
@@ -192,11 +240,14 @@ async function fetchYandexHtml(imageUrl: string): Promise<TraceLookupHit[]> {
 export async function lookupReverseImage(imageUrl: string): Promise<{
   hits: TraceLookupHit[];
   sources: string[];
+  autoLookupConfigured: boolean;
+  lookupHint: string | null;
 }> {
   imageUrl = normalizeSearchImageUrl(imageUrl);
   const seen = new Set<string>();
   const merged: TraceLookupHit[] = [];
   const sources: string[] = [];
+  const providersConfigured = getConfiguredLookupProviders();
 
   const addBatch = (label: string, batch: TraceLookupHit[]) => {
     if (batch.length === 0) return;
@@ -208,17 +259,36 @@ export async function lookupReverseImage(imageUrl: string): Promise<{
     }
   };
 
-  const [yandex, serp, bing] = await Promise.all([
-    fetchYandex(imageUrl).catch(() => []),
+  const [serp, serper, yandex, yandexHtml, bing] = await Promise.all([
     fetchSerpApi(imageUrl).catch(() => []),
+    fetchSerperLens(imageUrl).catch(() => []),
+    fetchYandex(imageUrl).catch(() => []),
+    fetchYandexHtml(imageUrl).catch(() => []),
     fetchBingHtml(imageUrl).catch(() => []),
   ]);
 
-  addBatch("yandex", yandex);
   addBatch("serpapi", serp);
+  addBatch("serper", serper);
+  addBatch("yandex", yandex);
+  addBatch("yandex-html", yandexHtml);
   addBatch("bing", bing);
 
-  return { hits: merged.slice(0, 40), sources };
+  const hits = merged.slice(0, 40);
+  let lookupHint: string | null = null;
+  if (hits.length === 0 && providersConfigured.length === 0) {
+    lookupHint =
+      "Add SERPAPI_API_KEY or SERPER_API_KEY to the backend Vercel project for in-app matches (free tiers at serpapi.com / serper.dev).";
+  } else if (hits.length === 0) {
+    lookupHint =
+      "No matches returned for this image. Try Open Bing search or paste URLs from Lens manually.";
+  }
+
+  return {
+    hits,
+    sources,
+    autoLookupConfigured: providersConfigured.length > 0,
+    lookupHint,
+  };
 }
 
 function parseDataUrl(dataUrl: string): { bytes: Buffer; mime: string; ext: string } | null {
