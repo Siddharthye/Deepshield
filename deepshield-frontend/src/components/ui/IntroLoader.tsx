@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useLanguage } from "@/context/LanguageContext";
 
 const KEY = "deepshield_intro_seen";
@@ -35,14 +35,7 @@ export function IntroLoader() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
-            <Image
-              src="/images/ds-logo.jpeg"
-              alt={t("brandAlt")}
-              width={100}
-              height={100}
-              className="rounded-2xl"
-              unoptimized
-            />
+            <BrandLogo size="lg" showWordmark={false} />
           </motion.div>
           <motion.p
             className="mt-6 max-w-xs text-center text-lg text-ink"

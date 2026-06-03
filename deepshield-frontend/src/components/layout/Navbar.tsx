@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
@@ -54,17 +54,11 @@ export function Navbar() {
       className="fixed z-50 w-full border-b border-transparent shadow-sm"
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2.5 md:gap-3 md:py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/images/ds-logo.jpeg"
-            alt="DeepShield"
-            width={36}
-            height={36}
-            className="rounded-lg object-contain ring-1 ring-blue/40"
-            unoptimized
-          />
-          <span className="font-display hidden text-ink sm:inline">DeepShield</span>
-        </Link>
+        <BrandLogo
+          href="/"
+          size="sm"
+          className="[&>span:nth-child(2)]:hidden sm:[&>span:nth-child(2)]:inline"
+        />
         <nav className="flex flex-wrap items-center justify-center gap-0.5 text-xs md:text-sm">
           {LINKS.map(({ href, key }) => {
             const active =

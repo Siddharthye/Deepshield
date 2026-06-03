@@ -368,16 +368,6 @@ a.text-link:hover,
   background: color-mix(in srgb, var(--color-meadow) 10%, var(--color-cream));
 }
 
-.hero-device {
-  transform: perspective(1200px) rotateY(-2deg) rotateX(1deg);
-}
-
-@media (max-width: 1023px) {
-  .hero-device {
-    transform: none;
-  }
-}
-
 .intro-pink-bg {
   background: linear-gradient(
     165deg,

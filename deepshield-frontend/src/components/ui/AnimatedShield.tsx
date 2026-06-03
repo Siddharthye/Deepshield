@@ -13,7 +13,7 @@ export function AnimatedShield({ className = "" }: { className?: string }) {
       <motion.path
         d="M32 4 L56 14 V36 C56 52 44 64 32 68 C20 64 8 52 8 36 V14 Z"
         fill="none"
-        stroke="#f4c4d0"
+        stroke="var(--color-berry)"
         strokeWidth="2"
         variants={{
           hidden: { pathLength: 0, opacity: 0 },

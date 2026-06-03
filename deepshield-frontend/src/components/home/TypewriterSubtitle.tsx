@@ -11,7 +11,7 @@ const PHRASE_KEYS: I18nKey[] = [
   "typewriter4",
 ];
 
-export function TypewriterSubtitle({ className = "" }: { className?: string }) {
+export function TypewriterSubtitle({ className = "text-base md:text-lg" }: { className?: string }) {
   const { t, language } = useLanguage();
   const [text, setText] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
