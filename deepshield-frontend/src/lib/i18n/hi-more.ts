@@ -169,6 +169,12 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   scanStepPrepare: "छवि तैयार हो रही है…",
   scanPleaseWait: "विश्लेषण पृष्ठभूमि में चल रहा है — कुछ सेकंड लग सकते हैं।",
   scanExplainLoading: "व्याख्या तैयार हो रही है…",
+  scanModelUnavailable:
+    "क्लाउड डीपफेक मॉडल अस्थायी रूप से उपलब्ध नहीं — स्कोर केवल OpenCV और चेहरा विश्लेषण पर आधारित है।",
+  scanServiceUnavailable:
+    "स्कैन सेवा अस्थायी रूप से उपलब्ध नहीं। कृपया कुछ देर बाद पुनः प्रयास करें।",
+  scanRateLimited: "बहुत अधिक स्कैन। एक मिनट प्रतीक्षा करें और पुनः प्रयास करें।",
+  scanImageTooLarge: "छवि बहुत बड़ी है। छोटी फ़ोटो आज़माएँ (8 MB से कम)।",
   scanStep1: "चेहरे की ज्यामिति विश्लेषण (face-api)…",
   scanStep2: "OpenCV कलाकृति पास…",
   scanStep3: "डीपफेक मॉडल चल रहा है…",

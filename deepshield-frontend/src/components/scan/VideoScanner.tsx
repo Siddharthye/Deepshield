@@ -97,15 +97,15 @@ export function VideoScanner() {
         const frame = extracted[i];
         setProgress(t("videoFrameProgress").replace("{n}", String(i + 1)).replace("{total}", String(extracted.length)));
 
-        const [{ symmetryScore, faceBox }, artifactScore, { modelScore }] =
-          await Promise.all([
-            analyzeFaceOnce(frame.dataUrl),
-            analyzeOpenCvArtifactScore(frame.dataUrl),
-            scanImage({
-              imageBase64: frame.dataUrl,
-              mimeType: "image/jpeg",
-            }),
-          ]);
+        const { modelScore, modelUnavailable: hfDown } = await scanImage({
+          imageBase64: frame.dataUrl,
+          mimeType: "image/jpeg",
+        });
+        await yieldToMain();
+        const [{ symmetryScore, faceBox }, artifactScore] = await Promise.all([
+          analyzeFaceOnce(frame.dataUrl),
+          analyzeOpenCvArtifactScore(frame.dataUrl),
+        ]);
         await yieldToMain();
         let heatmap: HeatmapCell[] = [];
         try {
@@ -119,7 +119,10 @@ export function VideoScanner() {
           heatmap = await buildArtifactHeatmap(frame.dataUrl);
         }
         await yieldToMain();
-        const risk = computeRisk({ modelScore, artifactScore, symmetryScore });
+        const risk = computeRisk(
+          { modelScore, artifactScore, symmetryScore },
+          { modelUnavailable: hfDown },
+        );
         scored.push({
           timeSec: frame.timeSec,
           dataUrl: frame.dataUrl,

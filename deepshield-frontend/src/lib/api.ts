@@ -60,7 +60,11 @@ export async function scanImage(args: {
 
   mimeType: string;
 
-}): Promise<{ modelScore: number; requestId: string }> {
+}): Promise<{
+  modelScore: number;
+  requestId: string;
+  modelUnavailable?: boolean;
+}> {
 
   return postJson("/api/scan-image", {
 

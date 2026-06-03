@@ -6,7 +6,7 @@ import {
   isSupportedImageMime,
   stripDataUrlPrefix,
 } from "@/lib/media";
-import { callHfDeepfakeModelBase64 } from "@/lib/huggingface";
+import { callHfDeepfakeModelSafe } from "@/lib/huggingface";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -109,13 +109,17 @@ export async function POST(request: Request) {
     }
 
     const t0 = Date.now();
-    const modelScore = await callHfDeepfakeModelBase64({ base64: base64Raw });
+    const { modelScore, modelUnavailable } = await callHfDeepfakeModelSafe({
+      base64: base64Raw,
+      mimeType,
+    });
     const t1 = Date.now();
 
     return NextResponse.json({
       frameIndex,
       timestampSec,
       modelScore,
+      modelUnavailable,
       requestId,
       timingsMs: { hf: t1 - t0 },
       meta: meta && typeof meta === "object" ? meta : undefined,

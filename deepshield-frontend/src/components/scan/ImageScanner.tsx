@@ -18,6 +18,7 @@ import { loadScanSession, saveScanSession } from "@/lib/scanSession";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 import { playScanChime } from "@/lib/ambientSound";
 import { deferToIdle, yieldToMain } from "@/lib/yieldToMain";
+import { formatScanError } from "@/lib/scanErrors";
 import { useLanguage } from "@/context/LanguageContext";
 import type { ExplainResult, RiskResult, ScanSession } from "@/lib/types";
 import type { I18nKey } from "@/lib/i18n";
@@ -47,12 +48,14 @@ export function ImageScanner() {
   const [explainLoading, setExplainLoading] = useState(false);
   const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
   const [shield, setShield] = useState(false);
+  const [modelUnavailable, setModelUnavailable] = useState(false);
 
   async function onFile(file: File) {
     setError(null);
     setRisk(null);
     setExplain(null);
     setHeatmap([]);
+    setModelUnavailable(false);
     setLoading(true);
 
     try {
@@ -61,20 +64,29 @@ export function ImageScanner() {
       setPreview(dataUrl);
       await yieldToMain();
 
-      setStepKey("scanStep1");
-      const facePromise = analyzeFaceOnce(dataUrl);
-      const openCvPromise = analyzeOpenCvArtifactScore(dataUrl);
-      const apiPromise = scanImage({ imageBase64: dataUrl, mimeType });
+      setStepKey("scanStep3");
+      const { modelScore, modelUnavailable: hfDown } = await scanImage({
+        imageBase64: dataUrl,
+        mimeType,
+      });
+      setModelUnavailable(!!hfDown);
+      await yieldToMain();
 
-      const [{ symmetryScore, faceBox }, artifactScore, { modelScore }] =
-        await Promise.all([facePromise, openCvPromise, apiPromise]);
+      setStepKey("scanStep1");
+      const [{ symmetryScore, faceBox }, artifactScore] = await Promise.all([
+        analyzeFaceOnce(dataUrl),
+        analyzeOpenCvArtifactScore(dataUrl),
+      ]);
       await yieldToMain();
 
       setStepKey("scanStep4");
       const cells = await buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox);
       setHeatmap(cells);
 
-      const riskResult = computeRisk({ modelScore, artifactScore, symmetryScore });
+      const riskResult = computeRisk(
+        { modelScore, artifactScore, symmetryScore },
+        { modelUnavailable: hfDown },
+      );
       setRisk(riskResult);
       setLoading(false);
 
@@ -122,8 +134,11 @@ export function ImageScanner() {
         });
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("scanFailed"));
+      const raw = e instanceof Error ? e.message : t("scanFailed");
+      const key = formatScanError(raw);
+      setError(key.startsWith("scan") ? t(key as I18nKey) : raw);
       setLoading(false);
+      setPreview(null);
     }
   }
 
@@ -142,6 +157,7 @@ export function ImageScanner() {
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) void onFile(f);
+              e.target.value = "";
             }}
           />
         </label>
@@ -215,6 +231,11 @@ export function ImageScanner() {
             <p className="text-sm text-ink-muted">{t("manipulationRisk")}</p>
             <AnimatedRisk value={risk.finalRisk} />
             <p className="mt-2 text-xl font-medium text-accent">{t(verdictLabelKey(risk.verdict))}</p>
+            {modelUnavailable && (
+              <p className="mt-2 rounded-xl bg-peach/35 px-3 py-2 text-xs text-ink-muted">
+                {t("scanModelUnavailable")}
+              </p>
+            )}
             <ul className="mt-4 space-y-2 text-sm text-ink-muted">
               <li className="flex justify-between">
                 <span>{t("breakdownHf")}</span>

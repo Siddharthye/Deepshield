@@ -168,6 +168,12 @@ export const EN_MORE = {
   scanStepPrepare: "Preparing image…",
   scanPleaseWait: "Analysis runs in the background — this may take a few seconds.",
   scanExplainLoading: "Generating explanation…",
+  scanModelUnavailable:
+    "Cloud deepfake model is temporarily unavailable — score uses OpenCV and face analysis only.",
+  scanServiceUnavailable:
+    "Scan service is temporarily unavailable. Please try again in a moment.",
+  scanRateLimited: "Too many scans. Please wait a minute and try again.",
+  scanImageTooLarge: "Image is too large. Try a smaller photo (under 8 MB).",
   scanStep1: "Analyzing facial geometry (face-api)…",
   scanStep2: "OpenCV artifact pass…",
   scanStep3: "Running deepfake model…",

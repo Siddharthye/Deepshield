@@ -1,11 +1,18 @@
 import type { I18nKey } from "@/lib/i18n";
 import type { DetectionScores, RiskResult, Verdict } from "./types";
 
-export function computeRisk(scores: DetectionScores): RiskResult {
+export function computeRisk(
+  scores: DetectionScores,
+  opts?: { modelUnavailable?: boolean },
+): RiskResult {
+  const weights = opts?.modelUnavailable
+    ? { model: 0, artifact: 0.55, symmetry: 0.45 }
+    : { model: 0.6, artifact: 0.25, symmetry: 0.15 };
+
   const finalRisk = Math.round(
-    (scores.modelScore * 0.6 +
-      scores.artifactScore * 0.25 +
-      scores.symmetryScore * 0.15) *
+    (scores.modelScore * weights.model +
+      scores.artifactScore * weights.artifact +
+      scores.symmetryScore * weights.symmetry) *
       100,
   );
 

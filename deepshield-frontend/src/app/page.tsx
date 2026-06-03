@@ -8,7 +8,6 @@ import { HeroParticles } from "@/components/hero/HeroParticles";
 import { AnimatedShield } from "@/components/ui/AnimatedShield";
 import { HowItWorksPinned } from "@/components/sections/HowItWorksPinned";
 import { FeatureOrbs } from "@/components/sections/FeatureOrbs";
-import { HorizontalFeatures } from "@/components/sections/HorizontalFeatures";
 import { HomeCrisisStrip } from "@/components/sections/HomeCrisisStrip";
 import { HomeWhySection } from "@/components/sections/HomeWhySection";
 import { HomeQuickActions } from "@/components/sections/HomeQuickActions";
@@ -120,7 +119,6 @@ export default function HomePage() {
       <HomeWhySection />
       <WaveDivider />
       <HowItWorksPinned />
-      <HorizontalFeatures />
       <Testimonials />
       <HomeFaq />
       <CtaStrip />

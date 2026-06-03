@@ -19,11 +19,14 @@ function hfTimeoutMs() {
 
 /** Extract model id from env (plain id or legacy full URL). */
 function resolveModelId(envValue: string | undefined, fallback: string): string {
-  const v = (envValue ?? "").trim();
+  let v = (envValue ?? "").trim().replace(/^["']|["']$/g, "");
   if (!v) return fallback;
-  if (!v.includes("://") && !v.startsWith("http")) return v;
-  // Model ids include a slash (e.g. mistralai/Mistral-7B-Instruct-v0.3)
-  const match = v.match(/\/models\/([^?#]+)/);
+  if (!v.includes("://") && !v.startsWith("http")) {
+    return v.replace(/^\/+|\/+$/g, "");
+  }
+  const match =
+    v.match(/\/hf-inference\/models\/([^?#]+)/) ??
+    v.match(/\/models\/([^?#]+)/);
   return match?.[1]?.replace(/\/$/, "") ?? fallback;
 }
 
@@ -95,28 +98,7 @@ async function readUpstreamError(res: Response): Promise<string> {
   }
 }
 
-export async function callHfDeepfakeModelBase64(args: {
-  base64: string;
-}): Promise<number> {
-  const url = hfDeepfakeInferenceUrl();
-
-  const res = await hfFetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${hfToken()}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ inputs: args.base64 }),
-  });
-
-  if (!res.ok) {
-    const detail = await readUpstreamError(res);
-    throw new Error(
-      `HF deepfake model http ${res.status}${detail ? `: ${detail}` : ""}`,
-    );
-  }
-
-  const data: HfJson = await res.json();
+function parseDeepfakeScore(data: HfJson): number {
   if (Array.isArray(data)) {
     const arr = data as Array<{ label?: string; score?: number }>;
     const fake = arr.find((x) => {
@@ -138,6 +120,70 @@ export async function callHfDeepfakeModelBase64(args: {
   }
 
   return 0;
+}
+
+export async function callHfDeepfakeModelBase64(args: {
+  base64: string;
+  mimeType?: string;
+}): Promise<number> {
+  const url = hfDeepfakeInferenceUrl();
+  const mime = args.mimeType ?? "image/jpeg";
+  const bytes = Buffer.from(args.base64, "base64");
+  const token = hfToken();
+
+  const attempts: Array<() => Promise<Response>> = [
+    () =>
+      hfFetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": mime,
+        },
+        body: bytes,
+      }),
+    () =>
+      hfFetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: `data:${mime};base64,${args.base64}`,
+        }),
+      }),
+  ];
+
+  let lastDetail = "";
+  for (const attempt of attempts) {
+    const res = await attempt();
+    if (res.ok) {
+      const data: HfJson = await res.json();
+      return parseDeepfakeScore(data);
+    }
+    lastDetail = await readUpstreamError(res);
+  }
+
+  throw new Error(
+    `HF deepfake model unavailable${lastDetail ? `: ${lastDetail.slice(0, 200)}` : ""}`,
+  );
+}
+
+/** Returns a neutral score when HF image inference is down (hf-inference outages). */
+export async function callHfDeepfakeModelSafe(args: {
+  base64: string;
+  mimeType: string;
+}): Promise<{ modelScore: number; modelUnavailable: boolean }> {
+  try {
+    const modelScore = await callHfDeepfakeModelBase64(args);
+    return { modelScore, modelUnavailable: false };
+  } catch (e) {
+    console.warn(
+      "[scan] HF deepfake model skipped:",
+      e instanceof Error ? e.message : e,
+    );
+    return { modelScore: 0.35, modelUnavailable: true };
+  }
 }
 
 function parseSystemUserPrompt(prompt: string): {
