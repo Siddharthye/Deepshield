@@ -18,6 +18,13 @@ export const EN = {
   footerLine2: "Cyber Crime Helpline 1930 · NCW 181 · iCall 9152987821",
   transitionTagline: "Your armor against digital violence",
   heroTitle: "Your armor against digital violence",
+  heroTaglineSub: "Detect · document · report — privately in your browser",
+  heroHighlight1Title: "3-signal detection",
+  heroHighlight1Desc: "AI model, face symmetry, and artifact analysis with a visual heatmap.",
+  heroHighlight2Title: "Evidence stays on your device",
+  heroHighlight2Desc: "PIN-encrypted vault and court-ready PDFs — no cloud gallery of your photos.",
+  heroLearnLink: "Learn to spot deepfakes →",
+  heroScroll: "Scroll to explore",
   heroExtra:
     "DeepShield is a complete safety toolkit for anyone facing morphed photos, deepfake videos, or non-consensual intimate imagery. Scan suspicious media, build a legal evidence pack, trace where your image was posted, and speak with Asha — all without creating an account.",
   trust1: "Browser-first privacy",

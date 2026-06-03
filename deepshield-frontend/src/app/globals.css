@@ -188,6 +188,31 @@ body::before {
   background: color-mix(in srgb, var(--color-cream-deep) 42%, var(--color-cream-tan));
 }
 
+.hero-section {
+  min-height: min(92vh, 920px);
+}
+
+.hero-glow {
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(75, 10, 10, 0.12), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 85% 35%, rgba(143, 122, 100, 0.18), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 90%, rgba(242, 232, 213, 0.35), transparent 60%);
+}
+
+.hero-title {
+  text-wrap: balance;
+}
+
+.hero-title::after {
+  content: "";
+  display: block;
+  margin-top: 1rem;
+  height: 3px;
+  width: 4.5rem;
+  border-radius: 3px;
+  background: var(--gradient-accent);
+}
+
 .page-badge {
   display: inline-block;
   margin-bottom: 0.75rem;
