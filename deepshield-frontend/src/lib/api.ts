@@ -1,8 +1,13 @@
 import type { ChatMessage, ExplainResult, RiskResult } from "./types";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "https://deepshield-xi.vercel.app";
+/** Empty = same-origin `/api/*` (proxied via vercel.json / next.config rewrites). */
+function getApiBase(): string {
+  const raw = process.env.NEXT_PUBLIC_API_URL;
+  if (raw === undefined || raw.trim() === "") return "";
+  return raw.replace(/\/$/, "");
+}
+
+const API_BASE = getApiBase();
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
