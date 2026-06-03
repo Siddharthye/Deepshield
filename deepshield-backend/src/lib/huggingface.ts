@@ -22,8 +22,9 @@ function resolveModelId(envValue: string | undefined, fallback: string): string 
   const v = (envValue ?? "").trim();
   if (!v) return fallback;
   if (!v.includes("://") && !v.startsWith("http")) return v;
-  const match = v.match(/\/models\/([^/?#]+)/);
-  return match?.[1] ?? fallback;
+  // Model ids include a slash (e.g. mistralai/Mistral-7B-Instruct-v0.3)
+  const match = v.match(/\/models\/([^?#]+)/);
+  return match?.[1]?.replace(/\/$/, "") ?? fallback;
 }
 
 function hfDeepfakeInferenceUrl() {
