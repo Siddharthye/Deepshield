@@ -72,7 +72,8 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         onHitsImported?.();
         setStatus(t("traceAutoFound").replace("{n}", String(result.hits.length)));
       } else {
-        setStatus(t("traceAutoNoResults"));
+        openTraceSearchEngines(hosted);
+        setStatus(t("traceAutoNoResultsOpened"));
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "";

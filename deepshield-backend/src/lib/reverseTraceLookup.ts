@@ -150,10 +150,50 @@ async function fetchBingHtml(imageUrl: string): Promise<TraceLookupHit[]> {
   return hits;
 }
 
+/** Prefer direct file URLs for reverse-search APIs. */
+export function normalizeSearchImageUrl(imageUrl: string): string {
+  const trimmed = imageUrl.trim();
+  if (/tempfile\.org\/[^/]+\/preview$/i.test(trimmed)) {
+    return trimmed.replace(/\/preview$/i, "/download");
+  }
+  return trimmed;
+}
+
+async function fetchYandexHtml(imageUrl: string): Promise<TraceLookupHit[]> {
+  const page = `https://yandex.com/images/search?rpt=imageview&url=${encodeURIComponent(imageUrl)}`;
+  const res = await fetch(page, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+      Accept: "text/html,application/xhtml+xml",
+    },
+    signal: AbortSignal.timeout(14_000),
+  });
+  if (!res.ok) return [];
+
+  const html = await res.text();
+  const seen = new Set<string>();
+  const hits: TraceLookupHit[] = [];
+  const patterns = [
+    /"url"\s*:\s*"(https?:[^"\\]+)"/gi,
+    /"pageUrl"\s*:\s*"(https?:[^"\\]+)"/gi,
+    /href="(https?:\/\/(?![^"]*(?:yandex|yastatic))[^"]+)"/gi,
+  ];
+  for (const re of patterns) {
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(html)) !== null) {
+      const raw = match[1].replace(/\\u002F/g, "/").replace(/\\\//g, "/");
+      addHit(seen, hits, raw);
+    }
+  }
+  return hits;
+}
+
 export async function lookupReverseImage(imageUrl: string): Promise<{
   hits: TraceLookupHit[];
   sources: string[];
 }> {
+  imageUrl = normalizeSearchImageUrl(imageUrl);
   const seen = new Set<string>();
   const merged: TraceLookupHit[] = [];
   const sources: string[] = [];
@@ -209,7 +249,7 @@ async function uploadToTempfile(blob: Blob, filename: string): Promise<string | 
   if (!data.success || !id) return null;
   const isImage = /\.(jpe?g|png|webp|gif)$/i.test(filename) || blob.type.startsWith("image/");
   return isImage
-    ? `https://tempfile.org/${id}/preview`
+    ? `https://tempfile.org/${id}/download`
     : `https://tempfile.org/${id}/download`;
 }
 
@@ -248,7 +288,7 @@ export async function uploadTraceBuffer(
   filename: string,
 ): Promise<string | null> {
   const blob = new Blob([new Uint8Array(bytes)], { type: mime });
-  const hosts = [uploadToTempfile, uploadToCatbox, uploadToLitterbox];
+  const hosts = [uploadToCatbox, uploadToTempfile, uploadToLitterbox];
   for (const upload of hosts) {
     try {
       const url = await upload(blob, filename);

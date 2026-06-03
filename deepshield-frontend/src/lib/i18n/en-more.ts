@@ -214,6 +214,8 @@ export const EN_MORE = {
   traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
   traceAutoFound: "Found {n} match(es) — saved to your trace log.",
   traceAutoNoResults: "No public matches found yet. Paste URLs below or open manual search.",
+  traceAutoNoResultsOpened:
+    "Image hosted successfully. Opened Lens, TinEye, Bing, and Yandex in new tabs — paste any links you find below to log them.",
   traceAutoFailed: "Automatic lookup failed — paste URLs from search results below.",
   traceAutoSources: "Checked: {sources}",
   traceAutoManualFallback: "Open manual search tabs",

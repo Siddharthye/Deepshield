@@ -216,6 +216,8 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   traceAutoSearching: "Yandex, Bing और Google पर आपकी छवि खोज रहे हैं…",
   traceAutoFound: "{n} मिलान मिले — ट्रेस लॉग में सहेजे।",
   traceAutoNoResults: "अभी कोई सार्वजनिक मिलान नहीं। नीचे URL चिपकाएँ या मैन्युअल खोज खोलें।",
+  traceAutoNoResultsOpened:
+    "छवि होस्ट हो गई। Lens, TinEye, Bing और Yandex नए टैब में खोले — मिले लिंक नीचे चिपकाकर लॉग करें।",
   traceAutoFailed: "स्वचालित खोज विफल — नीचे खोज परिणाम से URL चिपकाएँ।",
   traceAutoSources: "जाँचा: {sources}",
   traceAutoManualFallback: "मैन्युअल खोज टैब खोलें",
