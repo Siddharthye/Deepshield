@@ -38,24 +38,9 @@ const SECTIONS: Section[] = [
     bodyKey: "learnCard3Intro",
     timeline: [
       { titleKey: "learnTimeline1Title", bodyKey: "learnTimeline1Body" },
-      {
-        titleKey: "learnTimeline2Title",
-        bodyKey: "learnTimeline2Body",
-        href: "/scan",
-        linkKey: "learnCtaScan",
-      },
-      {
-        titleKey: "learnTimeline3Title",
-        bodyKey: "learnTimeline3Body",
-        href: "/vault",
-        linkKey: "learnCtaVault",
-      },
-      {
-        titleKey: "learnTimeline4Title",
-        bodyKey: "learnTimeline4Body",
-        href: "/asha",
-        linkKey: "learnCtaAsha",
-      },
+      { titleKey: "learnTimeline2Title", bodyKey: "learnTimeline2Body" },
+      { titleKey: "learnTimeline3Title", bodyKey: "learnTimeline3Body" },
+      { titleKey: "learnTimeline4Title", bodyKey: "learnTimeline4Body" },
     ],
   },
 ];
