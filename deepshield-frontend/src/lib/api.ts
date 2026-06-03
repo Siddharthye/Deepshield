@@ -1,9 +1,11 @@
 import type { ChatMessage, ExplainResult, RiskResult } from "./types";
 
-/** Empty = same-origin `/api/*` (proxied via vercel.json / next.config rewrites). */
+/** Same-origin `/api/*` when unset, empty, or Vercel placeholder (vercel.json rewrites). */
 function getApiBase(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL;
-  if (raw === undefined || raw.trim() === "") return "";
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (!raw) return "";
+  const sameOrigin = new Set(["same-origin", "relative", "proxy", "__relative__"]);
+  if (sameOrigin.has(raw.toLowerCase())) return "";
   return raw.replace(/\/$/, "");
 }
 
