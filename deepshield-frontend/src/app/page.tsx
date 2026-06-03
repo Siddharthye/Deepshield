@@ -19,62 +19,66 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { CtaStrip } from "@/components/sections/CtaStrip";
 import { WaveDivider } from "@/components/sections/WaveDivider";
 import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
+import { HeroPanel } from "@/components/home/HeroPanel";
 import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
 const TRUST_KEYS = ["trust1", "trust2", "trust3"] as const;
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
-    <div className="relative overflow-hidden pt-16">
+    <div key={language} className="relative overflow-hidden pt-16">
       <HeroParticles />
 
-      <section className="relative mx-auto max-w-6xl px-4 py-12 md:py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center gap-10 md:flex-row"
-        >
-          <div className="relative shrink-0">
-            <AnimatedShield className="absolute -right-2 -top-2 h-12 w-12 opacity-80" />
-            <Image
-              src="/images/ds-logo.jpeg"
-              alt="DeepShield"
-              width={150}
-              height={150}
-              className="relative rounded-3xl object-contain shadow-lg ring-2 ring-peach/70"
-              priority
-              unoptimized
-            />
-          </div>
-          <div>
-            <p className="page-badge">{t("tagline")}</p>
-            <h1 className="font-display max-w-3xl text-4xl leading-tight text-ink md:text-5xl lg:text-[3.25rem]">
-              {t("heroTitle")}
-            </h1>
-            <TypewriterSubtitle />
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink/70">{t("homeHero")}</p>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/60">{t("heroExtra")}</p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {TRUST_KEYS.map((key) => (
-                <li
-                  key={key}
-                  className="rounded-full bg-sage/40 px-3 py-1 text-xs font-medium text-ink/80"
-                >
-                  {t(key)}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/scan">{t("scanNow")}</ButtonLink>
-              <ButtonLink href="/asha" variant="secondary">
-                {t("talkToAsha")}
-              </ButtonLink>
+      <section className="relative mx-auto max-w-6xl px-4 py-12 md:py-16">
+        <div className="grid items-stretch gap-10 lg:grid-cols-[1fr_minmax(280px,380px)]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col gap-8 sm:flex-row sm:items-start"
+          >
+            <div className="relative shrink-0">
+              <AnimatedShield className="absolute -right-2 -top-2 h-12 w-12 opacity-80" />
+              <Image
+                src="/images/ds-logo.jpeg"
+                alt="DeepShield"
+                width={140}
+                height={140}
+                className="relative rounded-3xl object-contain shadow-lg ring-2 ring-sage/50"
+                priority
+                unoptimized
+              />
             </div>
-          </div>
-        </motion.div>
+            <div className="min-w-0 flex-1">
+              <p className="page-badge">{t("tagline")}</p>
+              <h1 className="font-display text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem]">
+                {t("heroTitle")}
+              </h1>
+              <TypewriterSubtitle />
+              <p className="mt-4 text-base leading-relaxed text-ink/70">{t("homeHero")}</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink/65">{t("heroExtra")}</p>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {TRUST_KEYS.map((key) => (
+                  <li
+                    key={key}
+                    className="rounded-full bg-sage/45 px-3 py-1 text-xs font-medium text-ink/85"
+                  >
+                    {t(key)}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <ButtonLink href="/scan">{t("scanNow")}</ButtonLink>
+                <ButtonLink href="/asha" variant="secondary">
+                  {t("talkToAsha")}
+                </ButtonLink>
+              </div>
+            </div>
+          </motion.div>
+          <HeroPanel />
+        </div>
       </section>
 
       <HomeCrisisStrip />
@@ -99,7 +103,7 @@ export default function HomePage() {
           </GlassCard>
           <GlassCard className="py-8 text-center" tilt>
             <p className="font-display text-4xl text-ink">
-              <OdometerNumber value={8} />
+              <OdometerNumber value={2} />
             </p>
             <p className="mt-1 text-sm font-medium text-ink/80">{t("statLangs")}</p>
             <p className="mt-1 text-xs text-ink/55">{t("statLangsHint")}</p>

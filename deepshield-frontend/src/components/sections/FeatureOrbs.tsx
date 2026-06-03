@@ -57,7 +57,7 @@ const FEATURES = [
     icon: "💬",
     href: "/asha",
     desc: "Trauma-informed chat for emotional support and plain-language rights guidance. Crisis helplines are one tap away.",
-    points: ["Streaming support chat", "Rights quick prompts", "8 languages"],
+    points: ["Streaming support chat", "Rights quick prompts", "English & Hindi"],
   },
   {
     id: "rights",
@@ -88,8 +88,8 @@ const FEATURES = [
     label: "Languages",
     icon: "🗣️",
     href: "/",
-    desc: "Full UI in English, Hindi, Tamil, Telugu, Bengali, Marathi, Kannada, and Malayalam — so you can navigate in the language you think in.",
-    points: ["8 Indian languages", "Nav + core flows", "Asha responds in your language"],
+    desc: "Full UI in English and Hindi — switch anytime from the globe icon in the nav bar.",
+    points: ["English & Hindi", "Nav + home flows", "Asha responds in your language"],
   },
   {
     id: "privacy",

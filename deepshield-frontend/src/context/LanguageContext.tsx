@@ -4,10 +4,16 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
-import { LANGUAGES, type LanguageCode, t as translate, type I18nKey } from "@/lib/i18n";
+import { type LanguageCode, t as translate, type I18nKey } from "@/lib/i18n";
+
+function readStoredLanguage(): LanguageCode {
+  if (typeof window === "undefined") return "en";
+  const saved = localStorage.getItem("deepshield_lang");
+  return saved === "hi" ? "hi" : "en";
+}
 
 type LanguageContextValue = {
   language: LanguageCode;
@@ -19,21 +25,27 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>("en");
+  const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("deepshield_lang") as LanguageCode | null;
-    if (saved && LANGUAGES.some((l) => l.code === saved)) {
-      setLanguageState(saved);
-    }
+  useLayoutEffect(() => {
+    const saved = readStoredLanguage();
+    setLanguageState(saved);
+    document.documentElement.lang = saved;
+    setReady(true);
   }, []);
 
   const setLanguage = useCallback((code: LanguageCode) => {
-    setLanguageState(code);
-    localStorage.setItem("deepshield_lang", code);
-    document.documentElement.lang = code;
+    const next = code === "hi" ? "hi" : "en";
+    setLanguageState(next);
+    localStorage.setItem("deepshield_lang", next);
+    document.documentElement.lang = next;
   }, []);
 
   const t = useCallback((key: I18nKey) => translate(language, key), [language]);
+
+  if (!ready) {
+    return <div className="min-h-screen bg-cream/30" aria-busy="true" />;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

@@ -3,28 +3,14 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
-const FAQ = [
-  {
-    q: "Does DeepShield store my photos on a server?",
-    a: "Scans are sent to our API only for model scoring — we do not build a gallery of your uploads. Your vault, trace log, and saved sessions are encrypted and stored in your browser’s local storage. You control export and deletion.",
-  },
-  {
-    q: "How accurate is the deepfake detection?",
-    a: "We use three independent signals: a Hugging Face image classifier, face-api.js symmetry analysis, and OpenCV-style artifact heuristics. No single signal is perfect; the combined risk score and heatmap are meant to support your judgment and any professional review.",
-  },
-  {
-    q: "Can I use the PDF in a police complaint?",
-    a: "The report is designed as supporting documentation — scan results, trace URLs, and law references — alongside your own statement. Always follow guidance from cybercrime.gov.in or a qualified lawyer for your specific case.",
-  },
-  {
-    q: "Who is Asha and what can she help with?",
-    a: "Asha provides trauma-informed emotional support and plain-language explanations of Indian cyber and privacy laws. She does not replace legal counsel or emergency services. For immediate danger, call police; for cyber abuse, 1930 is available nationally.",
-  },
-  {
-    q: "Is DeepShield really free?",
-    a: "Yes. This is a hackathon build deployed on free-tier infrastructure. There are no paywalls, accounts, or subscriptions — because access to safety tools should not depend on income.",
-  },
+const FAQ_KEYS: { q: I18nKey; a: I18nKey }[] = [
+  { q: "faq1Q", a: "faq1A" },
+  { q: "faq2Q", a: "faq2A" },
+  { q: "faq3Q", a: "faq3A" },
+  { q: "faq4Q", a: "faq4A" },
+  { q: "faq5Q", a: "faq5A" },
 ];
 
 export function HomeFaq() {
@@ -36,7 +22,7 @@ export function HomeFaq() {
       <p className="page-badge">{t("faqBadge")}</p>
       <h2 className="font-display text-2xl text-ink md:text-3xl">{t("faqTitle")}</h2>
       <div className="mt-8 space-y-3">
-        {FAQ.map((item, i) => (
+        {FAQ_KEYS.map((item, i) => (
           <GlassCard key={item.q} className="overflow-hidden p-0">
             <button
               type="button"
@@ -44,12 +30,12 @@ export function HomeFaq() {
               onClick={() => setOpen(open === i ? null : i)}
               aria-expanded={open === i}
             >
-              <span className="font-medium text-ink">{item.q}</span>
-              <span className="text-pink">{open === i ? "−" : "+"}</span>
+              <span className="font-medium text-ink">{t(item.q)}</span>
+              <span className="text-sage">{open === i ? "−" : "+"}</span>
             </button>
             {open === i && (
               <p className="border-t border-white/30 px-6 pb-5 pt-2 text-sm leading-relaxed text-ink/75">
-                {item.a}
+                {t(item.a)}
               </p>
             )}
           </GlassCard>
