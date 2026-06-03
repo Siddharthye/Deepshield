@@ -43,9 +43,16 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
       });
 
       setStatus(t("traceAutoHosting"));
-      const hosted = await publishTraceImage(preview);
-      if (!hosted) {
-        setStatus(t("traceAutoPublishFailed"));
+      let hosted: string;
+      try {
+        hosted = await publishTraceImage(preview);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "";
+        setStatus(
+          msg && msg.length < 140
+            ? `${t("traceAutoPublishFailed")} (${msg})`
+            : t("traceAutoPublishFailed"),
+        );
         return;
       }
       setPublicUrl(hosted);

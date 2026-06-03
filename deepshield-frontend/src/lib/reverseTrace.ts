@@ -96,18 +96,14 @@ export const TRACE_SEARCH_ENGINES: TraceSearchEngine[] = [
 ];
 
 /** Best-effort public URL for reverse search-by-URL engines (via same-origin API). */
-export async function publishTraceImage(dataUrl: string): Promise<string | null> {
-  try {
-    const { resizeDataUrlForTrace } = await import("./resizeImage");
-    const { uploadTraceImageFile } = await import("./api");
-    const resized = await resizeDataUrlForTrace(dataUrl);
-    const blob = await (await fetch(resized)).blob();
-    const type = blob.type || "image/jpeg";
-    const ext = type.includes("png") ? "png" : "jpg";
-    return uploadTraceImageFile(blob, `deepshield-trace.${ext}`);
-  } catch {
-    return null;
-  }
+export async function publishTraceImage(dataUrl: string): Promise<string> {
+  const { resizeDataUrlForTrace } = await import("./resizeImage");
+  const { uploadTraceImageFile } = await import("./api");
+  const resized = await resizeDataUrlForTrace(dataUrl);
+  const blob = await (await fetch(resized)).blob();
+  const type = blob.type || "image/jpeg";
+  const ext = type.includes("png") ? "png" : "jpg";
+  return uploadTraceImageFile(blob, `deepshield-trace.${ext}`);
 }
 
 export async function copyImageToClipboard(dataUrl: string): Promise<boolean> {

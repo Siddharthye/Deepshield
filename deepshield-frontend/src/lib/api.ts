@@ -363,7 +363,7 @@ export type ReverseTraceHit = {
 export async function uploadTraceImageFile(
   blob: Blob,
   filename = "deepshield-trace.jpg",
-): Promise<string | null> {
+): Promise<string> {
   const fd = new FormData();
   fd.append("image", blob, filename);
   const res = await fetch(`${API_BASE}/api/trace-upload`, {
@@ -374,9 +374,13 @@ export async function uploadTraceImageFile(
     publicImageUrl?: string;
     error?: { message?: string };
   };
-  if (!res.ok) return null;
+  if (!res.ok) {
+    const msg = data.error?.message ?? `Upload failed (${res.status})`;
+    throw new Error(msg);
+  }
   const url = data.publicImageUrl?.trim();
-  return url?.startsWith("http") ? url : null;
+  if (!url?.startsWith("http")) throw new Error("No public image URL returned");
+  return url;
 }
 
 export async function fetchReverseTrace(args: {

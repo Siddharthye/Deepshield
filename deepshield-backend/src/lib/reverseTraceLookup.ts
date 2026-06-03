@@ -191,44 +191,71 @@ function parseDataUrl(dataUrl: string): { bytes: Buffer; mime: string; ext: stri
   return { bytes, mime, ext };
 }
 
+async function uploadToTempfile(blob: Blob, filename: string): Promise<string | null> {
+  const fd = new FormData();
+  fd.append("files", blob, filename);
+  fd.append("expiryHours", "48");
+  const res = await fetch("https://tempfile.org/api/upload/local", {
+    method: "POST",
+    body: fd,
+    signal: AbortSignal.timeout(25_000),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    success?: boolean;
+    files?: Array<{ id?: string }>;
+  };
+  const id = data.files?.[0]?.id;
+  if (!data.success || !id) return null;
+  const isImage = /\.(jpe?g|png|webp|gif)$/i.test(filename) || blob.type.startsWith("image/");
+  return isImage
+    ? `https://tempfile.org/${id}/preview`
+    : `https://tempfile.org/${id}/download`;
+}
+
+async function uploadToCatbox(blob: Blob, filename: string): Promise<string | null> {
+  const fd = new FormData();
+  fd.append("reqtype", "fileupload");
+  fd.append("fileToUpload", blob, filename);
+  const res = await fetch("https://catbox.moe/user/api.php", {
+    method: "POST",
+    body: fd,
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!res.ok) return null;
+  const url = (await res.text()).trim();
+  return url.startsWith("http") ? url : null;
+}
+
+async function uploadToLitterbox(blob: Blob, filename: string): Promise<string | null> {
+  const fd = new FormData();
+  fd.append("reqtype", "fileupload");
+  fd.append("time", "72h");
+  fd.append("fileToUpload", blob, filename);
+  const res = await fetch("https://litterbox.catbox.moe/resources/internals/api.php", {
+    method: "POST",
+    body: fd,
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!res.ok) return null;
+  const url = (await res.text()).trim();
+  return url.startsWith("http") ? url : null;
+}
+
 export async function uploadTraceBuffer(
   bytes: Buffer,
   mime: string,
   filename: string,
 ): Promise<string | null> {
   const blob = new Blob([new Uint8Array(bytes)], { type: mime });
-
-  const catbox = new FormData();
-  catbox.append("reqtype", "fileupload");
-  catbox.append("fileToUpload", blob, filename);
-  try {
-    const res = await fetch("https://catbox.moe/user/api.php", {
-      method: "POST",
-      body: catbox,
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (res.ok) {
-      const url = (await res.text()).trim();
-      if (url.startsWith("http")) return url;
+  const hosts = [uploadToTempfile, uploadToCatbox, uploadToLitterbox];
+  for (const upload of hosts) {
+    try {
+      const url = await upload(blob, filename);
+      if (url) return url;
+    } catch {
+      /* try next host */
     }
-  } catch {
-    /* next */
-  }
-
-  const ox = new FormData();
-  ox.append("file", blob, filename);
-  try {
-    const res = await fetch("https://0x0.st", {
-      method: "POST",
-      body: ox,
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (res.ok) {
-      const url = (await res.text()).trim();
-      if (url.startsWith("http")) return url;
-    }
-  } catch {
-    /* exhausted */
   }
   return null;
 }
