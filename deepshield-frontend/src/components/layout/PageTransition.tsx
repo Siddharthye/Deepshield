@@ -1,8 +1,8 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { BrandLogo } from "@/components/ui/BrandLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -69,8 +69,18 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
               }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              <BrandLogo size="lg" showWordmark={false} />
-              <p className="font-display mt-5 text-lg tracking-tight text-ink">DeepShield</p>
+              <div className="overflow-hidden rounded-3xl bg-white p-3 shadow-[0_24px_80px_rgba(63,46,58,0.1)] ring-1 ring-pink/40">
+                <Image
+                  src="/images/ds-logo.jpeg"
+                  alt="DeepShield"
+                  width={80}
+                  height={80}
+                  className="rounded-2xl object-contain"
+                  unoptimized
+                  priority
+                />
+              </div>
+              <p className="font-display mt-5 text-xl tracking-tight text-ink">DeepShield</p>
               <p className="mt-1 text-xs text-ink-subtle">{t("transitionTagline")}</p>
             </motion.div>
           </motion.div>

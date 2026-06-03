@@ -23,12 +23,6 @@ export const EN = {
   trust1: "Browser-first privacy",
   trust2: "No account required",
   trust3: "Free for survivors",
-  heroMomentBadge: "Private by design",
-  heroMomentQuote:
-    "Your media stays on this device. Nothing is uploaded unless you choose to save or report.",
-  heroMomentCaption:
-    "Built for survivors of digital violence — calm, clear, and under your control.",
-  heroMomentFootnote: "Always",
   typewriter1: "Detect deepfakes in seconds.",
   typewriter2: "Generate legal proof instantly.",
   typewriter3: "Find where your photo was shared.",
@@ -51,42 +45,12 @@ export const EN = {
   heroPanelTitle: "What you can do right now",
   heroPanelIntro:
     "Everything runs in your browser. No signup, no cloud gallery of your photos — only tools you choose to use.",
-  heroPanelScan: "Check if a photo or video looks fake",
-  heroPanelTrace: "Find where your image was posted online",
-  heroPanelReport: "Download a report for police or cyber cell",
-  heroPanelVault: "Save evidence privately on this phone",
-  heroPanelAsha: "Talk to Asha — support and your rights",
-  heroPanelScanCta: "Open scan",
-  heroPanelTraceCta: "Start trace",
-  heroPanelReportCta: "Build report",
-  heroPanelVaultCta: "Open vault",
-  heroPanelAshaCta: "Chat now",
-  heroPanelLawTitle: "You may have legal options",
-  heroPanelLaw:
-    "Non-consensual morphed or deepfake images can be reported under Indian cyber and criminal laws. DeepShield helps you gather proof — a lawyer or cyber cell can guide next steps.",
-  heroPanelUrgentBadge: "In danger right now?",
-  heroPanelUrgentIntro: "Call the national cyber crime helpline. They can advise on urgent reporting.",
-  heroPanelCall1930: "Call 1930 now",
-  heroGuideBadge: "Start here",
-  heroGuideTitle: "What do you need right now?",
-  heroGuideIntro:
-    "Pick the step that matches how you feel. You can come back anytime — no account needed.",
-  heroGuideScanTitle: "Is this photo or video real?",
-  heroGuideScanDesc:
-    "Upload what worries you. You will get a simple risk result and a picture showing which areas look edited.",
-  heroGuideScanCta: "Check a photo",
-  heroGuideTraceTitle: "Where was my face shared?",
-  heroGuideTraceDesc:
-    "Search the web for copies of your image and save links as evidence for a complaint.",
-  heroGuideTraceCta: "Trace my image",
-  heroGuideAshaTitle: "I need to talk to someone",
-  heroGuideAshaDesc:
-    "Asha offers calm, private chat about what happened and what you can do next — not a replacement for police if you are unsafe.",
-  heroGuideAshaCta: "Talk to Asha",
-  heroGuideCrisisTitle: "National helplines (India)",
-  heroGuideCrisisIntro: "Tap to call. Available if you want human help beyond this website.",
-  heroGuideReassure:
-    "You are not alone. Nothing is saved to the cloud unless you choose to scan or export a report.",
+  heroPanelScan: "Scan — 3-signal deepfake check + heatmap",
+  heroPanelTrace: "Trace — log where your image was posted",
+  heroPanelReport: "Report — legal PDF for authorities",
+  heroPanelVault: "Vault — PIN-encrypted evidence on device",
+  heroPanelAsha: "Asha — support chat + know your rights",
+  heroPanelLaw: "Laws: IT Act §66E, §67, §67A · IPC §354C",
   problemStat1Val: "Minutes",
   problemStat1Lbl: "to spread",
   problemStat1Txt:

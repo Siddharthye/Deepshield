@@ -55,10 +55,10 @@ export function FeatureOrbs() {
                 onMouseEnter={() => setActive(f.id)}
                 onFocus={() => setActive(f.id)}
                 onClick={() => setActive(f.id)}
-                className={`absolute flex flex-col items-center justify-center rounded-full shadow-sm transition-colors ${
+                className={`absolute flex flex-col items-center justify-center rounded-full shadow-md transition-colors ${
                   isActive
-                    ? "z-20 bg-[var(--color-koubai)] text-white ring-4 ring-[var(--color-berry)]/70"
-                    : "z-10 bg-white text-ink-muted ring-1 ring-black/8 hover:bg-[var(--color-berry)]/40"
+                    ? "z-20 bg-secondary text-primary ring-4 ring-pink/50"
+                    : "z-10 bg-primary text-ink-muted ring-1 ring-secondary/15 hover:bg-secondary/8"
                 }`}
                 style={{ ...orbStyle(i, ORB_FEATURE_META.length), width: ORB_SIZE, height: ORB_SIZE }}
                 animate={{ scale: isActive ? 1.12 : dim ? 0.88 : 1, opacity: dim ? 0.55 : 1 }}
@@ -81,7 +81,7 @@ export function FeatureOrbs() {
           >
             <GlassCard className="p-8">
               <div className="flex items-start gap-4">
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-berry)]/55 text-2xl">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-peach/50 text-2xl">
                   {current.icon}
                 </span>
                 <div>
@@ -108,8 +108,8 @@ export function FeatureOrbs() {
                       onClick={() => setLanguage(l.code as LanguageCode)}
                       className={`rounded-full px-5 py-2.5 text-sm font-medium shadow-md transition ${
                         language === l.code
-                          ? "bg-[var(--color-koubai)] text-white ring-2 ring-[var(--color-berry)]/60"
-                          : "border border-black/8 bg-white/80 text-ink-muted hover:bg-white"
+                          ? "bg-gradient-to-r from-pink to-peach text-ink ring-2 ring-sage/50"
+                          : "border border-sage/50 bg-cream/90 text-ink-muted hover:bg-blue/35"
                       }`}
                       aria-pressed={language === l.code}
                     >
@@ -120,7 +120,7 @@ export function FeatureOrbs() {
               ) : (
                 <Link
                   href={current.href}
-                  className="mt-6 inline-flex rounded-full bg-[var(--color-koubai)] px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-glow)] hover:brightness-[1.06]"
+                  className="mt-6 inline-flex rounded-full bg-gradient-to-r from-pink to-peach px-5 py-2.5 text-sm font-medium text-ink shadow-md hover:brightness-105"
                 >
                   {t("openFeature")} {t(keys.label)} {t("openFeatureArrow")}
                 </Link>

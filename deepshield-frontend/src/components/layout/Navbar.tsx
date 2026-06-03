@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { BrandLogo } from "@/components/ui/BrandLogo";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
@@ -25,13 +25,13 @@ export function Navbar() {
   const bg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(250, 249, 247, 0)", "rgba(250, 249, 247, 0.82)"],
+    ["rgba(251, 247, 244, 0)", "rgba(251, 247, 244, 0.94)"],
   );
-  const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(20px)"]);
+  const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(18px)"]);
   const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(87, 85, 39, 0)", "rgba(87, 85, 39, 0.08)"],
+    ["rgba(63, 46, 58, 0)", "rgba(63, 46, 58, 0.12)"],
   );
   const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
   const radius = useTransform(scrollY, [0, 80], [0, 9999]);
@@ -54,11 +54,17 @@ export function Navbar() {
       className="fixed z-50 w-full border-b border-transparent shadow-sm"
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2.5 md:gap-3 md:py-3">
-        <BrandLogo
-          href="/"
-          size="sm"
-          className="[&>span:nth-child(2)]:hidden sm:[&>span:nth-child(2)]:inline"
-        />
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/images/ds-logo.jpeg"
+            alt="DeepShield"
+            width={36}
+            height={36}
+            className="rounded-lg object-contain ring-1 ring-blue/40"
+            unoptimized
+          />
+          <span className="font-display hidden text-ink sm:inline">DeepShield</span>
+        </Link>
         <nav className="flex flex-wrap items-center justify-center gap-0.5 text-xs md:text-sm">
           {LINKS.map(({ href, key }) => {
             const active =
@@ -69,8 +75,8 @@ export function Navbar() {
                 href={href}
                 className={`rounded-full px-2 py-1.5 md:px-3 ${
                   active
-                    ? "bg-white/90 font-medium text-ink shadow-sm ring-1 ring-black/6"
-                    : "text-ink-muted hover:bg-white/50"
+                    ? "bg-secondary/12 font-medium text-ink ring-1 ring-secondary/25"
+                    : "text-ink-muted hover:bg-secondary/8"
                 }`}
               >
                 {t(key)}

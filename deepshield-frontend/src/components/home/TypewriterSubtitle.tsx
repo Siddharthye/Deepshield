@@ -11,9 +11,7 @@ const PHRASE_KEYS: I18nKey[] = [
   "typewriter4",
 ];
 
-type Props = { className?: string };
-
-export function TypewriterSubtitle({ className = "" }: Props) {
+export function TypewriterSubtitle() {
   const { t, language } = useLanguage();
   const [text, setText] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
@@ -52,7 +50,7 @@ export function TypewriterSubtitle({ className = "" }: Props) {
   }, [text, deleting, phraseIdx, t]);
 
   return (
-    <p className={`text-ink-muted ${className || "mt-3 min-h-[1.75rem] text-lg"}`}>
+    <p className="mt-3 min-h-[1.75rem] text-lg text-ink-muted">
       {text}
       <span className="ml-0.5 inline-block animate-pulse text-accent">|</span>
     </p>

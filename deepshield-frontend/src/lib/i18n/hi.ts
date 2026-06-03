@@ -24,12 +24,6 @@ export const HI: Record<keyof typeof EN, string> = {
   trust1: "ब्राउज़र-प्रथम गोपनीयता",
   trust2: "खाते की ज़रूरत नहीं",
   trust3: "पीड़ितों के लिए मुफ़्त",
-  heroMomentBadge: "डिज़ाइन से निजी",
-  heroMomentQuote:
-    "आपकी मीडिया इस डिवाइस पर रहती है। जब तक आप सहेजें या रिपोर्ट न करें, कुछ अपलोड नहीं होता।",
-  heroMomentCaption:
-    "डिजिटल हिंसा से पीड़ितों के लिए — शांत, स्पष्ट, और आपके नियंत्रण में।",
-  heroMomentFootnote: "हमेशा",
   typewriter1: "सेकंडों में डीपफेक पहचानें।",
   typewriter2: "तुरंत कानूनी सबूत बनाएं।",
   typewriter3: "पता करें आपकी फ़ोटो कहाँ साझा हुई।",
@@ -52,42 +46,12 @@ export const HI: Record<keyof typeof EN, string> = {
   heroPanelTitle: "अभी आप क्या कर सकती हैं",
   heroPanelIntro:
     "सब कुछ आपके ब्राउज़र में चलता है। कोई साइन-अप नहीं, कोई क्लाउड गैलरी नहीं — केवल वे टूल जो आप चुनती हैं।",
-  heroPanelScan: "जाँचें कि फ़ोटो या वीडियो नकली तो नहीं",
-  heroPanelTrace: "पता करें आपकी छवि ऑनलाइन कहाँ साझा हुई",
-  heroPanelReport: "पुलिस या साइबर सेल के लिए रिपोर्ट डाउनलोड",
-  heroPanelVault: "सबूत इस फ़ोन पर निजी रूप से सहेजें",
-  heroPanelAsha: "आशा से बात करें — सहायता और अधिकार",
-  heroPanelScanCta: "स्कैन खोलें",
-  heroPanelTraceCta: "ट्रेस शुरू",
-  heroPanelReportCta: "रिपोर्ट बनाएं",
-  heroPanelVaultCta: "वॉल्ट खोलें",
-  heroPanelAshaCta: "अभी चैट",
-  heroPanelLawTitle: "आपके पास कानूनी विकल्प हो सकते हैं",
-  heroPanelLaw:
-    "गैर-सहमति वाली मॉर्फ्ड या डीपफेक छवियों की रिपोर्ट भारतीय साइबर और आपराधिक कानूनों के तहत हो सकती है। DeepShield सबूत इकट्ठा करने में मदद करता है।",
-  heroPanelUrgentBadge: "अभी खतरे में?",
-  heroPanelUrgentIntro: "राष्ट्रीय साइबर क्राइम हेल्पलाइन पर कॉल करें।",
-  heroPanelCall1930: "अभी 1930 पर कॉल",
-  heroGuideBadge: "यहाँ से शुरू",
-  heroGuideTitle: "अभी आपको क्या चाहिए?",
-  heroGuideIntro:
-    "वह कदम चुनें जो आपकी स्थिति से मेल खाए। बाद में वापस आ सकती हैं — खाते की ज़रूरत नहीं।",
-  heroGuideScanTitle: "क्या यह फ़ोटो या वीडियो असली है?",
-  heroGuideScanDesc:
-    "जो चिंतित करे वह अपलोड करें। सरल जोखिम परिणाम और संपादित हिस्सों की तस्वीर मिलेगी।",
-  heroGuideScanCta: "फ़ोटो जाँचें",
-  heroGuideTraceTitle: "मेरा चेहरा कहाँ साझा हुआ?",
-  heroGuideTraceDesc:
-    "वेब पर अपनी छवि की प्रतियाँ खोजें और शिकायत के लिए लिंक सहेजें।",
-  heroGuideTraceCta: "छवि ट्रेस करें",
-  heroGuideAshaTitle: "मुझे किसी से बात करनी है",
-  heroGuideAshaDesc:
-    "आशा शांत, निजी चैट देती है — पुलिस का विकल्प नहीं यदि आप असुरक्षित हैं।",
-  heroGuideAshaCta: "आशा से बात",
-  heroGuideCrisisTitle: "राष्ट्रीय हेल्पलाइन (भारत)",
-  heroGuideCrisisIntro: "कॉल के लिए टैप करें।",
-  heroGuideReassure:
-    "आप अकेली नहीं हैं। स्कैन या रिपोर्ट निर्यात के अलावा कुछ क्लाउड में नहीं जाता।",
+  heroPanelScan: "स्कैन — 3-संकेत डीपफेक जाँच + हीटमैप",
+  heroPanelTrace: "ट्रेस — पता करें छवि कहाँ पोस्ट हुई",
+  heroPanelReport: "रिपोर्ट — अधिकारियों के लिए कानूनी PDF",
+  heroPanelVault: "वॉल्ट — डिवाइस पर PIN से सुरक्षित सबूत",
+  heroPanelAsha: "आशा — सहायता चैट + अपने अधिकार जानें",
+  heroPanelLaw: "कानून: IT Act §66E, §67, §67A · IPC §354C",
   problemStat1Val: "मिनट",
   problemStat1Lbl: "फैलने में",
   problemStat1Txt:
