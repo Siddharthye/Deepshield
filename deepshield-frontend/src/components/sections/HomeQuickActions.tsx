@@ -18,13 +18,13 @@ export function HomeQuickActions() {
   const { t } = useLanguage();
 
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-8">
+    <section id="tools" className="mx-auto max-w-6xl px-4 pb-8 scroll-mt-24">
       <p className="page-badge">{t("quickStartBadge")}</p>
       <h2 className="font-display text-xl text-ink md:text-2xl">{t("quickStartTitle")}</h2>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {ACTIONS.map((a) => (
           <Link key={a.href} href={a.href}>
-            <GlassCard className="flex h-full gap-4 p-5 transition hover:ring-2 hover:ring-sage/40">
+            <GlassCard className="flex h-full gap-4 p-5 transition hover:ring-2 hover:ring-[var(--color-berry)]/80">
               <span className="text-2xl">{a.icon}</span>
               <div>
                 <p className="font-semibold text-ink">{t(a.titleKey)}</p>
