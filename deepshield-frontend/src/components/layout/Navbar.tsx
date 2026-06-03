@@ -25,13 +25,13 @@ export function Navbar() {
   const bg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(251, 247, 244, 0)", "rgba(251, 247, 244, 0.94)"],
+    ["rgba(250, 249, 247, 0)", "rgba(250, 249, 247, 0.82)"],
   );
-  const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(18px)"]);
+  const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(20px)"]);
   const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(63, 46, 58, 0)", "rgba(63, 46, 58, 0.12)"],
+    ["rgba(87, 85, 39, 0)", "rgba(87, 85, 39, 0.08)"],
   );
   const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
   const radius = useTransform(scrollY, [0, 80], [0, 9999]);
@@ -75,8 +75,8 @@ export function Navbar() {
                 href={href}
                 className={`rounded-full px-2 py-1.5 md:px-3 ${
                   active
-                    ? "bg-secondary/12 font-medium text-ink ring-1 ring-secondary/25"
-                    : "text-ink-muted hover:bg-secondary/8"
+                    ? "bg-white/90 font-medium text-ink shadow-sm ring-1 ring-black/6"
+                    : "text-ink-muted hover:bg-white/50"
                 }`}
               >
                 {t(key)}

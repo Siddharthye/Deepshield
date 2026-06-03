@@ -6,17 +6,17 @@ import { motion } from "framer-motion";
 
 const variants = {
   primary:
-    "bg-gradient-to-r from-pink to-peach text-ink shadow-[0_4px_20px_rgba(155,127,168,0.35)] hover:brightness-105",
+    "bg-[var(--color-koubai)] text-white shadow-[var(--shadow-glow)] hover:brightness-[1.06] active:scale-[0.98]",
   secondary:
-    "border border-secondary/35 bg-primary text-ink hover:bg-secondary/10",
-  dark: "bg-secondary text-primary hover:opacity-90",
-  ghost: "text-accent hover:bg-peach/50",
+    "border border-[color-mix(in_srgb,var(--color-soldier)_14%,transparent)] bg-white/80 text-ink shadow-sm hover:bg-white",
+  dark: "bg-[var(--color-soldier)] text-[var(--color-fog)] hover:opacity-90",
+  ghost: "text-accent hover:bg-white/60",
 } as const;
 
 type Variant = keyof typeof variants;
 
 function baseClasses(variant: Variant, className = "") {
-  return `relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2.5 text-sm font-medium ${variants[variant]} ${className}`;
+  return `relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-2.5 text-sm font-semibold tracking-tight ${variants[variant]} ${className}`;
 }
 
 type ButtonProps = {

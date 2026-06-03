@@ -192,7 +192,7 @@ export function AshaChat({
               type="button"
               onClick={() => send()}
               disabled={streaming}
-              className="rounded-full bg-gradient-to-r from-pink to-peach px-5 py-2.5 text-sm font-medium text-ink shadow-md transition hover:brightness-105 disabled:opacity-50"
+              className="rounded-full bg-[var(--color-koubai)] px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-glow)] transition hover:brightness-[1.06] disabled:opacity-50"
             >
               {t("ashaSend")}
             </button>
@@ -204,7 +204,7 @@ export function AshaChat({
         <button
           type="button"
           onClick={() => setCrisisOpen((o) => !o)}
-          className="w-full rounded-full border border-pink/50 bg-gradient-to-r from-pink/40 to-peach/50 px-5 py-3 text-sm font-semibold text-ink transition hover:from-pink/55 hover:to-peach/60"
+          className="w-full rounded-full border border-[var(--color-berry)] bg-[color-mix(in_srgb,var(--color-berry)_45%,white)] px-5 py-3 text-sm font-semibold text-ink transition hover:bg-[var(--color-berry)]/70"
         >
           {t("ashaImmediateHelp")}
         </button>

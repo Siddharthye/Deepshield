@@ -18,8 +18,6 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { CtaStrip } from "@/components/sections/CtaStrip";
 import { WaveDivider } from "@/components/sections/WaveDivider";
 import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
-import { HeroPanel } from "@/components/home/HeroPanel";
-import { HeroGuidance } from "@/components/home/HeroGuidance";
 import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -32,56 +30,54 @@ export default function HomePage() {
     <div key={language} className="relative overflow-hidden pt-16">
       <HeroParticles />
 
-      <section className="relative mx-auto max-w-6xl px-4 py-12 md:py-16">
-        <div className="grid items-stretch gap-10 lg:grid-cols-[1fr_minmax(280px,380px)] lg:gap-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex min-h-0 flex-col"
-          >
-            <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
-              <div className="relative shrink-0">
-                <AnimatedShield className="absolute -right-2 -top-2 h-12 w-12 opacity-80" />
-                <Image
-                  src="/images/ds-logo.jpeg"
-                  alt={t("brandAlt")}
-                  width={140}
-                  height={140}
-                  className="relative rounded-3xl object-contain shadow-lg ring-2 ring-sage/50"
-                  priority
-                  unoptimized
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="page-badge">{t("tagline")}</p>
-                <h1 className="font-display text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem]">
-                  {t("heroTitle")}
-                </h1>
-                <TypewriterSubtitle />
-                <p className="mt-4 text-base leading-relaxed text-ink-muted">{t("homeHero")}</p>
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">{t("heroExtra")}</p>
-                <ul className="mt-4 flex flex-wrap gap-2">
-                  {TRUST_KEYS.map((key) => (
-                    <li
-                      key={key}
-                      className="rounded-full bg-sage/45 px-3 py-1 text-xs font-medium text-ink-muted"
-                    >
-                      {t(key)}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <ButtonLink href="/scan">{t("scanNow")}</ButtonLink>
-                  <ButtonLink href="/asha" variant="secondary">
-                    {t("talkToAsha")}
-                  </ButtonLink>
-                </div>
-              </div>
-            </div>
-            <HeroGuidance />
-          </motion.div>
-          <HeroPanel />
-        </div>
+      <section className="relative mx-auto max-w-3xl px-4 py-14 md:py-20 lg:max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center text-center sm:items-start sm:text-left"
+        >
+          <div className="relative mb-8 shrink-0">
+            <AnimatedShield className="absolute -right-2 -top-2 h-11 w-11 opacity-70" />
+            <Image
+              src="/images/ds-logo.jpeg"
+              alt={t("brandAlt")}
+              width={120}
+              height={120}
+              className="relative rounded-[22px] object-contain shadow-[var(--shadow-soft)] ring-1 ring-black/5"
+              priority
+              unoptimized
+            />
+          </div>
+          <p className="page-badge">{t("tagline")}</p>
+          <h1 className="font-display text-3xl leading-[1.15] tracking-tight text-ink md:text-[2.65rem]">
+            {t("heroTitle")}
+          </h1>
+          <div className="mt-3 w-full max-w-xl">
+            <TypewriterSubtitle />
+          </div>
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">
+            {t("homeHero")}
+          </p>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-subtle">
+            {t("heroExtra")}
+          </p>
+          <ul className="mt-6 flex flex-wrap justify-center gap-2 sm:justify-start">
+            {TRUST_KEYS.map((key) => (
+              <li
+                key={key}
+                className="rounded-full bg-white/70 px-3.5 py-1.5 text-xs font-medium text-ink-muted shadow-sm ring-1 ring-black/5"
+              >
+                {t(key)}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-9 flex flex-wrap justify-center gap-3 sm:justify-start">
+            <ButtonLink href="/scan">{t("scanNow")}</ButtonLink>
+            <ButtonLink href="/asha" variant="secondary">
+              {t("talkToAsha")}
+            </ButtonLink>
+          </div>
+        </motion.div>
       </section>
 
       <HomeCrisisStrip />

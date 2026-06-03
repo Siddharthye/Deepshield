@@ -14,7 +14,7 @@ export function HomeCrisisStrip() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <GlassCard className="glass-card-tint-blue border-blue/30 p-6">
+      <GlassCard className="glass-card-tint-blue p-6 md:p-8">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
           {t("crisisBadge")}
         </p>
@@ -23,7 +23,7 @@ export function HomeCrisisStrip() {
           {HELPLINES.map((h) => (
             <div
               key={h.number}
-              className="rounded-2xl bg-cream/80 px-4 py-3 ring-1 ring-sage/35"
+              className="rounded-[var(--radius-card)] bg-white/75 px-4 py-3.5 ring-1 ring-black/6"
             >
               <p className="text-xs font-medium text-ink-muted">{h.name}</p>
               <p className="font-display text-xl text-ink">{h.number}</p>
