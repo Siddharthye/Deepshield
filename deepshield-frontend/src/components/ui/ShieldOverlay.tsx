@@ -2,14 +2,17 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { AnimatedShield } from "@/components/ui/AnimatedShield";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function ShieldOverlay({
   show,
-  message = "Protected.",
+  message,
 }: {
   show: boolean;
   message?: string;
 }) {
+  const { t } = useLanguage();
+  const label = message ?? t("protected");
   return (
     <AnimatePresence>
       {show && (
@@ -35,7 +38,7 @@ export function ShieldOverlay({
               aria-hidden
             />
             <AnimatedShield className="mx-auto mb-4 h-16 w-16" />
-            <p className="font-display text-3xl text-ink">{message}</p>
+            <p className="font-display text-3xl text-ink">{label}</p>
           </motion.div>
         </motion.div>
       )}

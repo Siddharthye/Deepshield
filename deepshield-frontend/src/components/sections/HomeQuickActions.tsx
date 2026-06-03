@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { useLanguage } from "@/context/LanguageContext";
 
 const ACTIONS = [
   {
@@ -41,10 +44,12 @@ const ACTIONS = [
 ];
 
 export function HomeQuickActions() {
+  const { t } = useLanguage();
+
   return (
     <section className="mx-auto max-w-6xl px-4 pb-8">
-      <p className="page-badge">Quick start</p>
-      <h2 className="font-display text-xl text-ink md:text-2xl">Jump to what you need</h2>
+      <p className="page-badge">{t("quickStartBadge")}</p>
+      <h2 className="font-display text-xl text-ink md:text-2xl">{t("quickStartTitle")}</h2>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {ACTIONS.map((a) => (
           <Link key={a.href} href={a.href}>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function AmbientSoundToggle() {
+  const { t } = useLanguage();
   const [on, setOn] = useState(false);
   const ctxRef = useRef<AudioContext | null>(null);
   const oscRef = useRef<OscillatorNode | null>(null);
@@ -39,7 +41,7 @@ export function AmbientSoundToggle() {
       className="fixed bottom-20 right-4 z-50 rounded-full border border-sage/50 bg-cream/90 px-3 py-2 text-xs text-ink shadow-md backdrop-blur md:bottom-6"
       aria-label="Toggle ambient sound"
     >
-      {on ? "🔊 Sound on" : "🔇 Sound off"}
+      {on ? `🔊 ${t("soundOn")}` : `🔇 ${t("soundOff")}`}
     </button>
   );
 }

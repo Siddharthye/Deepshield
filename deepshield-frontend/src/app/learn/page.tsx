@@ -24,7 +24,7 @@ const CARDS = [
 ];
 
 export default function LearnPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [score, setScore] = useState(0);
   const [round, setRound] = useState<{ hintA: string; hintB: string; answer: "a" | "b"; explanation: string } | null>(null);
   const [picked, setPicked] = useState<"a" | "b" | null>(null);
@@ -62,9 +62,9 @@ export default function LearnPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:py-14 pb-24 md:pb-14">
       <PageHeader
-        badge="Learn"
-        title="Awareness hub"
-        subtitle="LLM-generated quiz rounds and educational cards — spot deepfakes with confidence."
+        badge={t("learnPageBadge")}
+        title={t("learnPageTitle")}
+        subtitle={t("learnPageSubtitle")}
       />
 
       <GlassCard className="mb-8">

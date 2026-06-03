@@ -8,15 +8,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 
 const LINKS = [
-  { href: "/", key: "navHome" },
-  { href: "/scan", key: "navScan" },
-  { href: "/trace", key: "navTrace" },
-  { href: "/report", key: "navReport" },
-  { href: "/vault", key: "navVault" },
-  { href: "/asha", key: "navAsha" },
-  { href: "/community", key: "navCommunity" },
-  { href: "/learn", key: "navLearn" },
-] as const;
+  { href: "/", key: "navHome" as const },
+  { href: "/scan", key: "navScan" as const },
+  { href: "/trace", key: "navTrace" as const },
+  { href: "/report", key: "navReport" as const },
+  { href: "/vault", key: "navVault" as const },
+  { href: "/asha", key: "navAsha" as const },
+  { href: "/community", key: "navCommunity" as const },
+  { href: "/learn", key: "navLearn" as const },
+];
 
 export function Navbar() {
   const pathname = usePathname();
@@ -25,13 +25,13 @@ export function Navbar() {
   const bg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(253, 246, 235, 0)", "rgba(253, 214, 193, 0.94)"],
+    ["rgba(253, 246, 235, 0)", "rgba(214, 232, 242, 0.92)"],
   );
   const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(18px)"]);
   const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(197, 204, 173, 0)", "rgba(197, 204, 173, 0.5)"],
+    ["rgba(197, 204, 173, 0)", "rgba(197, 204, 173, 0.55)"],
   );
   const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
   const radius = useTransform(scrollY, [0, 80], [0, 9999]);
@@ -60,25 +60,29 @@ export function Navbar() {
             alt="DeepShield"
             width={36}
             height={36}
-            className="rounded-lg object-contain"
+            className="rounded-lg object-contain ring-1 ring-blue/40"
             unoptimized
           />
           <span className="font-display hidden text-ink sm:inline">DeepShield</span>
         </Link>
         <nav className="flex flex-wrap items-center justify-center gap-0.5 text-xs md:text-sm">
-          {LINKS.map(({ href, key }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`rounded-full px-2 py-1.5 md:px-3 ${
-                pathname === href || (href !== "/" && pathname.startsWith(href))
-                  ? "bg-pink/55 font-medium text-ink"
-                  : "text-ink/70 hover:bg-blue/45"
-              }`}
-            >
-              {t(key)}
-            </Link>
-          ))}
+          {LINKS.map(({ href, key }) => {
+            const active =
+              href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`rounded-full px-2 py-1.5 md:px-3 ${
+                  active
+                    ? "bg-blue/50 font-medium text-ink ring-1 ring-sage/40"
+                    : "text-ink/70 hover:bg-sage/35"
+                }`}
+              >
+                {t(key)}
+              </Link>
+            );
+          })}
         </nav>
         <LanguageMenu />
       </div>

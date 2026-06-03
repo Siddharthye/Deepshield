@@ -1,8 +1,11 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ButtonLink } from "@/components/ui/Button";
+import { useLanguage } from "@/context/LanguageContext";
 
 const STEPS = [
   {
@@ -44,14 +47,13 @@ const STEPS = [
 ];
 
 export function HowItWorksPinned() {
+  const { t } = useLanguage();
+
   return (
     <section className="section-pad mx-auto max-w-6xl px-4">
-      <p className="page-badge">How it works</p>
-      <h2 className="font-display text-2xl text-ink md:text-3xl">Your path from harm to action</h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">
-        You do not have to figure this out alone. DeepShield walks you through detection,
-        evidence, and next steps — without storing your files on our servers.
-      </p>
+      <p className="page-badge">{t("howBadge")}</p>
+      <h2 className="font-display text-2xl text-ink md:text-3xl">{t("howTitle")}</h2>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">{t("howIntro")}</p>
 
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {STEPS.map((s, i) => (

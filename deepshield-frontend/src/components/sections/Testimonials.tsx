@@ -24,16 +24,12 @@ const PRINCIPLES = [
 ];
 
 export function Testimonials() {
+  const { t } = useLanguage();
+
   return (
-    <section className="section-pad mx-auto max-w-6xl px-4">
-      <p className="page-badge">Voices & values</p>
-      <h2 className="font-display text-2xl text-ink md:text-3xl">
-        Built for dignity, not spectacle
-      </h2>
-      <p className="mt-3 max-w-2xl text-sm text-ink/70">
-        DeepShield is infrastructure for people facing image-based abuse — designed with input
-        from advocates and privacy-first engineering.
-      </p>
+    <section className="section-pad section-alt-blue mx-auto max-w-6xl px-4">
+      <p className="page-badge">{t("voicesBadge")}</p>
+      <h2 className="font-display text-2xl text-ink md:text-3xl">{t("voicesTitle")}</h2>
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {PRINCIPLES.map((p) => (

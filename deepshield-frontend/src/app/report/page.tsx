@@ -16,7 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { ScanSession } from "@/lib/types";
 
 export default function ReportPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [scan, setScan] = useState<ScanSession | null>(null);
   const [legalSummary, setLegalSummary] = useState<string | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
@@ -63,9 +63,9 @@ export default function ReportPage() {
     <div className="mx-auto max-w-3xl px-4 py-10 md:py-14 pb-24 md:pb-14">
       <ShieldOverlay show={shield} />
       <PageHeader
-        badge="Evidence"
-        title="Legal evidence report"
-        subtitle="LLM legal summary, PDF with scan image, trace URLs, and cybercrime filing prep."
+        badge={t("reportPageBadge")}
+        title={t("reportPageTitle")}
+        subtitle={t("reportPageSubtitle")}
       />
 
       {!scan ? (

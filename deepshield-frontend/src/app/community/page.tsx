@@ -25,7 +25,7 @@ function randomAuthor() {
 }
 
 export default function CommunityPage() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [text, setText] = useState("");
   const [tag, setTag] = useState(TAGS[0]);
@@ -72,9 +72,9 @@ export default function CommunityPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
       <PageHeader
-        badge="Community"
-        title="Community shield"
-        subtitle="Anonymous stories and solidarity — stored only on your device."
+        badge={t("communityPageBadge")}
+        title={t("communityPageTitle")}
+        subtitle={t("communityPageSubtitle")}
       />
 
       <GlassCard className="mb-8 space-y-4">

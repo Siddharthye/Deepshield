@@ -42,7 +42,7 @@ function AnimatedRisk({ value }: { value: number }) {
 }
 
 export function ImageScanner() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [preview, setPreview] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState("image/jpeg");
   const [loading, setLoading] = useState(false);
@@ -144,8 +144,8 @@ export function ImageScanner() {
 
       <GlassCard>
         <label className="upload-zone">
-          <span className="font-display text-lg text-ink">Upload JPG or PNG</span>
-          <span className="mt-2 text-sm text-ink/60">face-api · OpenCV · HF model</span>
+          <span className="font-display text-lg text-ink">{t("uploadImageTitle")}</span>
+          <span className="mt-2 text-sm text-ink/60">{t("uploadImageHint")}</span>
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
@@ -206,10 +206,8 @@ export function ImageScanner() {
         >
           <GlassCard className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-ink">Compare original vs heatmap</p>
-              <p className="text-xs text-ink/55">
-                Drag the slider — red regions show higher manipulation suspicion
-              </p>
+              <p className="text-sm font-medium text-ink">{t("compareTitle")}</p>
+              <p className="text-xs text-ink/55">{t("compareHint")}</p>
             </div>
             <CompareSlider
               originalSrc={preview}
@@ -220,10 +218,11 @@ export function ImageScanner() {
                   showBaseImage
                 />
               }
-              overlayLabel="Heatmap"
+              originalLabel={t("originalLabel")}
+              overlayLabel={t("heatmapLabel")}
             />
             <div>
-              <p className="mb-2 text-sm font-medium text-ink">Full manipulation heatmap</p>
+              <p className="mb-2 text-sm font-medium text-ink">{t("heatmapFullTitle")}</p>
               <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-peach/50">
                 <HeatmapOverlay
                   imageSrc={preview}
@@ -231,14 +230,11 @@ export function ImageScanner() {
                   showBaseImage
                 />
               </div>
-              <p className="mt-2 text-xs text-ink/55">
-                Grid overlay combines artifact density with face-region saliency weighted by the
-                model score. Save via vault or include in your legal PDF.
-              </p>
+              <p className="mt-2 text-xs text-ink/55">{t("heatmapFullHint")}</p>
             </div>
           </GlassCard>
           <GlassCard>
-            <p className="text-sm text-ink/70">Manipulation risk</p>
+            <p className="text-sm text-ink/70">{t("manipulationRisk")}</p>
             <AnimatedRisk value={risk.finalRisk} />
             <p className="mt-2 text-xl font-medium text-pink">{verdictLabel(risk.verdict)}</p>
             <ul className="mt-4 space-y-2 text-sm text-ink/80">

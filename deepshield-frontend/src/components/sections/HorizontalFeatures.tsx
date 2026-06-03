@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { useLanguage } from "@/context/LanguageContext";
 
 const PANELS = [
   {
@@ -67,15 +68,13 @@ const PANELS = [
 ];
 
 export function HorizontalFeatures() {
+  const { t } = useLanguage();
+
   return (
-    <section className="section-pad mx-auto max-w-6xl px-4">
-      <p className="page-badge">Your journey</p>
-      <h2 className="font-display text-2xl text-ink md:text-3xl">Your journey from detection to action</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink/70">
-        Each step below is a real feature in DeepShield — not a marketing funnel. You can enter
-        at any point: scan first if you have suspicious media, or speak with Asha if you need
-        emotional support before anything else. There is no wrong order; your safety comes first.
-      </p>
+    <section className="section-pad section-alt-sage mx-auto max-w-6xl px-4">
+      <p className="page-badge">{t("journeyBadge")}</p>
+      <h2 className="font-display text-2xl text-ink md:text-3xl">{t("journeyTitle")}</h2>
+      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink/70">{t("journeyIntro")}</p>
 
       <div className="mt-8 -mx-4 flex gap-5 overflow-x-auto px-4 pb-4 snap-x snap-mandatory scroll-smooth md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:snap-none lg:grid-cols-3">
         {PANELS.map((p) => (

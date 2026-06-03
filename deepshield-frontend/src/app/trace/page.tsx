@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 import { TraceResults } from "@/components/trace/TraceResults";
+import { useLanguage } from "@/context/LanguageContext";
 
 const REPORT_LINKS = [
   { name: "Meta (Facebook/Instagram)", url: "https://www.facebook.com/help/contact/571927962448785" },
@@ -15,6 +16,7 @@ const REPORT_LINKS = [
 ];
 
 export default function TracePage() {
+  const { t } = useLanguage();
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [vaultSaved, setVaultSaved] = useState(false);
@@ -29,9 +31,9 @@ export default function TracePage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 md:py-14">
       <PageHeader
-        badge="Trace"
-        title="Reverse image tracer"
-        subtitle="Upload your photo, search with Lens or TinEye, and save URLs for your evidence report."
+        badge={t("tracePageBadge")}
+        title={t("tracePageTitle")}
+        subtitle={t("tracePageSubtitle")}
       />
 
       <GlassCard className="mb-6 space-y-4">

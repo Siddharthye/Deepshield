@@ -1,51 +1,58 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
-const PHRASES = [
-  "Detect deepfakes in seconds.",
-  "Generate legal proof instantly.",
-  "Find where your photo was shared.",
-  "You are not alone. You have rights.",
+const PHRASE_KEYS: I18nKey[] = [
+  "typewriter1",
+  "typewriter2",
+  "typewriter3",
+  "typewriter4",
 ];
 
 export function TypewriterSubtitle() {
+  const { t, language } = useLanguage();
   const [text, setText] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const phrase = PHRASES[phraseIdx];
+    setText("");
+    setPhraseIdx(0);
+    setDeleting(false);
+  }, [language]);
+
+  useEffect(() => {
+    const phrase = t(PHRASE_KEYS[phraseIdx]);
     const doneTyping = text === phrase;
     const doneDeleting = text === "";
 
     const delay = deleting ? 20 : 40;
     const pause = doneTyping ? 2000 : doneDeleting ? 400 : delay;
 
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       if (doneTyping && !deleting) {
         setDeleting(true);
         return;
       }
       if (doneDeleting && deleting) {
         setDeleting(false);
-        setPhraseIdx((i) => (i + 1) % PHRASES.length);
+        setPhraseIdx((i) => (i + 1) % PHRASE_KEYS.length);
         return;
       }
       setText(
-        deleting
-          ? phrase.slice(0, text.length - 1)
-          : phrase.slice(0, text.length + 1),
+        deleting ? phrase.slice(0, text.length - 1) : phrase.slice(0, text.length + 1),
       );
     }, pause);
 
-    return () => clearTimeout(t);
-  }, [text, deleting, phraseIdx]);
+    return () => clearTimeout(timer);
+  }, [text, deleting, phraseIdx, t]);
 
   return (
     <p className="mt-3 min-h-[1.75rem] text-lg text-ink/75">
       {text}
-      <span className="ml-0.5 inline-block animate-pulse text-pink">|</span>
+      <span className="ml-0.5 inline-block animate-pulse text-sage">|</span>
     </p>
   );
 }

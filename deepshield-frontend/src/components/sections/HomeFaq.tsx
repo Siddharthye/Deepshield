@@ -27,15 +27,13 @@ const FAQ = [
 ];
 
 export function HomeFaq() {
+  const { t } = useLanguage();
   const [open, setOpen] = useState<number | null>(0);
 
   return (
     <section className="section-pad mx-auto max-w-6xl px-4">
-      <p className="page-badge">Questions</p>
-      <h2 className="font-display text-2xl text-ink md:text-3xl">Frequently asked</h2>
-      <p className="mt-3 max-w-2xl text-sm text-ink/70">
-        Clear answers about privacy, accuracy, and how to use each part of the platform.
-      </p>
+      <p className="page-badge">{t("faqBadge")}</p>
+      <h2 className="font-display text-2xl text-ink md:text-3xl">{t("faqTitle")}</h2>
       <div className="mt-8 space-y-3">
         {FAQ.map((item, i) => (
           <GlassCard key={item.q} className="overflow-hidden p-0">

@@ -22,17 +22,7 @@ import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
 import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
-const STATS = [
-  { value: 11, label: "Core features", hint: "Scan through vault & Asha" },
-  { value: 3, label: "Detection signals", hint: "Model · face · artifacts" },
-  { value: 8, label: "Languages", hint: "Major Indian languages" },
-];
-
-const TRUST = [
-  "Browser-first privacy",
-  "No account required",
-  "Free for survivors",
-];
+const TRUST_KEYS = ["trust1", "trust2", "trust3"] as const;
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -62,23 +52,18 @@ export default function HomePage() {
           <div>
             <p className="page-badge">{t("tagline")}</p>
             <h1 className="font-display max-w-3xl text-4xl leading-tight text-ink md:text-5xl lg:text-[3.25rem]">
-              Your armor against digital violence
+              {t("heroTitle")}
             </h1>
             <TypewriterSubtitle />
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink/70">{t("homeHero")}</p>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/60">
-              DeepShield is a complete safety toolkit for anyone facing morphed photos, deepfake
-              videos, or non-consensual intimate imagery. Scan suspicious media, build a legal
-              evidence pack, trace where your image was posted, and speak with Asha — all without
-              creating an account or uploading your life to a corporate cloud.
-            </p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/60">{t("heroExtra")}</p>
             <ul className="mt-4 flex flex-wrap gap-2">
-              {TRUST.map((item) => (
+              {TRUST_KEYS.map((key) => (
                 <li
-                  key={item}
-                  className="rounded-full bg-sage/35 px-3 py-1 text-xs font-medium text-ink/80"
+                  key={key}
+                  className="rounded-full bg-sage/40 px-3 py-1 text-xs font-medium text-ink/80"
                 >
-                  {item}
+                  {t(key)}
                 </li>
               ))}
             </ul>
@@ -98,15 +83,27 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-6xl px-4 pb-8">
         <div className="grid gap-4 sm:grid-cols-3">
-          {STATS.map((s) => (
-            <GlassCard key={s.label} className="py-8 text-center" tilt>
-              <p className="font-display text-4xl text-pink">
-                <OdometerNumber value={s.value} />
-              </p>
-              <p className="mt-1 text-sm font-medium text-ink/80">{s.label}</p>
-              <p className="mt-1 text-xs text-ink/55">{s.hint}</p>
-            </GlassCard>
-          ))}
+          <GlassCard className="py-8 text-center" tilt>
+            <p className="font-display text-4xl text-ink">
+              <OdometerNumber value={11} />
+            </p>
+            <p className="mt-1 text-sm font-medium text-ink/80">{t("statFeatures")}</p>
+            <p className="mt-1 text-xs text-ink/55">{t("statFeaturesHint")}</p>
+          </GlassCard>
+          <GlassCard className="py-8 text-center" tilt>
+            <p className="font-display text-4xl text-ink">
+              <OdometerNumber value={3} />
+            </p>
+            <p className="mt-1 text-sm font-medium text-ink/80">{t("statSignals")}</p>
+            <p className="mt-1 text-xs text-ink/55">{t("statSignalsHint")}</p>
+          </GlassCard>
+          <GlassCard className="py-8 text-center" tilt>
+            <p className="font-display text-4xl text-ink">
+              <OdometerNumber value={8} />
+            </p>
+            <p className="mt-1 text-sm font-medium text-ink/80">{t("statLangs")}</p>
+            <p className="mt-1 text-xs text-ink/55">{t("statLangsHint")}</p>
+          </GlassCard>
         </div>
       </section>
 

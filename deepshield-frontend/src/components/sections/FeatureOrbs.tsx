@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { useLanguage } from "@/context/LanguageContext";
 
 const ORB_SIZE = 52;
 const RADIUS = 128;
@@ -110,17 +111,15 @@ function orbStyle(index: number, total: number) {
 }
 
 export function FeatureOrbs() {
+  const { t } = useLanguage();
   const [active, setActive] = useState(FEATURES[0].id);
   const current = FEATURES.find((f) => f.id === active) ?? FEATURES[0];
 
   return (
-    <section className="section-pad mx-auto max-w-6xl px-4">
-      <p className="page-badge">Features</p>
-      <h2 className="font-display text-2xl text-ink md:text-3xl">Eleven ways we protect you</h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">
-        Hover a node on the ring to learn what each tool does — then jump straight in. Every
-        feature is built for one goal: help you detect harm, document it, and act safely.
-      </p>
+    <section className="section-pad section-alt-blue mx-auto max-w-6xl px-4">
+      <p className="page-badge">{t("featuresBadge")}</p>
+      <h2 className="font-display text-2xl text-ink md:text-3xl">{t("featuresTitle")}</h2>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">{t("featuresIntro")}</p>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start">
         <div
@@ -145,8 +144,8 @@ export function FeatureOrbs() {
                 onClick={() => setActive(f.id)}
                 className={`absolute flex flex-col items-center justify-center rounded-full shadow-md transition-colors ${
                   isActive
-                    ? "z-20 bg-pink text-ink ring-4 ring-peach/60"
-                    : "z-10 bg-cream text-ink/80 hover:bg-peach/80"
+                    ? "z-20 bg-blue text-ink ring-4 ring-sage/50"
+                    : "z-10 bg-cream text-ink/80 hover:bg-sage/40"
                 }`}
                 style={{ ...orbStyle(i, FEATURES.length), width: ORB_SIZE, height: ORB_SIZE }}
                 animate={{ scale: isActive ? 1.12 : dim ? 0.88 : 1, opacity: dim ? 0.55 : 1 }}

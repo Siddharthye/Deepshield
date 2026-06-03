@@ -1,4 +1,7 @@
+"use client";
+
 import { GlassCard } from "@/components/ui/GlassCard";
+import { useLanguage } from "@/context/LanguageContext";
 
 const STATS = [
   {
@@ -19,19 +22,15 @@ const STATS = [
 ];
 
 export function HomeProblem() {
+  const { t } = useLanguage();
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-12">
-      <GlassCard className="bg-gradient-to-br from-blue/25 to-peach/20 p-8 md:p-12">
-        <p className="page-badge">The problem</p>
-        <h2 className="font-display max-w-2xl text-2xl text-ink md:text-3xl">
-          When your face becomes someone else&apos;s weapon
-        </h2>
+      <GlassCard className="bg-gradient-to-br from-blue/30 to-sage/25 p-8 md:p-12">
+        <p className="page-badge">{t("problemBadge")}</p>
+        <h2 className="font-display max-w-2xl text-2xl text-ink md:text-3xl">{t("problemTitle")}</h2>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-ink/80 md:text-base">
-          Non-consensual deepfakes and morphed images are a form of digital sexual violence. Many
-          survivors do not know whether an image is real, where it was posted, or which laws apply.
-          Police and cyber cells increasingly take these cases seriously — but they need clear
-          evidence. DeepShield helps you gather that evidence privately before you decide whom to
-          trust with it.
+          {t("problemBody")}
         </p>
         <div className="mt-10 grid gap-6 sm:grid-cols-3">
           {STATS.map((s) => (

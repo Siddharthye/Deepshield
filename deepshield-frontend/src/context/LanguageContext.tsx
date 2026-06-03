@@ -7,12 +7,12 @@ import {
   useEffect,
   useState,
 } from "react";
-import { LANGUAGES, type LanguageCode, t } from "@/lib/i18n";
+import { LANGUAGES, type LanguageCode, t as translate, type I18nKey } from "@/lib/i18n";
 
 type LanguageContextValue = {
   language: LanguageCode;
   setLanguage: (code: LanguageCode) => void;
-  t: (key: string) => string;
+  t: (key: I18nKey) => string;
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -30,14 +30,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLanguage = useCallback((code: LanguageCode) => {
     setLanguageState(code);
     localStorage.setItem("deepshield_lang", code);
+    document.documentElement.lang = code;
   }, []);
 
-  const translate = useCallback((key: string) => t(language, key), [language]);
+  const t = useCallback((key: I18nKey) => translate(language, key), [language]);
 
   return (
-    <LanguageContext.Provider
-      value={{ language, setLanguage, t: translate }}
-    >
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
