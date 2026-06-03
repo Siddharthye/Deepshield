@@ -14,7 +14,7 @@ export const EN_MORE = {
     "Your vault and saved scans stay on your device with AES encryption. We do not host your intimate images on a server.",
   whyFact3Title: "Made for India",
   whyFact3Body:
-    "English and Hindi UI, IT Act and IPC references, and cybercrime.gov.in filing prep — designed for how reporting actually works here.",
+    "8 Indian languages in the UI (full copy in English & Hindi), IT Act and IPC references, and cybercrime.gov.in filing prep — designed for how reporting actually works here.",
   whyLawsTitle: "Laws we help you understand",
   whyLawDisclaimer:
     "Summaries are for orientation only — Asha and the rights explainer help you ask the right questions before speaking to a lawyer or police.",
@@ -26,7 +26,7 @@ export const EN_MORE = {
     "Courts and cyber cells need more than a screenshot. We bundle scan image, heatmap, risk breakdown, trace log, and plain-language legal summary into one PDF.",
   missionPillar3Title: "Recover with dignity",
   missionPillar3Body:
-    "Asha offers emotional support and rights education — with crisis numbers visible, English and Hindi, and pre-written law cards so you never start from zero.",
+    "Asha offers emotional support and rights education — with crisis numbers visible, 8 language options (English & Hindi for chat), and pre-written law cards so you never start from zero.",
   orbScanLabel: "Scan",
   orbScanDesc:
     "Upload a photo or video frame. Hugging Face model, face symmetry, and compression analysis into one risk score — with a heatmap for authorities.",
@@ -41,8 +41,8 @@ export const EN_MORE = {
   orbVideoP3: "Scroll-scrub timeline",
   orbTraceLabel: "Trace",
   orbTraceDesc:
-    "Log where your image appears — platform, URL, and date. Open Google Lens or TinEye in one tap, then save findings for your legal report.",
-  orbTraceP1: "Reverse-search links",
+    "Automatic reverse image trace finds public matches (Yandex, Bing, Google). Log platform, URL, and date — or paste URLs manually for your legal report.",
+  orbTraceP1: "Automatic web lookup",
   orbTraceP2: "Evidence log",
   orbTraceP3: "Flows into PDF",
   orbReportLabel: "Report",
@@ -62,7 +62,7 @@ export const EN_MORE = {
     "Trauma-informed chat for emotional support and plain-language rights guidance. Crisis helplines are one tap away.",
   orbAshaP1: "Streaming support chat",
   orbAshaP2: "Rights quick prompts",
-  orbAshaP3: "English & Hindi",
+  orbAshaP3: "8 languages (EN/HI chat)",
   orbRightsLabel: "Rights",
   orbRightsDesc:
     "Pre-written cards for IT Act §66E, §67, §67A, IPC §354C, and POCSO — plus an AI explainer for your situation.",
@@ -83,10 +83,10 @@ export const EN_MORE = {
   orbLearnP3: "Safe sharing habits",
   orbI18nLabel: "Languages",
   orbI18nDesc:
-    "Full UI in English and Hindi — switch anytime from the globe icon in the nav bar.",
-  orbI18nP1: "English & Hindi",
-  orbI18nP2: "Nav + all flows",
-  orbI18nP3: "Asha responds in your language",
+    "8 Indian languages — English, Hindi, Tamil, Telugu, Bengali, Marathi, Kannada, Malayalam. Switch anytime from the globe icon.",
+  orbI18nP1: "8 language menu",
+  orbI18nP2: "EN + HI full UI",
+  orbI18nP3: "More locales coming",
   orbPrivacyLabel: "Private",
   orbPrivacyDesc:
     "Browser-first: uploads go to the API only for scoring, never stored on our servers. Evidence stays in local storage.",
@@ -116,7 +116,7 @@ export const EN_MORE = {
   journeyAshaTitle: "Asha",
   journeyAshaDesc: "Support chat plus know-your-rights cards — private and trauma-informed.",
   journeyAshaDetail:
-    "Asha listens without judgment, explains IT Act and IPC in plain language, and points to helplines. Available in English and Hindi.",
+    "Asha listens without judgment, explains IT Act and IPC in plain language, and points to helplines. Choose from 8 languages (chat in English or Hindi).",
   journeyAshaCta: "Talk to Asha",
   journeyLearnTitle: "Learn",
   journeyLearnDesc: "Quiz yourself on deepfake red flags and safe evidence habits.",
@@ -204,12 +204,20 @@ export const EN_MORE = {
   traceOpenTinEye: "Open TinEye",
   traceOpenBing: "Open Bing Visual Search",
   traceOpenYandex: "Open Yandex Images",
-  traceAutoStart: "Run automatic trace",
-  traceAutoRunning: "Opening search engines…",
+  languagePreviewNote:
+    "Full UI in English and Hindi. Tamil, Telugu, Bengali, Marathi, Kannada, and Malayalam use English content for now.",
+  traceAutoStart: "Run automatic reverse trace",
+  traceAutoRunning: "Searching the web for matches…",
+  traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
+  traceAutoFound: "Found {n} match(es) — saved to your trace log.",
+  traceAutoNoResults: "No public matches found yet. Paste URLs below or open manual search.",
+  traceAutoFailed: "Automatic lookup failed — paste URLs from search results below.",
+  traceAutoSources: "Checked: {sources}",
+  traceAutoManualFallback: "Open manual search tabs",
   traceAutoCopied: "Image copied — paste into Lens if prompted.",
   traceAutoCopyFailed: "Could not copy image; upload manually in each search tab.",
-  traceAutoHosted: "Public search link created for TinEye/Bing/Yandex.",
-  traceAutoManualUpload: "Upload your image in Google Lens, then paste URLs below.",
+  traceAutoHosted: "Public search link ready.",
+  traceAutoManualUpload: "Try manual search, then paste URLs below.",
   traceAutoPasteHint: "Paste any text from search results — URLs are detected and logged automatically.",
   traceAutoImport: "Import URLs from text",
   traceAutoPasteClipboard: "Paste from clipboard",
@@ -268,7 +276,7 @@ export const EN_MORE = {
   vaultEmpty: "Vault is empty. Save scans, traces, or notes here.",
   vaultEncryptedBadge: "encrypted",
   ashaWelcome:
-    "I'm Asha — your companion for emotional support and understanding your legal rights. I'm here to listen, validate what you're going through, and help with rights-related questions only. You're not alone.",
+    "I'm Asha on DeepShield — I only help with emotional support after digital abuse, your legal rights in India, and using our tools (scan, trace, vault, report). I can't answer recipes, homework, or other general topics. You're not alone.",
   ashaCrisis1: "Cyber Crime Helpline: 1930",
   ashaCrisis2: "NCW Helpline: 181",
   ashaCrisis3: "iCall: 9152987821",

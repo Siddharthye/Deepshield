@@ -42,7 +42,7 @@ export const HI: Record<keyof typeof EN, string> = {
   statSignals: "पहचान संकेत",
   statSignalsHint: "मॉडल · चेहरा · कलाकृतियाँ",
   statLangs: "भाषाएँ",
-  statLangsHint: "अंग्रेज़ी और हिंदी",
+  statLangsHint: "८ भाषाएँ — EN · HI · TA · TE · BN · MR · KN · ML",
   heroPanelTitle: "अभी आप क्या कर सकती हैं",
   heroPanelIntro:
     "सब कुछ आपके ब्राउज़र में चलता है। कोई साइन-अप नहीं, कोई क्लाउड गैलरी नहीं — केवल वे टूल जो आप चुनती हैं।",
@@ -75,7 +75,7 @@ export const HI: Record<keyof typeof EN, string> = {
   actionScanTitle: "संदिग्ध मीडिया स्कैन करें",
   actionScanDesc: "फ़ोटो या वीडियो — एक मिनट से कम में जोखिम स्कोर।",
   actionTraceTitle: "कहाँ साझा हुआ, पता करें",
-  actionTraceDesc: "URL दर्ज करें और रिवर्स इमेज सर्च खोलें।",
+  actionTraceDesc: "स्वचालित रिवर्स ट्रेस और मैन्युअल URL लॉगिंग।",
   actionReportTitle: "कानूनी सबूत बनाएं",
   actionReportDesc: "अधिकारियों के लिए तैयार PDF रिपोर्ट।",
   actionAshaTitle: "आशा से बात करें",

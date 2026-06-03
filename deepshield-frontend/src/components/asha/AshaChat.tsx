@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { streamAshaChat } from "@/lib/api";
+import { isAshaInScope, outOfScopeReply } from "@/lib/ashaScope";
 import { useLanguage } from "@/context/LanguageContext";
 import { RIGHTS_PROMPT_KEYS } from "@/components/asha/BasicRights";
 import type { ChatMessage } from "@/lib/types";
@@ -19,7 +20,7 @@ export function AshaChat({
 }: {
   onQuickPrompt?: (q: string) => void;
 }) {
-  const { language, t } = useLanguage();
+  const { language, apiLanguage, t } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -62,8 +63,14 @@ export function AshaChat({
 
     const userMsg: ChatMessage = { role: "user", content: text };
     const next = [...messages, userMsg];
-    setMessages(next);
     setInput("");
+
+    if (!isAshaInScope(text)) {
+      setMessages([...next, { role: "assistant", content: outOfScopeReply(apiLanguage) }]);
+      return;
+    }
+
+    setMessages(next);
     setStreaming(true);
 
     let assistantText = "";
@@ -71,7 +78,7 @@ export function AshaChat({
 
     await streamAshaChat({
       messages: next,
-      language,
+      language: apiLanguage,
       onToken: (tok) => {
         assistantText += tok;
         setMessages([...next, { role: "assistant", content: assistantText }]);

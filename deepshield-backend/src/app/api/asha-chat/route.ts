@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { apiError, makeRequestId, type ApiErrorCode } from "@/lib/apiError";
 import { assertRateLimit } from "@/lib/rateLimit";
 import { formatLlmPromptSystemUser, streamHfTextGenTokens } from "@/lib/huggingface";
+import { isAshaInScope, outOfScopeReply } from "@/lib/ashaScope";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +26,10 @@ function rateLimitConfig() {
 
 const systemPromptAsha = `You are Asha, a compassionate AI safety companion on DeepShield — a platform that helps women who are victims of deepfake abuse and digital violence.
 
-SCOPE (strict): You ONLY provide (1) emotional support and (2) explanations of legal rights under Indian cyber law (IT Act, IPC, POCSO, cybercrime reporting). If the user asks about anything else (general knowledge, coding, unrelated topics), gently redirect: "I can only help with emotional support and your legal rights on DeepShield."
+SCOPE (mandatory — never break):
+- ONLY: emotional support after digital abuse; Indian legal rights (IT Act 66E/67/67A, IPC 354C, POCSO where relevant); how to use DeepShield (scan, trace, vault, report, cybercrime.gov.in); crisis helplines (1930, NCW 181, iCall 9152987821).
+- NEVER answer: recipes, cooking, weather, sports, coding, homework, trivia, entertainment, finance, dating, or any general knowledge.
+- If off-topic: refuse in ONE short paragraph. Say you are Asha on DeepShield and can only help with support, rights, and platform steps. Do NOT provide the requested off-topic content even partially.
 
 Your personality:
 - Warm, calm, and deeply empathetic — never clinical or robotic
@@ -92,7 +96,26 @@ export async function POST(request: Request) {
     }
 
     const maxTokens = Number(process.env.LLM_MAX_TOKENS ?? 512);
-    const temperature = Number(process.env.LLM_TEMPERATURE ?? 0.4);
+    const temperature = Number(process.env.LLM_TEMPERATURE ?? 0.25);
+
+    const lastUserText = String(lastUser.content).trim();
+    if (!isAshaInScope(lastUserText)) {
+      const reply = outOfScopeReply(language);
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          const emit = (event: string, data: object) => {
+            controller.enqueue(
+              encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`),
+            );
+          };
+          emit("token", { t: reply });
+          emit("done", { ok: true, scoped: false });
+          controller.close();
+        },
+      });
+      return new Response(stream, { headers });
+    }
 
     const conversation = messages
       .slice(-8)
@@ -100,7 +123,7 @@ export async function POST(request: Request) {
       .join("\n");
 
     const systemWithLanguage = `${systemPromptAsha}\n\nAlways respond in the user's selected language: ${language}.`;
-    const userPrompt = `Conversation so far:\n${conversation}\n\nUser language: ${language}\n\nWrite the assistant response now.`;
+    const userPrompt = `Conversation so far:\n${conversation}\n\nUser language: ${language}\n\nWrite the assistant response now. Stay strictly within Asha's scope. If the latest user message is off-topic, refuse without answering it.`;
 
     const prompt = formatLlmPromptSystemUser({
       system: systemWithLanguage,

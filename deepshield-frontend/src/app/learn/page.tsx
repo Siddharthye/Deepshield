@@ -16,7 +16,7 @@ const CARD_KEYS = [
 ];
 
 export default function LearnPage() {
-  const { language, t } = useLanguage();
+  const { language, apiLanguage, t } = useLanguage();
   const [score, setScore] = useState(0);
   const [round, setRound] = useState<{
     hintA: string;
@@ -31,7 +31,7 @@ export default function LearnPage() {
   async function loadRound() {
     setLoading(true);
     try {
-      const r = await fetchQuizRound(language);
+      const r = await fetchQuizRound(apiLanguage);
       setRound(r);
     } finally {
       setLoading(false);

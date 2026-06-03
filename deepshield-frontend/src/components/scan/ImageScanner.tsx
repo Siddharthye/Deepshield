@@ -38,7 +38,7 @@ function AnimatedRisk({ value }: { value: number }) {
 }
 
 export function ImageScanner() {
-  const { language, t } = useLanguage();
+  const { apiLanguage, t } = useLanguage();
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [stepKey, setStepKey] = useState<I18nKey>("scanStepPrepare");
@@ -104,7 +104,7 @@ export function ImageScanner() {
 
       setExplainLoading(true);
       setStepKey("scanStep5");
-      void explainRisk({ risk: riskResult, language })
+      void explainRisk({ risk: riskResult, language: apiLanguage })
         .then((explanation) => {
           setExplain(explanation);
           saveScanSession({ ...baseSession, explain: explanation });

@@ -7,16 +7,23 @@ import {
   useLayoutEffect,
   useState,
 } from "react";
-import { type LanguageCode, t as translate, type I18nKey } from "@/lib/i18n";
+import {
+  type LanguageCode,
+  t as translate,
+  type I18nKey,
+  isLanguageCode,
+  apiLanguage,
+} from "@/lib/i18n";
 
 function readStoredLanguage(): LanguageCode {
   if (typeof window === "undefined") return "en";
   const saved = localStorage.getItem("deepshield_lang");
-  return saved === "hi" ? "hi" : "en";
+  return saved && isLanguageCode(saved) ? saved : "en";
 }
 
 type LanguageContextValue = {
   language: LanguageCode;
+  apiLanguage: ReturnType<typeof apiLanguage>;
   setLanguage: (code: LanguageCode) => void;
   t: (key: I18nKey) => string;
   ready: boolean;
@@ -36,16 +43,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setLanguage = useCallback((code: LanguageCode) => {
-    const next = code === "hi" ? "hi" : "en";
-    setLanguageState(next);
-    localStorage.setItem("deepshield_lang", next);
-    document.documentElement.lang = next;
+    setLanguageState(code);
+    localStorage.setItem("deepshield_lang", code);
+    document.documentElement.lang = code;
   }, []);
 
   const t = useCallback((key: I18nKey) => translate(language, key), [language]);
+  const apiLang = apiLanguage(language);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, ready }}>
+    <LanguageContext.Provider
+      value={{ language, apiLanguage: apiLang, setLanguage, t, ready }}
+    >
       {!ready ? (
         <div className="min-h-screen bg-primary" aria-busy="true" />
       ) : (

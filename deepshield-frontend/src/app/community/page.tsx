@@ -32,7 +32,7 @@ const AUTHOR_KEYS: I18nKey[] = [
 ];
 
 export default function CommunityPage() {
-  const { language, t } = useLanguage();
+  const { apiLanguage, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [text, setText] = useState("");
   const [tagKey, setTagKey] = useState<I18nKey>(TAG_KEYS[0]);
@@ -58,7 +58,7 @@ export default function CommunityPage() {
     setPosting(true);
     setError(null);
     try {
-      const mod = await moderatePost({ text, language });
+      const mod = await moderatePost({ text, language: apiLanguage });
       if (!mod.allowed) {
         setError(mod.reason || t("communityPostNotAllowed"));
         return;

@@ -15,7 +15,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
     "आपका वॉल्ट और स्कैन इस डिवाइस पर AES एन्क्रिप्शन में रहते हैं। हम आपकी निजी छवियाँ सर्वर पर नहीं रखते।",
   whyFact3Title: "भारत के लिए",
   whyFact3Body:
-    "अंग्रेज़ी और हिंदी UI, IT Act और IPC संदर्भ, cybercrime.gov.in दायर करने की तैयारी — जैसे यहाँ रिपोर्टिंग होती है।",
+    "UI में ८ भारतीय भाषाएँ (पूर्ण अनुवाद अंग्रेज़ी और हिंदी), IT Act और IPC संदर्भ, cybercrime.gov.in तैयारी — जैसे यहाँ रिपोर्टिंग होती है।",
   whyLawsTitle: "जिन कानूनों को हम समझाते हैं",
   whyLawDisclaimer:
     "ये सारांश केवल जानकारी के लिए हैं — वकील या पुलिस से बात करने से पहले आशा और अधिकार विवरणक से सही सवाल पूछें।",
@@ -27,7 +27,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
     "अदालतों और साइबर सेल को स्क्रीनशॉट से अधिक चाहिए। हम स्कैन, हीटमैप, जोखिम विवरण, ट्रेस लॉग और सादी कानूनी सारांश एक PDF में बाँधते हैं।",
   missionPillar3Title: "गरिमा के साथ उबरना",
   missionPillar3Body:
-    "आशा भावनात्मक सहायता और अधिकार शिक्षा देती है — संकट नंबर दिखते हैं, अंग्रेज़ी और हिंदी, और पहले से लिखे कानून कार्ड।",
+    "आशा भावनात्मक सहायता और अधिकार शिक्षा देती है — ८ भाषा विकल्प (चैट अंग्रेज़ी/हिंदी), और पहले से लिखे कानून कार्ड।",
   orbScanLabel: "स्कैन",
   orbScanDesc:
     "फ़ोटो या वीडियो फ़्रेम अपलोड करें। HF मॉडल, चेहरे की सममिति और कंप्रेशन विश्लेषण — अधिकारियों के लिए हीटमैप सहित।",
@@ -42,8 +42,8 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   orbVideoP3: "स्क्रॉल-स्क्रब टाइमलाइन",
   orbTraceLabel: "ट्रेस",
   orbTraceDesc:
-    "दर्ज करें आपकी छवि कहाँ है — प्लेटफ़ॉर्म, URL, तारीख। Google Lens या TinEye एक टैप में, फिर रिपोर्ट के लिए सहेजें।",
-  orbTraceP1: "रिवर्स-सर्च लिंक",
+    "स्वचालित रिवर्स इमेज ट्रेस सार्वजनिक मिलान ढूँढता है (Yandex, Bing, Google)। प्लेटफ़ॉर्म, URL, तारीख लॉग करें — या URL मैन्युअल चिपकाएँ।",
+  orbTraceP1: "स्वचालित वेब खोज",
   orbTraceP2: "सबूत लॉग",
   orbTraceP3: "PDF में जाता है",
   orbReportLabel: "रिपोर्ट",
@@ -63,7 +63,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
     "भावनात्मक सहायता और सादी भाषा में अधिकार मार्गदर्शन। संकट हेल्पलाइन एक टैप दूर।",
   orbAshaP1: "स्ट्रीमिंग सहायता चैट",
   orbAshaP2: "अधिकार त्वरित प्रॉम्प्ट",
-  orbAshaP3: "अंग्रेज़ी और हिंदी",
+  orbAshaP3: "८ भाषाएँ (चैट EN/HI)",
   orbRightsLabel: "अधिकार",
   orbRightsDesc:
     "IT Act §66E, §67, §67A, IPC §354C, POCSO के लिए कार्ड — और आपकी स्थिति के लिए AI विवरणक।",
@@ -84,10 +84,10 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   orbLearnP3: "सुरक्षित साझाकरण",
   orbI18nLabel: "भाषाएँ",
   orbI18nDesc:
-    "पूर्ण UI अंग्रेज़ी और हिंदी में — नेव बार में ग्लोब आइकन से कभी भी बदलें।",
-  orbI18nP1: "अंग्रेज़ी और हिंदी",
-  orbI18nP2: "नेव + सभी फ़्लो",
-  orbI18nP3: "आशा आपकी भाषा में",
+    "८ भारतीय भाषाएँ — अंग्रेज़ी, हिंदी, तमिल, तेलुगु, बंगाली, मराठी, कन्नड़, मलयालम। ग्लोब आइकन से बदलें।",
+  orbI18nP1: "८ भाषा मेनू",
+  orbI18nP2: "EN + HI पूर्ण UI",
+  orbI18nP3: "और भाषाएँ जल्द",
   orbPrivacyLabel: "निजी",
   orbPrivacyDesc:
     "ब्राउज़र-प्रथम: अपलोड केवल स्कोरिंग के लिए API पर — सर्वर पर संग्रह नहीं। सबूत स्थानीय स्टोरेज में।",
@@ -117,7 +117,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   journeyAshaTitle: "आशा",
   journeyAshaDesc: "सहायता चैट और अधिकार कार्ड — निजी और संवेदनशील।",
   journeyAshaDetail:
-    "आशा बिना निर्णय सुनती है, IT Act और IPC सादी भाषा में समझाती है, हेल्पलाइन दिखाती है। अंग्रेज़ी और हिंदी में।",
+    "आशा बिना निर्णय सुनती है, IT Act और IPC सादी भाषा में समझाती है, हेल्पलाइन दिखाती है। ८ भाषाएँ (चैट अंग्रेज़ी या हिंदी)।",
   journeyAshaCta: "आशा से बात करें",
   journeyLearnTitle: "सीखें",
   journeyLearnDesc: "डीपफेक संकेत और सुरक्षित सबूत आदतों पर क्विज़ लें।",
@@ -206,12 +206,20 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   traceOpenTinEye: "TinEye खोलें",
   traceOpenBing: "Bing Visual Search खोलें",
   traceOpenYandex: "Yandex Images खोलें",
-  traceAutoStart: "स्वचालित ट्रेस चलाएँ",
-  traceAutoRunning: "खोज इंजन खोले जा रहे हैं…",
+  languagePreviewNote:
+    "पूर्ण UI अंग्रेज़ी और हिंदी में। तमिल, तेलुगु, बंगाली, मराठी, कन्नड़, मलयालम अभी अंग्रेज़ी सामग्री दिखाते हैं।",
+  traceAutoStart: "स्वचालित रिवर्स ट्रेस चलाएँ",
+  traceAutoRunning: "वेब पर मिलान खोज रहे हैं…",
+  traceAutoSearching: "Yandex, Bing और Google पर आपकी छवि खोज रहे हैं…",
+  traceAutoFound: "{n} मिलान मिले — ट्रेस लॉग में सहेजे।",
+  traceAutoNoResults: "अभी कोई सार्वजनिक मिलान नहीं। नीचे URL चिपकाएँ या मैन्युअल खोज खोलें।",
+  traceAutoFailed: "स्वचालित खोज विफल — नीचे खोज परिणाम से URL चिपकाएँ।",
+  traceAutoSources: "जाँचा: {sources}",
+  traceAutoManualFallback: "मैन्युअल खोज टैब खोलें",
   traceAutoCopied: "छवि कॉपी हो गई — Lens में पेस्ट करें यदि पूछे।",
   traceAutoCopyFailed: "छवि कॉपी नहीं हुई; प्रत्येक टैब में मैन्युअल अपलोड करें।",
-  traceAutoHosted: "TinEye/Bing/Yandex के लिए सार्वजनिक लिंक बनाया गया।",
-  traceAutoManualUpload: "Google Lens में अपलोड करें, फिर नीचे URL चिपकाएँ।",
+  traceAutoHosted: "सार्वजनिक खोज लिंक तैयार।",
+  traceAutoManualUpload: "मैन्युअल खोज आज़माएँ, फिर नीचे URL चिपकाएँ।",
   traceAutoPasteHint: "खोज परिणाम का कोई भी टेक्स्ट चिपकाएँ — URL स्वतः पहचाने और लॉग होंगे।",
   traceAutoImport: "टेक्स्ट से URL आयात करें",
   traceAutoPasteClipboard: "क्लिपबोर्ड से चिपकाएँ",
@@ -271,7 +279,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   vaultEmpty: "वॉल्ट खाली है। स्कैन, ट्रेस या नोट्स यहाँ सहेजें।",
   vaultEncryptedBadge: "एन्क्रिप्टेड",
   ashaWelcome:
-    "मैं आशा हूँ — भावनात्मक सहायता और आपके कानूनी अधिकार समझने के लिए आपकी साथी। मैं सुनने, आपके अनुभव को मान्य करने और केवल अधिकारों से जुड़े सवालों में मदद के लिए यहाँ हूँ। आप अकेले नहीं हैं।",
+    "मैं DeepShield पर आशा हूँ — डिजिटल दुर्व्यवहार के बाद भावनात्मक सहायता, भारतीय कानून में अधिकार, और हमारे टूल (स्कैन, ट्रेस, वॉल्ट, रिपोर्ट) में ही मदद करती हूँ। रेसिपी, होमवर्क या अन्य सामान्य विषय नहीं। आप अकेले नहीं हैं।",
   ashaCrisis1: "साइबर क्राइम हेल्पलाइन: 1930",
   ashaCrisis2: "NCW हेल्पलाइन: 181",
   ashaCrisis3: "iCall: 9152987821",

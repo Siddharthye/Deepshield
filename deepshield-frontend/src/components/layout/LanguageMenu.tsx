@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LANGUAGES, type LanguageCode } from "@/lib/i18n";
+import { LANGUAGES, contentLanguage, type LanguageCode } from "@/lib/i18n";
 import { useLanguage } from "@/context/LanguageContext";
 
 function GlobeIcon({ className }: { className?: string }) {
@@ -31,7 +31,8 @@ export function LanguageMenu({
   /** Burgundy/dark surfaces (footer, scrolled nav) */
   onDark?: boolean;
 }) {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
+  const showPreviewNote = language !== "en" && contentLanguage(language) === "en";
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -71,7 +72,7 @@ export function LanguageMenu({
       {open && (
         <ul
           role="listbox"
-          className="glass-card absolute right-0 top-full z-[80] mt-2 w-40 py-1 shadow-lg"
+          className="glass-card absolute right-0 top-full z-[80] mt-2 w-52 max-h-72 overflow-y-auto py-1 shadow-lg"
           onPointerDown={(e) => e.stopPropagation()}
         >
           {LANGUAGES.map((l) => (
@@ -93,6 +94,11 @@ export function LanguageMenu({
               </button>
             </li>
           ))}
+          {showPreviewNote && (
+            <li className="border-t border-secondary/15 px-3 py-2 text-[11px] leading-snug text-ink-subtle">
+              {t("languagePreviewNote")}
+            </li>
+          )}
         </ul>
       )}
     </div>

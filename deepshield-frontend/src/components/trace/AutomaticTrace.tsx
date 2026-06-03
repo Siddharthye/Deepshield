@@ -5,13 +5,12 @@ import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
+import { fetchReverseTrace } from "@/lib/api";
 import {
-  copyImageToClipboard,
   openTraceSearchEngines,
   parseTraceUrlsFromText,
-  publishTraceImage,
 } from "@/lib/reverseTrace";
-import { appendTraceHits } from "@/lib/traceStorage";
+import { appendTraceHits, type TraceHit } from "@/lib/traceStorage";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 
 type Props = {
@@ -27,11 +26,13 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
   const [status, setStatus] = useState<string | null>(null);
   const [publicUrl, setPublicUrl] = useState<string | null>(null);
   const [imported, setImported] = useState(0);
+  const [previewHits, setPreviewHits] = useState<TraceHit[]>([]);
 
   async function runAutomaticTrace() {
     setRunning(true);
-    setStatus(null);
+    setStatus(t("traceAutoSearching"));
     setImported(0);
+    setPreviewHits([]);
     try {
       tryAddToVault({
         name: fileName ?? `trace_${Date.now()}.jpg`,
@@ -40,18 +41,26 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
         payload: preview,
       });
 
-      const copied = await copyImageToClipboard(preview);
-      setStatus(copied ? t("traceAutoCopied") : t("traceAutoCopyFailed"));
+      const result = await fetchReverseTrace({ imageBase64: preview });
+      setPublicUrl(result.publicImageUrl);
 
-      const hosted = await publishTraceImage(preview);
-      setPublicUrl(hosted);
-      openTraceSearchEngines(hosted ?? undefined);
-
-      if (hosted) {
-        setStatus((s) => `${s ?? ""} ${t("traceAutoHosted")}`.trim());
-      } else {
-        setStatus((s) => `${s ?? ""} ${t("traceAutoManualUpload")}`.trim());
+      if (result.sources?.length) {
+        setStatus(
+          t("traceAutoSources").replace("{sources}", result.sources.join(", ")),
+        );
       }
+
+      if (result.hits.length > 0) {
+        appendTraceHits(result.hits);
+        setImported(result.hits.length);
+        setPreviewHits(result.hits.slice(0, 6));
+        onHitsImported?.();
+        setStatus(t("traceAutoFound").replace("{n}", String(result.hits.length)));
+      } else {
+        setStatus(t("traceAutoNoResults"));
+      }
+    } catch {
+      setStatus(t("traceAutoFailed"));
     } finally {
       setRunning(false);
     }
@@ -62,8 +71,10 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
     if (hits.length === 0) return;
     appendTraceHits(hits);
     setImported(hits.length);
+    setPreviewHits(hits.slice(0, 6));
     setPaste("");
     onHitsImported?.();
+    setStatus(t("traceAutoImported").replace("{n}", String(hits.length)));
   }
 
   return (
@@ -84,6 +95,29 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
           </a>
         </p>
       )}
+
+      {previewHits.length > 0 && (
+        <ul className="max-h-36 space-y-1 overflow-y-auto rounded-lg border border-secondary/15 bg-cream-tan/50 p-2 text-xs">
+          {previewHits.map((h) => (
+            <li key={h.id}>
+              <span className="font-medium text-ink">{h.platform}</span>
+              {" — "}
+              <a href={h.url} target="_blank" rel="noopener noreferrer" className="text-link break-all">
+                {h.title || h.url}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Button
+        variant="ghost"
+        className="w-full text-sm"
+        disabled={running}
+        onClick={() => openTraceSearchEngines(publicUrl ?? undefined)}
+      >
+        {t("traceAutoManualFallback")}
+      </Button>
 
       <p className="text-xs text-ink-subtle">{t("traceAutoPasteHint")}</p>
       <textarea
@@ -111,11 +145,6 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
           {t("traceAutoPasteClipboard")}
         </Button>
       </div>
-      {imported > 0 && (
-        <p className="text-center text-sm text-accent">
-          {t("traceAutoImported").replace("{n}", String(imported))}
-        </p>
-      )}
     </GlassCard>
   );
 }

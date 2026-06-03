@@ -16,7 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import type { ScanSession } from "@/lib/types";
 
 export default function ReportPage() {
-  const { language, t } = useLanguage();
+  const { apiLanguage, t } = useLanguage();
   const [scan, setScan] = useState<ScanSession | null>(null);
   const [legalSummary, setLegalSummary] = useState<string | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
@@ -35,13 +35,13 @@ export default function ReportPage() {
       let summary = legalSummary;
       if (!summary) {
         setSummaryLoading(true);
-        summary = await fetchLegalReportSummary(scan, language);
+        summary = await fetchLegalReportSummary(scan, apiLanguage);
         setLegalSummary(summary);
         setSummaryLoading(false);
       }
       const traceHits = loadTraceHits();
       const traceUrls = loadTraceUrls();
-      const blob = await generateEvidencePdf(scan, traceUrls, summary, traceHits, language);
+      const blob = await generateEvidencePdf(scan, traceUrls, summary, traceHits, apiLanguage);
       if (pdfPreview) URL.revokeObjectURL(pdfPreview);
       setPdfPreview(URL.createObjectURL(blob));
       return blob;
@@ -93,7 +93,7 @@ export default function ReportPage() {
               onClick={async () => {
                 setSummaryLoading(true);
                 try {
-                  const s = await fetchLegalReportSummary(scan, language);
+                  const s = await fetchLegalReportSummary(scan, apiLanguage);
                   setLegalSummary(s);
                 } finally {
                   setSummaryLoading(false);

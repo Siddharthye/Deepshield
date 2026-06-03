@@ -8,7 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { RIGHTS_PROMPT_KEYS } from "@/components/asha/BasicRights";
 
 export function RightsExplainer() {
-  const { language, t } = useLanguage();
+  const { apiLanguage, t } = useLanguage();
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ export function RightsExplainer() {
     setLoading(true);
     setAnswer(null);
     try {
-      const res = await askRights({ question: q.trim(), language });
+      const res = await askRights({ question: q.trim(), language: apiLanguage });
       setAnswer(res.answer);
     } catch (e) {
       setAnswer(e instanceof Error ? e.message : t("rightsExplainerError"));

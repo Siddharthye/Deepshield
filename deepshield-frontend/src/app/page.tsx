@@ -101,7 +101,7 @@ export default function HomePage() {
           </GlassCard>
           <GlassCard className="py-8 text-center" tilt>
             <p className="font-display text-4xl text-ink">
-              <OdometerNumber value={2} />
+              <OdometerNumber value={8} />
             </p>
             <p className="mt-1 text-sm font-medium text-ink-muted">{t("statLangs")}</p>
             <p className="mt-1 text-xs text-ink-subtle">{t("statLangsHint")}</p>

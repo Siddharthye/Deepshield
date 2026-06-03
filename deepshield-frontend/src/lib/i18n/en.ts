@@ -41,7 +41,7 @@ export const EN = {
   statSignals: "Detection signals",
   statSignalsHint: "Model · face · artifacts",
   statLangs: "Languages",
-  statLangsHint: "English & Hindi",
+  statLangsHint: "EN · HI · TA · TE · BN · MR · KN · ML",
   heroPanelTitle: "What you can do right now",
   heroPanelIntro:
     "Everything runs in your browser. No signup, no cloud gallery of your photos — only tools you choose to use.",
@@ -74,7 +74,7 @@ export const EN = {
   actionScanTitle: "Scan suspicious media",
   actionScanDesc: "Photo or video — risk score in under a minute.",
   actionTraceTitle: "Trace where it was shared",
-  actionTraceDesc: "Log URLs and open reverse image search.",
+  actionTraceDesc: "Automatic reverse trace plus manual URL logging.",
   actionReportTitle: "Build legal evidence",
   actionReportDesc: "PDF report ready for authorities.",
   actionAshaTitle: "Talk to Asha",

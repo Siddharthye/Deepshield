@@ -350,3 +350,25 @@ export async function streamAshaChat(args: {
 
 }
 
+
+
+export type ReverseTraceHit = {
+  id: string;
+  platform: string;
+  title: string;
+  url: string;
+  firstSeen: string;
+};
+
+export async function fetchReverseTrace(args: {
+  imageUrl?: string;
+  imageBase64?: string;
+}): Promise<{
+  publicImageUrl: string;
+  hits: ReverseTraceHit[];
+  sources: string[];
+  count: number;
+}> {
+  return postJson("/api/reverse-trace", args);
+}
+
