@@ -1,87 +1,107 @@
 @import "tailwindcss";
 
-/* Bloom — soft feminine pastels with readable plum text */
+/* Earth & Burgundy — inspired by warm editorial UI (earthy base, cream cards, burgundy structure) */
 :root {
-  --color-blush: #fbf7f4;
-  --color-rose: #f4c4d0;
-  --color-lilac: #d4c4e8;
-  --color-sage-soft: #c8d4c4;
-  --color-mauve: #9b7fa8;
-  --color-plum: #3f2e3a;
-  --color-primary: var(--color-blush);
-  --color-secondary: #6e5568;
-  --color-secondary-muted: #5c4a56;
-  --color-secondary-soft: #f3e8ee;
-  /* Tailwind semantic aliases */
-  --color-cream: var(--color-blush);
-  --color-pink: var(--color-rose);
-  --color-peach: #f8d8e4;
-  --color-sage: var(--color-sage-soft);
-  --color-blue: var(--color-lilac);
-  --color-pink-deep: #e8a8b8;
-  --color-peach-deep: #edd4e0;
-  --color-sage-deep: #a8b8a4;
-  --color-blue-deep: #b8a4d4;
-  --color-cream-deep: #f5ede8;
-  --color-ink: var(--color-plum);
-  --color-ink-muted: #5c4a56;
-  --color-ink-subtle: #7a6774;
-  --color-accent: var(--color-mauve);
-  --color-link: #7a5c72;
-  --color-danger: #a64d5c;
+  --color-earth: #a69076;
+  --color-cream-tan: #d9c5a7;
+  --color-burgundy: #4b0a0a;
+  --color-burgundy-soft: #6b2020;
+  --color-charcoal: #2b1b17;
+  --color-parchment: #f2e8d5;
+  --color-earth-deep: #8f7a64;
+  --color-warm-tan: #c9b08e;
+
+  --color-primary: var(--color-earth);
+  --color-secondary: var(--color-burgundy);
+  --color-secondary-muted: var(--color-burgundy-soft);
+  --color-secondary-soft: color-mix(in srgb, var(--color-burgundy) 12%, var(--color-cream-tan));
+
+  /* Tailwind semantic aliases (mapped to palette roles) */
+  --color-blush: var(--color-cream-tan);
+  --color-rose: var(--color-burgundy-soft);
+  --color-lilac: var(--color-earth-deep);
+  --color-sage-soft: var(--color-warm-tan);
+  --color-mauve: var(--color-burgundy);
+  --color-plum: var(--color-charcoal);
+  --color-cream: var(--color-cream-tan);
+  --color-pink: var(--color-burgundy-soft);
+  --color-peach: var(--color-warm-tan);
+  --color-sage: var(--color-earth-deep);
+  --color-blue: var(--color-burgundy);
+  --color-pink-deep: var(--color-burgundy);
+  --color-peach-deep: var(--color-warm-tan);
+  --color-sage-deep: var(--color-earth-deep);
+  --color-blue-deep: #3a0808;
+  --color-cream-deep: var(--color-parchment);
+  --color-ink: var(--color-charcoal);
+  --color-ink-muted: #4a342e;
+  --color-ink-subtle: #6b5348;
+  --color-accent: var(--color-burgundy);
+  --color-link: var(--color-burgundy-soft);
+  --color-danger: #8b2e2e;
+
   --gradient-soft: linear-gradient(
     180deg,
-    var(--color-blush) 0%,
-    color-mix(in srgb, var(--color-rose) 18%, var(--color-blush)) 55%,
-    color-mix(in srgb, var(--color-lilac) 12%, var(--color-blush)) 100%
+    var(--color-earth) 0%,
+    color-mix(in srgb, var(--color-cream-tan) 45%, var(--color-earth)) 55%,
+    color-mix(in srgb, var(--color-earth-deep) 25%, var(--color-earth)) 100%
   );
   --gradient-cta: linear-gradient(
     135deg,
-    var(--color-mauve) 0%,
-    var(--color-rose) 52%,
-    color-mix(in srgb, var(--color-lilac) 70%, white) 100%
+    var(--color-burgundy) 0%,
+    var(--color-burgundy-soft) 55%,
+    color-mix(in srgb, var(--color-burgundy) 75%, var(--color-earth-deep)) 100%
   );
   --gradient-accent: linear-gradient(
     135deg,
-    var(--color-sage-soft) 0%,
-    var(--color-lilac) 100%
+    var(--color-burgundy-soft) 0%,
+    var(--color-earth-deep) 100%
   );
-  --shadow-soft: 0 8px 32px rgba(63, 46, 58, 0.08);
-  --shadow-glow: 0 4px 24px rgba(244, 196, 208, 0.55);
+  --shadow-soft: 0 8px 32px rgba(43, 27, 23, 0.12);
+  --shadow-glow: 0 4px 24px rgba(75, 10, 10, 0.28);
 }
 
 @theme inline {
-  --color-blush: #fbf7f4;
-  --color-rose: #f4c4d0;
-  --color-lilac: #d4c4e8;
-  --color-sage-soft: #c8d4c4;
-  --color-mauve: #9b7fa8;
-  --color-plum: #3f2e3a;
-  --color-primary: #fbf7f4;
-  --color-secondary: #6e5568;
-  --color-secondary-muted: #5c4a56;
-  --color-secondary-soft: #f3e8ee;
-  --color-cream: #fbf7f4;
-  --color-pink: #f4c4d0;
-  --color-peach: #f8d8e4;
-  --color-sage: #c8d4c4;
-  --color-blue: #d4c4e8;
-  --color-pink-deep: #e8a8b8;
-  --color-peach-deep: #edd4e0;
-  --color-sage-deep: #a8b8a4;
-  --color-blue-deep: #b8a4d4;
-  --color-cream-deep: #f5ede8;
-  --color-ink: #3f2e3a;
-  --color-ink-muted: #5c4a56;
-  --color-ink-subtle: #7a6774;
-  --color-accent: #9b7fa8;
-  --color-link: #7a5c72;
-  --color-danger: #a64d5c;
+  --color-earth: #a69076;
+  --color-cream-tan: #d9c5a7;
+  --color-burgundy: #4b0a0a;
+  --color-burgundy-soft: #6b2020;
+  --color-charcoal: #2b1b17;
+  --color-parchment: #f2e8d5;
+  --color-earth-deep: #8f7a64;
+  --color-warm-tan: #c9b08e;
+  --color-primary: #a69076;
+  --color-secondary: #4b0a0a;
+  --color-secondary-muted: #6b2020;
+  --color-secondary-soft: #e8ddd0;
+  --color-blush: #d9c5a7;
+  --color-rose: #6b2020;
+  --color-lilac: #8f7a64;
+  --color-sage-soft: #c9b08e;
+  --color-warm-tan: #c9b08e;
+  --color-mauve: #4b0a0a;
+  --color-plum: #2b1b17;
+  --color-cream: #d9c5a7;
+  --color-pink: #6b2020;
+  --color-peach: #c9b08e;
+  --color-sage: #8f7a64;
+  --color-blue: #4b0a0a;
+  --color-pink-deep: #4b0a0a;
+  --color-peach-deep: #c9b08e;
+  --color-sage-deep: #8f7a64;
+  --color-blue-deep: #3a0808;
+  --color-cream-deep: #f2e8d5;
+  --color-ink: #2b1b17;
+  --color-ink-muted: #4a342e;
+  --color-ink-subtle: #6b5348;
+  --color-accent: #4b0a0a;
+  --color-link: #6b2020;
+  --color-danger: #8b2e2e;
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 body {
-  background: var(--color-primary);
+  background: var(--color-earth);
   background-image: var(--gradient-soft);
   background-attachment: fixed;
   color: var(--color-ink);
@@ -96,7 +116,7 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.03;
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
@@ -110,8 +130,8 @@ body::before {
 
 .glass-card {
   backdrop-filter: blur(20px);
-  background: color-mix(in srgb, var(--color-primary) 96%, white);
-  border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  background: color-mix(in srgb, var(--color-cream-tan) 94%, white);
+  border: 1px solid color-mix(in srgb, var(--color-burgundy) 22%, transparent);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
   transition:
@@ -122,33 +142,32 @@ body::before {
 
 .glass-card:hover {
   backdrop-filter: blur(28px);
-  border-color: color-mix(in srgb, var(--color-mauve) 35%, transparent);
+  border-color: color-mix(in srgb, var(--color-burgundy) 45%, transparent);
   box-shadow: var(--shadow-glow);
 }
 
 .glass-card-tint-sage {
-  background: color-mix(in srgb, var(--color-sage-deep) 32%, transparent);
+  background: color-mix(in srgb, var(--color-earth-deep) 38%, var(--color-cream-tan));
 }
 
 .glass-card-tint-blue {
-  background: color-mix(in srgb, var(--color-blue-deep) 38%, transparent);
+  background: color-mix(in srgb, var(--color-burgundy) 14%, var(--color-cream-tan));
 }
 
 .glass-card-tint-peach {
-  background: color-mix(in srgb, var(--color-peach-deep) 30%, transparent);
+  background: color-mix(in srgb, var(--color-cream-deep) 42%, var(--color-cream-tan));
 }
 
 .page-badge {
   display: inline-block;
   margin-bottom: 0.75rem;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--color-rose) 45%, var(--color-primary));
-  border: 1px solid color-mix(in srgb, var(--color-mauve) 25%, transparent);
+  background: var(--color-burgundy);
   padding: 0.25rem 0.875rem;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: var(--color-ink-muted);
+  color: var(--color-parchment);
 }
 
 .page-header::after {
@@ -180,7 +199,7 @@ body::before {
   height: 480px;
   top: 4%;
   left: -4%;
-  background: color-mix(in srgb, var(--color-lilac) 28%, transparent);
+  background: color-mix(in srgb, var(--color-burgundy) 18%, transparent);
   animation: drift-blue 26s ease-in-out infinite;
 }
 
@@ -189,7 +208,7 @@ body::before {
   height: 440px;
   right: -6%;
   top: 28%;
-  background: color-mix(in srgb, var(--color-sage-soft) 32%, transparent);
+  background: color-mix(in srgb, var(--color-earth-deep) 35%, transparent);
   animation: drift-sage 24s ease-in-out infinite;
 }
 
@@ -198,7 +217,7 @@ body::before {
   height: 360px;
   bottom: 6%;
   left: 30%;
-  background: color-mix(in srgb, var(--color-peach-deep) 40%, transparent);
+  background: color-mix(in srgb, var(--color-cream-tan) 45%, transparent);
   animation: drift-peach 28s ease-in-out infinite reverse;
 }
 
@@ -207,7 +226,7 @@ body::before {
   height: 280px;
   bottom: 20%;
   right: 20%;
-  background: color-mix(in srgb, var(--color-rose) 38%, transparent);
+  background: color-mix(in srgb, var(--color-burgundy-soft) 22%, transparent);
   animation: drift-pink 22s ease-in-out infinite;
 }
 
@@ -240,17 +259,17 @@ body::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 3px;
   z-index: 60;
-  background: var(--gradient-accent);
+  background: var(--gradient-cta);
   transform: scaleX(0);
 }
 
 .input-field {
   width: 100%;
   border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
-  background: color-mix(in srgb, var(--color-primary) 98%, white);
+  border: 1px solid color-mix(in srgb, var(--color-burgundy) 25%, transparent);
+  background: color-mix(in srgb, var(--color-cream-tan) 98%, white);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   color: var(--color-ink);
@@ -263,8 +282,8 @@ body::before {
 
 .input-field:focus {
   outline: none;
-  border-color: color-mix(in srgb, var(--color-mauve) 55%, var(--color-lilac));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-lilac) 40%, transparent);
+  border-color: color-mix(in srgb, var(--color-burgundy) 55%, var(--color-earth-deep));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-burgundy) 18%, transparent);
 }
 
 .text-ink-muted {
@@ -299,8 +318,8 @@ a.text-link:hover,
   align-items: center;
   justify-content: center;
   border-radius: 1.25rem;
-  border: 2px dashed color-mix(in srgb, var(--color-mauve) 35%, var(--color-sage-soft));
-  background: color-mix(in srgb, var(--color-primary) 94%, white);
+  border: 2px dashed color-mix(in srgb, var(--color-burgundy) 35%, var(--color-earth-deep));
+  background: color-mix(in srgb, var(--color-cream-tan) 96%, white);
   padding: 3rem 1.5rem;
   transition:
     border-color 0.25s ease,
@@ -309,8 +328,8 @@ a.text-link:hover,
 }
 
 .upload-zone:hover {
-  border-color: color-mix(in srgb, var(--color-mauve) 50%, var(--color-rose));
-  background: color-mix(in srgb, var(--color-secondary-soft) 55%, var(--color-primary));
+  border-color: color-mix(in srgb, var(--color-burgundy) 55%, var(--color-burgundy-soft));
+  background: color-mix(in srgb, var(--color-parchment) 70%, var(--color-cream-tan));
   transform: translateY(-2px);
 }
 
@@ -318,8 +337,8 @@ a.text-link:hover,
   width: 3.25rem;
   height: 3.25rem;
   border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
-  background: var(--color-primary);
+  border: 2px solid color-mix(in srgb, var(--color-burgundy) 28%, transparent);
+  background: var(--color-cream-tan);
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-ink);
@@ -330,30 +349,30 @@ a.text-link:hover,
 }
 
 .pin-dot.filled {
-  border-color: color-mix(in srgb, var(--color-mauve) 50%, var(--color-rose));
+  border-color: color-mix(in srgb, var(--color-burgundy) 65%, var(--color-parchment));
   background: var(--gradient-cta);
-  color: var(--color-primary);
+  color: var(--color-parchment);
   transform: scale(1.05);
   box-shadow: var(--shadow-glow);
 }
 
 .site-footer {
-  border-top: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
-  background: var(--color-secondary);
+  border-top: 1px solid color-mix(in srgb, var(--color-parchment) 12%, transparent);
+  background: var(--color-burgundy);
   backdrop-filter: blur(12px);
-  color: var(--color-primary);
+  color: var(--color-parchment);
 }
 
 .site-footer p {
-  color: color-mix(in srgb, var(--color-primary) 94%, white);
+  color: color-mix(in srgb, var(--color-parchment) 96%, white);
 }
 
 .site-footer .text-ink-muted {
-  color: color-mix(in srgb, var(--color-primary) 96%, white);
+  color: color-mix(in srgb, var(--color-parchment) 92%, white);
 }
 
 .site-footer .text-ink-subtle {
-  color: color-mix(in srgb, var(--color-primary) 82%, white);
+  color: color-mix(in srgb, var(--color-parchment) 78%, white);
 }
 
 .section-pad {
@@ -362,19 +381,19 @@ a.text-link:hover,
 }
 
 .section-alt-blue {
-  background: color-mix(in srgb, var(--color-lilac) 14%, var(--color-primary));
+  background: color-mix(in srgb, var(--color-burgundy) 8%, var(--color-earth));
 }
 
 .section-alt-sage {
-  background: color-mix(in srgb, var(--color-sage-soft) 18%, var(--color-primary));
+  background: color-mix(in srgb, var(--color-cream-tan) 35%, var(--color-earth));
 }
 
 .intro-pink-bg {
   background: linear-gradient(
     145deg,
-    color-mix(in srgb, var(--color-rose) 50%, var(--color-primary)) 0%,
-    var(--color-primary) 45%,
-    color-mix(in srgb, var(--color-lilac) 22%, var(--color-primary)) 100%
+    var(--color-burgundy) 0%,
+    color-mix(in srgb, var(--color-burgundy-soft) 85%, var(--color-earth)) 50%,
+    var(--color-earth) 100%
   );
 }
 
@@ -397,7 +416,7 @@ a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-mauve) 65%, var(--color-lilac));
+  outline: 2px solid color-mix(in srgb, var(--color-burgundy) 70%, var(--color-parchment));
   outline-offset: 2px;
 }
 
@@ -412,6 +431,8 @@ input:focus-visible {
 
 .scan-beam {
   animation: scan-beam 2s ease-in-out infinite alternate;
+  background: color-mix(in srgb, var(--color-burgundy-soft) 85%, var(--color-parchment));
+  box-shadow: 0 0 24px rgba(75, 10, 10, 0.45);
 }
 
 @keyframes shimmer {

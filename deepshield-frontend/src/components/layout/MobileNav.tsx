@@ -18,7 +18,7 @@ export function MobileNav() {
   const { t } = useLanguage();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-sage/40 bg-cream/95 backdrop-blur-lg md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-secondary/35 bg-cream-tan/95 backdrop-blur-lg md:hidden">
       <div className="flex justify-around py-2">
         {LINKS.map(({ href, key }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);

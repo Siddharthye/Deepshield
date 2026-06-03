@@ -16,7 +16,7 @@ export function ScanCenter() {
 
   return (
     <>
-      <div className="mb-8 inline-flex rounded-full bg-blue/40 p-1 ring-1 ring-sage/30">
+      <div className="mb-8 inline-flex rounded-full bg-cream-tan/90 p-1 ring-1 ring-secondary/25">
         {tabs.map(({ id, label }) => (
           <button
             key={id}

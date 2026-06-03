@@ -45,7 +45,7 @@ export default function HomePage() {
                 alt={t("brandAlt")}
                 width={140}
                 height={140}
-                className="relative rounded-3xl object-contain shadow-lg ring-2 ring-sage/50"
+                className="relative rounded-3xl object-contain shadow-lg ring-2 ring-secondary/35"
                 priority
                 unoptimized
               />
@@ -62,7 +62,7 @@ export default function HomePage() {
                 {TRUST_KEYS.map((key) => (
                   <li
                     key={key}
-                    className="rounded-full bg-sage/45 px-3 py-1 text-xs font-medium text-ink-muted"
+                    className="rounded-full bg-cream-tan/80 px-3 py-1 text-xs font-medium text-ink-muted ring-1 ring-secondary/15"
                   >
                     {t(key)}
                   </li>

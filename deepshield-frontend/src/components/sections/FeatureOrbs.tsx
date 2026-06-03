@@ -108,7 +108,7 @@ export function FeatureOrbs() {
                       onClick={() => setLanguage(l.code as LanguageCode)}
                       className={`rounded-full px-5 py-2.5 text-sm font-medium shadow-md transition ${
                         language === l.code
-                          ? "bg-gradient-to-r from-pink to-peach text-ink ring-2 ring-sage/50"
+                          ? "bg-secondary text-cream-deep ring-2 ring-secondary/40"
                           : "border border-sage/50 bg-cream/90 text-ink-muted hover:bg-blue/35"
                       }`}
                       aria-pressed={language === l.code}

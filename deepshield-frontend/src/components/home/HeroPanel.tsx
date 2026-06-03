@@ -25,7 +25,7 @@ export function HeroPanel() {
           <li key={key}>
             <Link
               href={href}
-              className="flex items-start gap-2 rounded-xl bg-cream/70 px-3 py-2.5 text-sm text-ink-muted transition hover:bg-sage/35 hover:text-ink"
+              className="flex items-start gap-2 rounded-xl bg-parchment/90 px-3 py-2.5 text-sm text-ink-muted transition hover:bg-cream-deep/50 hover:text-ink"
             >
               <span className="mt-0.5 text-sage">✓</span>
               <span>{t(key)}</span>

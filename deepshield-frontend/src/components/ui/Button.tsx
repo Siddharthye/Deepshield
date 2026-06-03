@@ -6,11 +6,11 @@ import { motion } from "framer-motion";
 
 const variants = {
   primary:
-    "bg-gradient-to-r from-pink to-peach text-ink shadow-[0_4px_20px_rgba(155,127,168,0.35)] hover:brightness-105",
+    "bg-secondary text-cream-deep shadow-[0_4px_20px_rgba(75,10,10,0.35)] hover:brightness-110",
   secondary:
-    "border border-secondary/35 bg-primary text-ink hover:bg-secondary/10",
-  dark: "bg-secondary text-primary hover:opacity-90",
-  ghost: "text-accent hover:bg-peach/50",
+    "border border-secondary/40 bg-cream-deep text-ink hover:bg-parchment",
+  dark: "bg-secondary text-cream-deep hover:opacity-90",
+  ghost: "text-accent hover:bg-cream-tan/60",
 } as const;
 
 type Variant = keyof typeof variants;

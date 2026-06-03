@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
+import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 
@@ -22,16 +23,18 @@ export function Navbar() {
   const pathname = usePathname();
   const { t } = useLanguage();
   const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+  useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 48));
   const bg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(251, 247, 244, 0)", "rgba(251, 247, 244, 0.94)"],
+    ["rgba(166, 144, 118, 0)", "rgba(75, 10, 10, 0.96)"],
   );
   const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(18px)"]);
   const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(63, 46, 58, 0)", "rgba(63, 46, 58, 0.12)"],
+    ["rgba(75, 10, 10, 0)", "rgba(242, 232, 213, 0.22)"],
   );
   const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
   const radius = useTransform(scrollY, [0, 80], [0, 9999]);
@@ -60,10 +63,14 @@ export function Navbar() {
             alt="DeepShield"
             width={36}
             height={36}
-            className="rounded-lg object-contain ring-1 ring-blue/40"
+            className="rounded-lg object-contain ring-1 ring-secondary/40"
             unoptimized
           />
-          <span className="font-display hidden text-ink sm:inline">DeepShield</span>
+          <span
+            className={`font-display hidden sm:inline ${scrolled ? "text-cream-deep" : "text-ink"}`}
+          >
+            DeepShield
+          </span>
         </Link>
         <nav className="flex flex-wrap items-center justify-center gap-0.5 text-xs md:text-sm">
           {LINKS.map(({ href, key }) => {
@@ -75,8 +82,12 @@ export function Navbar() {
                 href={href}
                 className={`rounded-full px-2 py-1.5 md:px-3 ${
                   active
-                    ? "bg-secondary/12 font-medium text-ink ring-1 ring-secondary/25"
-                    : "text-ink-muted hover:bg-secondary/8"
+                    ? scrolled
+                      ? "bg-cream-deep/20 font-medium text-cream-deep ring-1 ring-cream-deep/35"
+                      : "bg-secondary/12 font-medium text-ink ring-1 ring-secondary/30"
+                    : scrolled
+                      ? "text-cream-deep/85 hover:bg-cream-deep/12"
+                      : "text-ink-muted hover:bg-secondary/8"
                 }`}
               >
                 {t(key)}
