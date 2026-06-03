@@ -8,8 +8,8 @@ const variants = {
   primary:
     "bg-gradient-to-r from-blue to-sage text-ink shadow-[0_4px_20px_rgba(159,124,239,0.4)] hover:brightness-105",
   secondary:
-    "border border-sage/60 bg-peach/35 text-ink hover:bg-blue/50",
-  dark: "bg-ink text-cream hover:opacity-90",
+    "border border-secondary/35 bg-primary text-ink hover:bg-secondary/10",
+  dark: "bg-secondary text-primary hover:opacity-90",
   ghost: "text-accent hover:bg-peach/50",
 } as const;
 

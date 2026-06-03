@@ -29,7 +29,7 @@ export function LanguageMenu() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-sage/50 bg-cream/80 text-sm text-ink shadow-sm backdrop-blur hover:bg-blue/40"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-secondary/25 bg-primary text-sm text-ink shadow-sm backdrop-blur hover:bg-secondary/10"
         aria-label={`Language: ${current.label}`}
         aria-expanded={open}
         aria-haspopup="listbox"

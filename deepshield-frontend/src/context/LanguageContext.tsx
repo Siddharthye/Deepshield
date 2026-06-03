@@ -47,7 +47,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, ready }}>
       {!ready ? (
-        <div className="min-h-screen bg-cream/30" aria-busy="true" />
+        <div className="min-h-screen bg-primary" aria-busy="true" />
       ) : (
         children
       )}

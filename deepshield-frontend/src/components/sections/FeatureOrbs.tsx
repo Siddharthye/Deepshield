@@ -35,7 +35,7 @@ export function FeatureOrbs() {
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start">
         <div
-          className="relative mx-auto shrink-0 rounded-full border border-dashed border-sage/60 bg-blue-deep/25"
+          className="relative mx-auto shrink-0 rounded-full border border-dashed border-secondary/30 bg-primary"
           style={{ width: BOX, height: BOX }}
         >
           <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center">
@@ -57,8 +57,8 @@ export function FeatureOrbs() {
                 onClick={() => setActive(f.id)}
                 className={`absolute flex flex-col items-center justify-center rounded-full shadow-md transition-colors ${
                   isActive
-                    ? "z-20 bg-blue text-ink ring-4 ring-sage/50"
-                    : "z-10 bg-cream text-ink-muted hover:bg-sage/40"
+                    ? "z-20 bg-secondary text-primary ring-4 ring-sage/50"
+                    : "z-10 bg-primary text-ink-muted ring-1 ring-secondary/15 hover:bg-secondary/8"
                 }`}
                 style={{ ...orbStyle(i, ORB_FEATURE_META.length), width: ORB_SIZE, height: ORB_SIZE }}
                 animate={{ scale: isActive ? 1.12 : dim ? 0.88 : 1, opacity: dim ? 0.55 : 1 }}
@@ -93,7 +93,7 @@ export function FeatureOrbs() {
                 {[keys.p1, keys.p2, keys.p3].map((pk) => (
                   <li
                     key={pk}
-                    className="rounded-xl bg-blue/25 px-3 py-2 text-xs font-medium text-ink-muted"
+                    className="rounded-xl bg-secondary/8 px-3 py-2 text-xs font-medium text-ink-muted"
                   >
                     ✓ {t(pk)}
                   </li>
