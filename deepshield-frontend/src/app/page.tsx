@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { ButtonLink } from "@/components/ui/Button";
 import { HeroParticles } from "@/components/hero/HeroParticles";
 import { AnimatedShield } from "@/components/ui/AnimatedShield";
 import { HowItWorksPinned } from "@/components/sections/HowItWorksPinned";
@@ -18,6 +17,7 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { WaveDivider } from "@/components/sections/WaveDivider";
 import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
 import { HeroInfoCards } from "@/components/home/HeroInfoCards";
+import { HeroHelplines } from "@/components/home/HeroHelplines";
 import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -64,8 +64,9 @@ export default function HomePage() {
           </div>
 
           <HeroInfoCards />
+          <HeroHelplines />
 
-          <div className="flex flex-col gap-6 border-t border-secondary/15 pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-5 border-t border-secondary/15 pt-8">
             <ul className="flex flex-wrap gap-2">
               {TRUST_KEYS.map((key) => (
                 <li
@@ -76,20 +77,12 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-
-            <div className="grid w-full grid-cols-1 gap-3 sm:w-auto sm:min-w-[20rem] sm:grid-cols-2">
-              <ButtonLink href="/scan" className="w-full justify-center">
-                {t("scanNow")}
-              </ButtonLink>
-              <ButtonLink href="/asha" variant="secondary" className="w-full justify-center">
-                {t("talkToAsha")}
-              </ButtonLink>
+            <div className="max-w-3xl space-y-2">
+              <p className="font-display text-lg text-ink">{t("footerLine1")}</p>
+              <p className="text-sm text-ink-muted">{t("heroClosing")}</p>
+              <p className="text-xs text-ink-subtle">{t("footerLine2")}</p>
             </div>
           </div>
-
-          <p className="text-center text-sm font-medium text-ink-muted md:text-left">
-            {t("footerLine1")}
-          </p>
         </motion.div>
       </section>
 

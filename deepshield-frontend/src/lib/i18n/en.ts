@@ -29,6 +29,17 @@ export const EN = {
   heroInfoLawTitle: "Laws that may apply in India",
   heroInfoLawBody:
     "IT Act §66E, §67, §67A and IPC §354C can apply to morphed and non-consensual intimate images. DeepShield helps you document; cybercrime.gov.in or a lawyer guides filing.",
+  heroInfoDocumentTitle: "Save evidence early",
+  heroInfoDocumentBody:
+    "Screenshot URLs, profiles, timestamps, and messages before platforms remove them. Keep originals where you can — compression can hide important detail.",
+  heroInfoPaceTitle: "Go at your own pace",
+  heroInfoPaceBody:
+    "There is no rush and no judgment here. Scroll when you are ready — more guidance, stories, and support are on this page below.",
+  heroHelplineBadge: "If you need help now",
+  heroHelplineIntro:
+    "If you are in danger, contact local police first. These national lines support cyber abuse and emotional care.",
+  heroClosing:
+    "DeepShield is free, private in your browser, and built for survivors — not spectacle.",
   trust1: "Browser-first privacy",
   trust2: "No account required",
   trust3: "Free for survivors",

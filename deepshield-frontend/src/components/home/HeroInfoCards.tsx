@@ -9,6 +9,8 @@ const CARDS: { titleKey: I18nKey; bodyKey: I18nKey; tint?: "blue" | "peach" }[] 
   { titleKey: "heroInfoPrivateTitle", bodyKey: "heroInfoPrivateBody", tint: "blue" },
   { titleKey: "heroInfoRemindTitle", bodyKey: "heroInfoRemindBody" },
   { titleKey: "heroInfoLawTitle", bodyKey: "heroInfoLawBody", tint: "peach" },
+  { titleKey: "heroInfoDocumentTitle", bodyKey: "heroInfoDocumentBody" },
+  { titleKey: "heroInfoPaceTitle", bodyKey: "heroInfoPaceBody", tint: "blue" },
 ];
 
 export function HeroInfoCards() {
