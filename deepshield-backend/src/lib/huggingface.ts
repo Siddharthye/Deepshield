@@ -36,10 +36,15 @@ function hfDeepfakeInferenceUrl() {
 }
 
 function hfLlmModelId() {
-  return resolveModelId(
+  const resolved = resolveModelId(
     process.env.HF_LLM_MODEL_URL,
-    "mistralai/Mistral-7B-Instruct-v0.3",
+    "meta-llama/Llama-3.1-8B-Instruct",
   );
+  // Legacy default pointed at a text-generation model, not router chat.
+  if (resolved === "mistralai/Mistral-7B-Instruct-v0.3") {
+    return "meta-llama/Llama-3.1-8B-Instruct";
+  }
+  return resolved;
 }
 
 function clamp01(n: number) {
