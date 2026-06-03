@@ -7,30 +7,24 @@ import { CompareSlider } from "@/components/ui/CompareSlider";
 import { HeatmapOverlay } from "@/components/scan/HeatmapOverlay";
 import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { explainRisk, scanImage } from "@/lib/api";
-import { analyzeFaceSymmetryScore } from "@/lib/faceAnalysis";
+import { analyzeFaceOnce } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
-import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
+import type { HeatmapCell } from "@/lib/clientAnalysis";
 import { exportHeatmapDataUrl } from "@/lib/heatmapExport";
+import { resizeImageForScan } from "@/lib/resizeImage";
 import { computeRisk, verdictLabelKey } from "@/lib/riskScoring";
-import { saveScanSession } from "@/lib/scanSession";
+import { loadScanSession, saveScanSession } from "@/lib/scanSession";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 import { playScanChime } from "@/lib/ambientSound";
+import { deferToIdle, yieldToMain } from "@/lib/yieldToMain";
 import { useLanguage } from "@/context/LanguageContext";
-import type { ExplainResult, RiskResult } from "@/lib/types";
-
-const SCAN_STEP_KEYS = [
-  "scanStep1",
-  "scanStep2",
-  "scanStep3",
-  "scanStep4",
-  "scanStep5",
-] as const;
+import type { ExplainResult, RiskResult, ScanSession } from "@/lib/types";
+import type { I18nKey } from "@/lib/i18n";
 
 function AnimatedRisk({ value }: { value: number }) {
   const [n, setN] = useState(0);
   useEffect(() => {
-    let start = 0;
     const t0 = performance.now();
     const run = (now: number) => {
       const p = Math.min(1, (now - t0) / 1400);
@@ -45,106 +39,92 @@ function AnimatedRisk({ value }: { value: number }) {
 export function ImageScanner() {
   const { language, t } = useLanguage();
   const [preview, setPreview] = useState<string | null>(null);
-  const [mimeType, setMimeType] = useState("image/jpeg");
   const [loading, setLoading] = useState(false);
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepKey, setStepKey] = useState<I18nKey>("scanStepPrepare");
   const [error, setError] = useState<string | null>(null);
   const [risk, setRisk] = useState<RiskResult | null>(null);
   const [explain, setExplain] = useState<ExplainResult | null>(null);
+  const [explainLoading, setExplainLoading] = useState(false);
   const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
   const [shield, setShield] = useState(false);
-
-  useEffect(() => {
-    if (!loading) return;
-    const id = setInterval(() => setStepIndex((i) => (i + 1) % SCAN_STEP_KEYS.length), 1100);
-    return () => clearInterval(id);
-  }, [loading]);
 
   async function onFile(file: File) {
     setError(null);
     setRisk(null);
     setExplain(null);
     setHeatmap([]);
-    setStepIndex(0);
+    setLoading(true);
 
-    const mt = file.type || "image/jpeg";
-    setMimeType(mt);
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const dataUrl = reader.result as string;
+    try {
+      setStepKey("scanStepPrepare");
+      const { dataUrl, mimeType } = await resizeImageForScan(file);
       setPreview(dataUrl);
-      setLoading(true);
-      try {
-        const symmetryScore = await analyzeFaceSymmetryScore(dataUrl);
-        const artifactScore = await analyzeOpenCvArtifactScore(dataUrl);
+      await yieldToMain();
 
-        const { modelScore } = await scanImage({ imageBase64: dataUrl, mimeType: mt });
-        let cells: HeatmapCell[] = [];
-        try {
-          cells = await buildModelGuidedHeatmap(dataUrl, modelScore);
-        } catch {
-          cells = await buildArtifactHeatmap(dataUrl);
-        }
-        if (
-          cells.length === 0 ||
-          cells.every((c) => c.intensity < 0.08)
-        ) {
-          cells = await buildArtifactHeatmap(dataUrl);
-        }
-        cells = cells.map((c) => ({
-          ...c,
-          intensity: Math.min(1, Math.max(c.intensity, 0.12) * 1.15),
-        }));
-        if (cells.length === 0) {
-          cells = Array.from({ length: 64 }, (_, i) => ({
-            x: i % 8,
-            y: Math.floor(i / 8),
-            intensity: 0.2 + modelScore * 0.45,
-          }));
-        }
-        setHeatmap(cells);
+      setStepKey("scanStep1");
+      const facePromise = analyzeFaceOnce(dataUrl);
+      const openCvPromise = analyzeOpenCvArtifactScore(dataUrl);
+      const apiPromise = scanImage({ imageBase64: dataUrl, mimeType });
 
-        const riskResult = computeRisk({ modelScore, artifactScore, symmetryScore });
-        setRisk(riskResult);
+      const [{ symmetryScore, faceBox }, artifactScore, { modelScore }] =
+        await Promise.all([facePromise, openCvPromise, apiPromise]);
+      await yieldToMain();
 
-        const explanation = await explainRisk({ risk: riskResult, language });
-        setExplain(explanation);
+      setStepKey("scanStep4");
+      const cells = await buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox);
+      setHeatmap(cells);
 
-        let heatmapDataUrl: string | undefined;
-        try {
-          heatmapDataUrl = await exportHeatmapDataUrl(dataUrl, cells);
-        } catch {
-          /* optional */
-        }
+      const riskResult = computeRisk({ modelScore, artifactScore, symmetryScore });
+      setRisk(riskResult);
+      setLoading(false);
 
-        const session = {
-          imageDataUrl: dataUrl,
-          mimeType: mt,
-          risk: riskResult,
-          explain: explanation,
-          scannedAt: new Date().toISOString(),
-          heatmapDataUrl,
-        };
-        saveScanSession(session);
+      setShield(true);
+      playScanChime();
+      setTimeout(() => setShield(false), 900);
 
+      const baseSession: ScanSession = {
+        imageDataUrl: dataUrl,
+        mimeType,
+        risk: riskResult,
+        scannedAt: new Date().toISOString(),
+      };
+      saveScanSession(baseSession);
+
+      setExplainLoading(true);
+      setStepKey("scanStep5");
+      void explainRisk({ risk: riskResult, language })
+        .then((explanation) => {
+          setExplain(explanation);
+          saveScanSession({ ...baseSession, explain: explanation });
+        })
+        .catch(() => {
+          /* results still usable without LLM text */
+        })
+        .finally(() => setExplainLoading(false));
+
+      deferToIdle(() => {
+        void exportHeatmapDataUrl(dataUrl, cells)
+          .then((heatmapDataUrl) => {
+            const session = loadScanSession();
+            saveScanSession({
+              ...(session ?? baseSession),
+              heatmapDataUrl,
+            });
+          })
+          .catch(() => {
+            /* optional */
+          });
         tryAddToVault({
           name: `scan_${Date.now()}.jpg`,
           kind: "scan",
-          sizeBytes: file.size,
+          sizeBytes: Math.round(dataUrl.length * 0.75),
           payload: dataUrl,
         });
-
-        setShield(true);
-        playScanChime();
-        setTimeout(() => setShield(false), 900);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : t("scanFailed"));
-      } finally {
-        setLoading(false);
-      }
-    };
-    reader.readAsDataURL(file);
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("scanFailed"));
+      setLoading(false);
+    }
   }
 
   return (
@@ -161,7 +141,7 @@ export function ImageScanner() {
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) onFile(f);
+              if (f) void onFile(f);
             }}
           />
         </label>
@@ -180,22 +160,14 @@ export function ImageScanner() {
                 <div className="relative mb-4 aspect-video overflow-hidden rounded-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={preview} alt="" className="h-full w-full object-contain" />
-                  <motion.div
-                    className="absolute inset-x-0 h-1 bg-pink shadow-[0_0_24px_rgba(244,196,208,0.85)]"
-                    animate={{ top: ["0%", "100%", "0%"] }}
-                    transition={{ duration: 2, repeat: Infinity }}
+                  <div
+                    className="scan-beam absolute inset-x-0 h-1 bg-pink shadow-[0_0_24px_rgba(244,196,208,0.85)]"
+                    aria-hidden
                   />
-                  {[0, 1, 2].map((r) => (
-                    <motion.span
-                      key={r}
-                      className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-pink/60"
-                      animate={{ scale: [1, 2.2], opacity: [0.5, 0] }}
-                      transition={{ duration: 1.6, repeat: Infinity, delay: r * 0.35 }}
-                    />
-                  ))}
                 </div>
               )}
-              <p className="text-center text-sm text-ink">{t(SCAN_STEP_KEYS[stepIndex])}</p>
+              <p className="text-center text-sm text-ink">{t(stepKey)}</p>
+              <p className="mt-2 text-center text-xs text-ink-subtle">{t("scanPleaseWait")}</p>
             </GlassCard>
           </motion.div>
         )}
@@ -221,12 +193,7 @@ export function ImageScanner() {
             <CompareSlider
               originalSrc={preview}
               overlay={
-                <HeatmapOverlay
-                  imageSrc={preview}
-                  cells={heatmap}
-                  showBaseImage
-                  animateReveal
-                />
+                <HeatmapOverlay imageSrc={preview} cells={heatmap} showBaseImage />
               }
               originalLabel={t("originalLabel")}
               overlayLabel={t("heatmapLabel")}
@@ -262,7 +229,10 @@ export function ImageScanner() {
                 <span>{(risk.breakdown.symmetryScore * 100).toFixed(0)}%</span>
               </li>
             </ul>
-            {explain && (
+            {explainLoading && (
+              <p className="mt-6 animate-pulse text-sm text-ink-subtle">{t("scanExplainLoading")}</p>
+            )}
+            {explain && !explainLoading && (
               <div className="mt-6 space-y-3 border-t border-peach/40 pt-4 text-sm">
                 <p>{explain.explanation}</p>
                 <p className="rounded-xl bg-peach/35 px-4 py-3 font-medium">{explain.recommendation}</p>

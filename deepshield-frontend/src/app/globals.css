@@ -401,6 +401,19 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+@keyframes scan-beam {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.scan-beam {
+  animation: scan-beam 2s ease-in-out infinite alternate;
+}
+
 @keyframes shimmer {
   0% {
     transform: translateX(-120%) skewX(-12deg);

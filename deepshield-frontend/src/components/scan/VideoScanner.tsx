@@ -7,8 +7,9 @@ import { CompareSlider } from "@/components/ui/CompareSlider";
 import { scanImage } from "@/lib/api";
 import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
-import { analyzeFaceSymmetryScore } from "@/lib/faceAnalysis";
+import { analyzeFaceOnce } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
+import { yieldToMain } from "@/lib/yieldToMain";
 import { extractFramesFfmpeg } from "@/lib/ffmpegExtract";
 import { extractVideoFrames } from "@/lib/videoFrames";
 import { computeRisk, verdictLabelKey } from "@/lib/riskScoring";
@@ -96,20 +97,28 @@ export function VideoScanner() {
         const frame = extracted[i];
         setProgress(t("videoFrameProgress").replace("{n}", String(i + 1)).replace("{total}", String(extracted.length)));
 
-        const [artifactScore, symmetryScore] = await Promise.all([
-          analyzeOpenCvArtifactScore(frame.dataUrl),
-          analyzeFaceSymmetryScore(frame.dataUrl),
-        ]);
-        const { modelScore } = await scanImage({
-          imageBase64: frame.dataUrl,
-          mimeType: "image/jpeg",
-        });
+        const [{ symmetryScore, faceBox }, artifactScore, { modelScore }] =
+          await Promise.all([
+            analyzeFaceOnce(frame.dataUrl),
+            analyzeOpenCvArtifactScore(frame.dataUrl),
+            scanImage({
+              imageBase64: frame.dataUrl,
+              mimeType: "image/jpeg",
+            }),
+          ]);
+        await yieldToMain();
         let heatmap: HeatmapCell[] = [];
         try {
-          heatmap = await buildModelGuidedHeatmap(frame.dataUrl, modelScore);
+          heatmap = await buildModelGuidedHeatmap(
+            frame.dataUrl,
+            modelScore,
+            8,
+            faceBox,
+          );
         } catch {
           heatmap = await buildArtifactHeatmap(frame.dataUrl);
         }
+        await yieldToMain();
         const risk = computeRisk({ modelScore, artifactScore, symmetryScore });
         scored.push({
           timeSec: frame.timeSec,
