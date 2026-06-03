@@ -233,6 +233,7 @@ export const EN_MORE = {
   cyberIncidentScanPrefix: "Deepfake / morphed image concern. Scan:",
   vaultPinPrompt: "Enter a 4-digit PIN (AES-256 encrypted)",
   vaultPinAria: "Vault PIN",
+  vaultPinTapHint: "Tap the circles above, then type your 4-digit PIN",
   vaultUnlock: "Unlock vault",
   vaultAddFile: "Add file",
   vaultExportZip: "Export ZIP",

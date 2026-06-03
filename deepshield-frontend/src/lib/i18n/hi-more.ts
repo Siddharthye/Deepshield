@@ -236,6 +236,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   cyberIncidentScanPrefix: "डीपफेक / मॉर्फ्ड छवि चिंता। स्कैन:",
   vaultPinPrompt: "4-अंकीय PIN दर्ज करें (AES-256 एन्क्रिप्टेड)",
   vaultPinAria: "वॉल्ट PIN",
+  vaultPinTapHint: "ऊपर के गोले पर टैप करें, फिर 4-अंकीय PIN टाइप करें",
   vaultUnlock: "वॉल्ट अनलॉक करें",
   vaultAddFile: "फ़ाइल जोड़ें",
   vaultExportZip: "ZIP निर्यात",

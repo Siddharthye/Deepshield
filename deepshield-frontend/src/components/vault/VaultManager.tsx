@@ -27,11 +27,61 @@ function isImagePayload(payload: string) {
   return payload.startsWith("data:image/");
 }
 
+function PinPad({
+  value,
+  onChange,
+  inputRef,
+  shake,
+  burst,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  shake?: boolean;
+  burst?: boolean;
+}) {
+  const slots = ["", "", "", ""].map((_, i) => value[i] ?? "");
+
+  return (
+    <motion.div animate={shake ? { x: [-8, 8, 0] } : {}} className="relative">
+      <button
+        type="button"
+        className="relative mx-auto flex w-full max-w-xs justify-center gap-3 py-2"
+        onClick={() => inputRef.current?.focus()}
+        aria-label="PIN entry"
+      >
+        {slots.map((d, i) => (
+          <motion.div
+            key={i}
+            animate={burst ? { scale: [1, 1.15, 1] } : {}}
+            className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
+          >
+            {d ? "•" : ""}
+          </motion.div>
+        ))}
+        <input
+          ref={inputRef}
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete="one-time-code"
+          maxLength={4}
+          value={value}
+          onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          className="absolute inset-0 z-10 h-full w-full cursor-text opacity-0"
+        />
+      </button>
+    </motion.div>
+  );
+}
+
 export function VaultManager() {
   const { t } = useLanguage();
   const [mode, setMode] = useState<"unlock" | "setup">("unlock");
-  const [digits, setDigits] = useState(["", "", "", ""]);
-  const [confirmDigits, setConfirmDigits] = useState(["", "", "", ""]);
+  const [setupStep, setSetupStep] = useState<"create" | "confirm">("create");
+  const [draftPin, setDraftPin] = useState("");
+  const [pinValue, setPinValue] = useState("");
+  const [confirmValue, setConfirmValue] = useState("");
   const [pinMismatch, setPinMismatch] = useState(false);
   const [pin, setPin] = useState<string | null>(null);
   const [records, setRecords] = useState<VaultRecord[]>([]);
@@ -42,6 +92,8 @@ export function VaultManager() {
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const pinInputRef = useRef<HTMLInputElement>(null);
+  const confirmInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMode(vaultExists() ? "unlock" : "setup");
@@ -57,6 +109,18 @@ export function VaultManager() {
     }
   }, []);
 
+  useEffect(() => {
+    if (pin) return;
+    const id = window.setTimeout(() => {
+      if (mode === "setup" && setupStep === "confirm") {
+        confirmInputRef.current?.focus();
+      } else {
+        pinInputRef.current?.focus();
+      }
+    }, 200);
+    return () => window.clearTimeout(id);
+  }, [pin, mode, setupStep]);
+
   function flashShield() {
     setShield(true);
     setTimeout(() => setShield(false), 900);
@@ -69,8 +133,8 @@ export function VaultManager() {
     setBurst(true);
     setTimeout(() => setBurst(false), 600);
     flashShield();
-    setDigits(["", "", "", ""]);
-    setConfirmDigits(["", "", "", ""]);
+    setPinValue("");
+    setConfirmValue("");
   }
 
   function unlock(entered: string) {
@@ -87,9 +151,11 @@ export function VaultManager() {
     if (entered !== confirm) {
       setPinMismatch(true);
       setShake(true);
+      setConfirmValue("");
       setTimeout(() => {
         setShake(false);
         setPinMismatch(false);
+        confirmInputRef.current?.focus();
       }, 500);
       return;
     }
@@ -97,19 +163,23 @@ export function VaultManager() {
     unlockSuccess(entered, []);
   }
 
-  function handlePinChange(value: string, isConfirm = false) {
-    const nums = value.replace(/\D/g, "").slice(0, 4).split("");
-    const next = ["", "", "", ""].map((_, i) => nums[i] ?? "");
-    if (isConfirm) {
-      setConfirmDigits(next);
-      if (nums.length === 4) {
-        setupVault(digits.join(""), next.join(""));
-      }
-    } else {
-      setDigits(next);
-      if (mode === "unlock" && nums.length === 4) {
-        unlock(next.join(""));
-      }
+  function onPinValueChange(value: string) {
+    setPinValue(value);
+    if (mode === "unlock" && value.length === 4) {
+      unlock(value);
+    }
+    if (mode === "setup" && setupStep === "create" && value.length === 4) {
+      setDraftPin(value);
+      setSetupStep("confirm");
+      setConfirmValue("");
+      window.setTimeout(() => confirmInputRef.current?.focus(), 50);
+    }
+  }
+
+  function onConfirmValueChange(value: string) {
+    setConfirmValue(value);
+    if (value.length === 4) {
+      setupVault(draftPin, value);
     }
   }
 
@@ -117,8 +187,10 @@ export function VaultManager() {
     setPin(null);
     setRecords([]);
     sessionStorage.removeItem("deepshield_vault_pin");
-    setDigits(["", "", "", ""]);
-    setConfirmDigits(["", "", "", ""]);
+    setPinValue("");
+    setConfirmValue("");
+    setDraftPin("");
+    setSetupStep("create");
     setMode(vaultExists() ? "unlock" : "setup");
   }
 
@@ -213,17 +285,6 @@ export function VaultManager() {
     persist([]);
   }
 
-  const pinDots = (vals: string[], filled: boolean) =>
-    vals.map((d, i) => (
-      <motion.div
-        key={i}
-        animate={burst && filled ? { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] } : {}}
-        className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
-      >
-        {d ? "•" : ""}
-      </motion.div>
-    ));
-
   if (!pin) {
     return (
       <>
@@ -235,50 +296,55 @@ export function VaultManager() {
           <p className="mb-6 text-center text-sm text-ink/75">
             {mode === "setup" ? t("vaultSetupHint") : t("vaultPinPrompt")}
           </p>
-          <motion.div
-            animate={shake ? { x: [-8, 8, 0] } : {}}
-            className="mb-4 flex flex-col gap-4"
-          >
-            <div className="flex justify-center gap-3">{pinDots(digits, true)}</div>
-            {mode === "setup" && (
+          <div className="mb-4 space-y-4">
+            {mode === "setup" && setupStep === "confirm" ? (
               <>
                 <p className="text-center text-xs text-ink/60">{t("vaultConfirmPin")}</p>
-                <div className="flex justify-center gap-3">{pinDots(confirmDigits, false)}</div>
+                <PinPad
+                  value={confirmValue}
+                  onChange={onConfirmValueChange}
+                  inputRef={confirmInputRef}
+                  shake={shake}
+                  burst={burst}
+                />
               </>
+            ) : (
+              <PinPad
+                value={pinValue}
+                onChange={onPinValueChange}
+                inputRef={pinInputRef}
+                shake={shake}
+                burst={burst}
+              />
             )}
-          </motion.div>
+          </div>
           {pinMismatch && (
             <p className="mb-4 text-center text-sm text-pink">{t("vaultPinMismatch")}</p>
           )}
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={4}
-            className="sr-only"
-            aria-label={t("vaultPinAria")}
-            autoFocus
-            onChange={(e) => handlePinChange(e.target.value, false)}
-          />
-          {mode === "setup" && (
-            <input
-              type="password"
-              inputMode="numeric"
-              maxLength={4}
-              className="sr-only"
-              aria-label={t("vaultConfirmPin")}
-              onChange={(e) => handlePinChange(e.target.value, true)}
-            />
-          )}
+          <p className="mb-4 text-center text-xs text-ink/50">{t("vaultPinTapHint")}</p>
           <Button
             variant="dark"
             className="w-full"
-            onClick={() =>
-              mode === "setup"
-                ? setupVault(digits.join(""), confirmDigits.join(""))
-                : unlock(digits.join(""))
-            }
+            onClick={() => {
+              if (mode === "setup") {
+                if (setupStep === "create" && pinValue.length === 4) {
+                  setDraftPin(pinValue);
+                  setSetupStep("confirm");
+                  setConfirmValue("");
+                  confirmInputRef.current?.focus();
+                } else if (setupStep === "confirm") {
+                  setupVault(draftPin, confirmValue);
+                }
+              } else {
+                unlock(pinValue);
+              }
+            }}
           >
-            {mode === "setup" ? t("vaultCreate") : t("vaultUnlock")}
+            {mode === "setup"
+              ? setupStep === "confirm"
+                ? t("vaultCreate")
+                : t("vaultConfirmPin")
+              : t("vaultUnlock")}
           </Button>
         </GlassCard>
       </>
