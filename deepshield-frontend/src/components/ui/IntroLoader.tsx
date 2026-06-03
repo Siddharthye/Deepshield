@@ -31,9 +31,9 @@ export function IntroLoader() {
           transition={{ duration: 0.5 }}
         >
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
             <Image
               src="/images/ds-logo.jpeg"
@@ -45,7 +45,7 @@ export function IntroLoader() {
             />
           </motion.div>
           <motion.p
-            className="mt-6 max-w-xs text-center text-lg text-ink"
+            className="mt-6 max-w-xs text-center text-lg font-medium text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}

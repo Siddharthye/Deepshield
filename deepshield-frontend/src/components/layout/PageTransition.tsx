@@ -61,15 +61,14 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
             />
             <motion.div
               className="relative z-10 flex flex-col items-center"
-              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{
                 opacity: phase === "exit" ? 0 : 1,
-                scale: phase === "hold" ? 1 : phase === "exit" ? 1.03 : 0.94,
                 y: phase === "exit" ? -6 : 0,
               }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="overflow-hidden rounded-3xl bg-white p-3 shadow-[0_24px_80px_rgba(63,46,58,0.1)] ring-1 ring-pink/40">
+              <div className="overflow-hidden rounded-3xl bg-white/95 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.25)] ring-1 ring-white/30">
                 <Image
                   src="/images/ds-logo.jpeg"
                   alt="DeepShield"
@@ -80,8 +79,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
                   priority
                 />
               </div>
-              <p className="font-display mt-5 text-xl tracking-tight text-ink">DeepShield</p>
-              <p className="mt-1 text-xs text-ink-subtle">{t("transitionTagline")}</p>
+              <p className="font-display mt-5 text-xl tracking-tight text-white">DeepShield</p>
+              <p className="mt-1 text-xs text-white/90">{t("transitionTagline")}</p>
             </motion.div>
           </motion.div>
         )}
