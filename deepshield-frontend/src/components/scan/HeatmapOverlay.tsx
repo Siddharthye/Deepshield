@@ -53,7 +53,7 @@ export function HeatmapOverlay({
             ctx.fillStyle = `rgba(235, 70, 90, ${alpha})`;
             ctx.fillRect(ox + c.x * cw, oy + c.y * ch, cw, ch);
           });
-          ctx.strokeStyle = "rgba(241, 205, 226, 0.45)";
+          ctx.strokeStyle = "rgba(244, 196, 208, 0.5)";
           ctx.lineWidth = 1;
           for (let i = 0; i <= grid; i++) {
             ctx.beginPath();

@@ -57,7 +57,7 @@ export function FeatureOrbs() {
                 onClick={() => setActive(f.id)}
                 className={`absolute flex flex-col items-center justify-center rounded-full shadow-md transition-colors ${
                   isActive
-                    ? "z-20 bg-secondary text-primary ring-4 ring-sage/50"
+                    ? "z-20 bg-secondary text-primary ring-4 ring-pink/50"
                     : "z-10 bg-primary text-ink-muted ring-1 ring-secondary/15 hover:bg-secondary/8"
                 }`}
                 style={{ ...orbStyle(i, ORB_FEATURE_META.length), width: ORB_SIZE, height: ORB_SIZE }}

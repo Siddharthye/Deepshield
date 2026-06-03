@@ -33,7 +33,7 @@ function Points({ count = 600 }: { count?: number }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.06}
-        color="#f1cde2"
+        color="#f4c4d0"
         transparent
         opacity={0.75}
         sizeAttenuation

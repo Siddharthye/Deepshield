@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 const variants = {
   primary:
-    "bg-gradient-to-r from-blue to-sage text-primary shadow-[0_4px_20px_rgba(61,82,76,0.35)] hover:brightness-105",
+    "bg-gradient-to-r from-pink to-peach text-ink shadow-[0_4px_20px_rgba(155,127,168,0.35)] hover:brightness-105",
   secondary:
     "border border-secondary/35 bg-primary text-ink hover:bg-secondary/10",
   dark: "bg-secondary text-primary hover:opacity-90",

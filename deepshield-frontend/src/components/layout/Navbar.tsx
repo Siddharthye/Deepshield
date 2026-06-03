@@ -25,13 +25,13 @@ export function Navbar() {
   const bg = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(244, 240, 224, 0)", "rgba(244, 240, 224, 0.94)"],
+    ["rgba(251, 247, 244, 0)", "rgba(251, 247, 244, 0.94)"],
   );
   const blur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(18px)"]);
   const border = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(159, 124, 239, 0)", "rgba(159, 124, 239, 0.2)"],
+    ["rgba(63, 46, 58, 0)", "rgba(63, 46, 58, 0.12)"],
   );
   const maxW = useTransform(scrollY, [0, 80], ["100%", "56rem"]);
   const radius = useTransform(scrollY, [0, 80], [0, 9999]);

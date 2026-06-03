@@ -172,7 +172,7 @@ export function ImageScanner() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={preview} alt="" className="h-full w-full object-contain" />
                   <motion.div
-                    className="absolute inset-x-0 h-1 bg-pink shadow-[0_0_24px_rgba(241,205,226,0.9)]"
+                    className="absolute inset-x-0 h-1 bg-pink shadow-[0_0_24px_rgba(244,196,208,0.85)]"
                     animate={{ top: ["0%", "100%", "0%"] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />

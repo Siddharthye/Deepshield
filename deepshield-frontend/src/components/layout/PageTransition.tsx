@@ -69,7 +69,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
               }}
               transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="overflow-hidden rounded-3xl bg-white p-3 shadow-[0_24px_80px_rgba(159,124,239,0.15)] ring-1 ring-blue/30">
+              <div className="overflow-hidden rounded-3xl bg-white p-3 shadow-[0_24px_80px_rgba(63,46,58,0.1)] ring-1 ring-pink/40">
                 <Image
                   src="/images/ds-logo.jpeg"
                   alt="DeepShield"
