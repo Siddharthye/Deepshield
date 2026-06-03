@@ -12,6 +12,9 @@ import { HorizontalFeatures } from "@/components/sections/HorizontalFeatures";
 import { HomeCrisisStrip } from "@/components/sections/HomeCrisisStrip";
 import { HomeWhySection } from "@/components/sections/HomeWhySection";
 import { HomeQuickActions } from "@/components/sections/HomeQuickActions";
+import { HomeProblem } from "@/components/sections/HomeProblem";
+import { HomeMission } from "@/components/sections/HomeMission";
+import { HomeFaq } from "@/components/sections/HomeFaq";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { CtaStrip } from "@/components/sections/CtaStrip";
 import { WaveDivider } from "@/components/sections/WaveDivider";
@@ -63,6 +66,12 @@ export default function HomePage() {
             </h1>
             <TypewriterSubtitle />
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink/70">{t("homeHero")}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/60">
+              DeepShield is a complete safety toolkit for anyone facing morphed photos, deepfake
+              videos, or non-consensual intimate imagery. Scan suspicious media, build a legal
+              evidence pack, trace where your image was posted, and speak with Asha — all without
+              creating an account or uploading your life to a corporate cloud.
+            </p>
             <ul className="mt-4 flex flex-wrap gap-2">
               {TRUST.map((item) => (
                 <li
@@ -84,6 +93,7 @@ export default function HomePage() {
       </section>
 
       <HomeCrisisStrip />
+      <HomeProblem />
       <WaveDivider />
 
       <section className="mx-auto max-w-6xl px-4 pb-8">
@@ -102,6 +112,8 @@ export default function HomePage() {
 
       <HomeQuickActions />
       <WaveDivider />
+      <HomeMission />
+      <WaveDivider />
       <FeatureOrbs />
       <WaveDivider />
       <HomeWhySection />
@@ -109,6 +121,7 @@ export default function HomePage() {
       <HowItWorksPinned />
       <HorizontalFeatures />
       <Testimonials />
+      <HomeFaq />
       <CtaStrip />
     </div>
   );

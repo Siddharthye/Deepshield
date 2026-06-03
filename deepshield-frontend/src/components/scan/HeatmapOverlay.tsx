@@ -7,40 +7,88 @@ export function HeatmapOverlay({
   imageSrc,
   cells,
   grid = 8,
+  showBaseImage = true,
 }: {
   imageSrc: string;
   cells: HeatmapCell[];
   grid?: number;
+  showBaseImage?: boolean;
 }) {
-  const ref = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas || !cells.length) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!container || !canvas || cells.length === 0) return;
 
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      const cw = canvas.width / grid;
-      const ch = canvas.height / grid;
-      cells.forEach((c) => {
-        const alpha = 0.15 + c.intensity * 0.55;
-        ctx.fillStyle = `rgba(253, 100, 90, ${alpha})`;
-        ctx.fillRect(c.x * cw, c.y * ch, cw, ch);
-      });
+    const draw = () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w < 16 || h < 16) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      canvas.width = w;
+      canvas.height = h;
+
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, w, h);
+        if (showBaseImage) {
+          const scale = Math.min(w / img.width, h / img.height);
+          const dw = img.width * scale;
+          const dh = img.height * scale;
+          const ox = (w - dw) / 2;
+          const oy = (h - dh) / 2;
+          ctx.drawImage(img, ox, oy, dw, dh);
+
+          const cw = dw / grid;
+          const ch = dh / grid;
+          cells.forEach((c) => {
+            const alpha = 0.2 + c.intensity * 0.75;
+            ctx.fillStyle = `rgba(235, 70, 90, ${alpha})`;
+            ctx.fillRect(ox + c.x * cw, oy + c.y * ch, cw, ch);
+          });
+          ctx.strokeStyle = "rgba(253, 200, 194, 0.35)";
+          ctx.lineWidth = 1;
+          for (let i = 0; i <= grid; i++) {
+            ctx.beginPath();
+            ctx.moveTo(ox + (i * dw) / grid, oy);
+            ctx.lineTo(ox + (i * dw) / grid, oy + dh);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(ox, oy + (i * dh) / grid);
+            ctx.lineTo(ox + dw, oy + (i * dh) / grid);
+            ctx.stroke();
+          }
+        } else {
+          const cw = w / grid;
+          const ch = h / grid;
+          cells.forEach((c) => {
+            const alpha = 0.25 + c.intensity * 0.75;
+            ctx.fillStyle = `rgba(235, 70, 90, ${alpha})`;
+            ctx.fillRect(c.x * cw, c.y * ch, cw, ch);
+          });
+        }
+      };
+      img.src = imageSrc;
     };
-    img.src = imageSrc;
-  }, [imageSrc, cells, grid]);
+
+    draw();
+    const ro = new ResizeObserver(draw);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [imageSrc, cells, grid, showBaseImage]);
 
   return (
-    <canvas
-      ref={ref}
-      className="h-full w-full rounded-xl object-contain"
-      aria-label="Artifact density heatmap overlay"
-    />
+    <div ref={containerRef} className="absolute inset-0 min-h-[240px]">
+      <canvas
+        ref={canvasRef}
+        className="h-full w-full"
+        aria-label="Manipulation heatmap — warmer regions indicate higher suspicion"
+      />
+    </div>
   );
 }

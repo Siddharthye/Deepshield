@@ -143,8 +143,12 @@ export function VideoScanner() {
           {current && (
             <div className="grid gap-6 lg:grid-cols-2">
               <GlassCard>
-                <div className="relative aspect-video overflow-hidden rounded-xl">
-                  <HeatmapOverlay imageSrc={current.dataUrl} cells={current.heatmap} />
+                <div className="relative aspect-video min-h-[200px] overflow-hidden rounded-xl ring-1 ring-peach/50">
+                  <HeatmapOverlay
+                    imageSrc={current.dataUrl}
+                    cells={current.heatmap}
+                    showBaseImage
+                  />
                 </div>
                 <p className="mt-2 text-center text-xs text-ink/60">
                   {current.timeSec.toFixed(1)}s · {current.finalRisk}% · scroll to change frame

@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 
 const LINKS = [
+  { href: "/", key: "navHome" },
   { href: "/scan", key: "navScan" },
   { href: "/trace", key: "navTrace" },
   { href: "/report", key: "navReport" },
@@ -70,7 +71,7 @@ export function Navbar() {
               key={href}
               href={href}
               className={`rounded-full px-2 py-1.5 md:px-3 ${
-                pathname === href
+                pathname === href || (href !== "/" && pathname.startsWith(href))
                   ? "bg-pink/55 font-medium text-ink"
                   : "text-ink/70 hover:bg-blue/45"
               }`}
