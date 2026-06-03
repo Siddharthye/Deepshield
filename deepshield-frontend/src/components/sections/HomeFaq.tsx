@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { useLanguage } from "@/context/LanguageContext";
 
 const FAQ = [
   {
