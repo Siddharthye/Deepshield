@@ -28,7 +28,7 @@ export function HeroParticles() {
   }
 
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 h-[min(520px,70vh)] w-full">
+    <div className="pointer-events-none absolute inset-0 -z-10 h-[min(480px,65vh)] w-full opacity-50">
       <Canvas />
     </div>
   );

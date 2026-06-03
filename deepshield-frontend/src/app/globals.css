@@ -201,6 +201,11 @@ body::before {
   text-wrap: nowrap;
 }
 
+.hero-apple {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Short labels: stay on one line when space allows */
 .ui-nowrap {
   text-wrap: nowrap;

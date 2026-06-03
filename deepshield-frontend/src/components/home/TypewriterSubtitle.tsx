@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import type { I18nKey } from "@/lib/i18n";
 
-const PHRASE_KEYS: I18nKey[] = [
+const DEFAULT_PHRASE_KEYS: I18nKey[] = [
   "typewriter1",
   "typewriter2",
   "typewriter3",
   "typewriter4",
 ];
 
-export function TypewriterSubtitle() {
+export function TypewriterSubtitle({ phrases = DEFAULT_PHRASE_KEYS }: { phrases?: I18nKey[] }) {
   const { t, language } = useLanguage();
   const [text, setText] = useState("");
   const [phraseIdx, setPhraseIdx] = useState(0);
@@ -50,9 +50,9 @@ export function TypewriterSubtitle() {
   }, [text, deleting, phraseIdx, t]);
 
   return (
-    <p className="min-h-[3.25rem] text-base leading-relaxed text-ink-muted sm:min-h-[1.75rem] sm:text-lg sm:leading-snug">
+    <p className="min-h-[1.75rem] text-center text-xl font-normal leading-snug tracking-tight text-ink-muted md:min-h-[2rem] md:text-2xl">
       {text}
-      <span className="ml-0.5 inline-block animate-pulse text-accent">|</span>
+      <span className="ml-0.5 inline-block font-light text-ink-subtle/80">|</span>
     </p>
   );
 }
