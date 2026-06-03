@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
+import { useLanguage } from "@/context/LanguageContext";
 import type { TraceHit } from "@/lib/traceStorage";
 
 const STORAGE = "deepshield_trace_results";
 
 export function TraceResults() {
+  const { t } = useLanguage();
   const [hits, setHits] = useState<TraceHit[]>([]);
   const [platform, setPlatform] = useState("");
   const [title, setTitle] = useState("");
@@ -37,8 +39,8 @@ export function TraceResults() {
     if (!url.trim()) return;
     const hit: TraceHit = {
       id: crypto.randomUUID(),
-      platform: platform || "Unknown platform",
-      title: title || "Untitled page",
+      platform: platform || t("traceUnknownPlatform"),
+      title: title || t("traceUntitled"),
       url: url.trim(),
       firstSeen: firstSeen || new Date().toISOString().slice(0, 10),
     };
@@ -52,22 +54,22 @@ export function TraceResults() {
   return (
     <div className="space-y-6">
       <GlassCard className="space-y-3">
-        <p className="text-sm font-medium text-ink">Log a search result</p>
+        <p className="text-sm font-medium text-ink">{t("traceLogTitle")}</p>
         <input
           className="input-field"
-          placeholder="Platform (e.g. Instagram)"
+          placeholder={t("tracePlatformPh")}
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
         />
         <input
           className="input-field"
-          placeholder="Page title"
+          placeholder={t("tracePagePh")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <input
           className="input-field"
-          placeholder="URL"
+          placeholder={t("traceUrlPh")}
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
@@ -78,13 +80,15 @@ export function TraceResults() {
           onChange={(e) => setFirstSeen(e.target.value)}
         />
         <Button variant="primary" className="w-full" onClick={add}>
-          Add to results
+          {t("traceAddResult")}
         </Button>
       </GlassCard>
 
       {hits.length > 0 && (
         <div className="space-y-3">
-          <h3 className="font-display text-lg text-ink">Results ({hits.length})</h3>
+          <h3 className="font-display text-lg text-ink">
+            {t("traceResultsCount")} ({hits.length})
+          </h3>
           {hits.map((h) => (
             <GlassCard key={h.id}>
               <p className="text-xs font-medium text-pink">{h.platform}</p>
@@ -97,7 +101,9 @@ export function TraceResults() {
               >
                 {h.url}
               </a>
-              <p className="mt-2 text-xs text-ink/55">First seen: {h.firstSeen}</p>
+              <p className="mt-2 text-xs text-ink/55">
+                {t("traceFirstSeen")} {h.firstSeen}
+              </p>
             </GlassCard>
           ))}
         </div>

@@ -1,6 +1,6 @@
-import type { I18nKey } from "./en";
+import type { EN } from "./en";
 
-export const HI: Record<I18nKey, string> = {
+export const HI: Record<keyof typeof EN, string> = {
   tagline: "डीपफेक और डिजिटल हिंसा के खिलाफ AI कवच",
   scanNow: "छवि स्कैन करें",
   talkToAsha: "आशा से बात करें",

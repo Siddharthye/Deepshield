@@ -7,26 +7,23 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { fetchQuizRound } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
-const CARDS = [
-  {
-    title: "How deepfakes are made",
-    body: "AI swaps faces or generates expressions from training data — often without consent.",
-  },
-  {
-    title: "5 signs of manipulation",
-    body: "Blurry jawlines, skin tone mismatch, odd shadows, inconsistent lighting, warped backgrounds.",
-  },
-  {
-    title: "First 24 hours",
-    body: "Screenshot evidence, scan with DeepShield, save to vault, talk to Asha, know your rights.",
-  },
+const CARD_KEYS = [
+  { title: "learnCard1Title" as I18nKey, body: "learnCard1Body" as I18nKey },
+  { title: "learnCard2Title" as I18nKey, body: "learnCard2Body" as I18nKey },
+  { title: "learnCard3Title" as I18nKey, body: "learnCard3Body" as I18nKey },
 ];
 
 export default function LearnPage() {
   const { language, t } = useLanguage();
   const [score, setScore] = useState(0);
-  const [round, setRound] = useState<{ hintA: string; hintB: string; answer: "a" | "b"; explanation: string } | null>(null);
+  const [round, setRound] = useState<{
+    hintA: string;
+    hintB: string;
+    answer: "a" | "b";
+    explanation: string;
+  } | null>(null);
   const [picked, setPicked] = useState<"a" | "b" | null>(null);
   const [loading, setLoading] = useState(true);
   const shareRef = useRef<HTMLDivElement>(null);
@@ -68,9 +65,11 @@ export default function LearnPage() {
       />
 
       <GlassCard className="mb-8">
-        <p className="font-display text-2xl text-pink">Score: {score}</p>
+        <p className="font-display text-2xl text-pink">
+          {t("learnScore")}: {score}
+        </p>
         {loading || !round ? (
-          <p className="mt-4 text-sm text-ink/60">Loading quiz round…</p>
+          <p className="mt-4 text-sm text-ink/60">{t("learnLoading")}</p>
         ) : (
           <>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -79,7 +78,7 @@ export default function LearnPage() {
                 onClick={() => guess("a")}
                 className="rounded-xl bg-blue/35 p-4 text-left text-sm hover:bg-pink/30"
               >
-                <span className="text-xs font-semibold text-pink">Image A</span>
+                <span className="text-xs font-semibold text-pink">{t("learnImageA")}</span>
                 <p className="mt-2">{round.hintA}</p>
               </button>
               <button
@@ -87,7 +86,7 @@ export default function LearnPage() {
                 onClick={() => guess("b")}
                 className="rounded-xl bg-peach/40 p-4 text-left text-sm hover:bg-pink/30"
               >
-                <span className="text-xs font-semibold text-pink">Image B</span>
+                <span className="text-xs font-semibold text-pink">{t("learnImageB")}</span>
                 <p className="mt-2">{round.hintB}</p>
               </button>
             </div>
@@ -97,29 +96,30 @@ export default function LearnPage() {
                 animate={{ opacity: 1 }}
                 className="mt-4 text-center text-sm"
               >
-                {picked === round.answer ? "Correct." : "Good try."} {round.explanation}
+                {picked === round.answer ? t("learnCorrect") : t("learnGoodTry")}{" "}
+                {round.explanation}
               </motion.p>
             )}
           </>
         )}
         <Button variant="ghost" className="mt-4" onClick={shareScore}>
-          Share score card ↓
+          {t("learnShareCard")}
         </Button>
       </GlassCard>
 
       <div ref={shareRef} className="mb-8" id="share-card">
         <GlassCard className="text-center">
-          <p className="text-xs uppercase tracking-wide text-pink">DeepShield · Can you spot the deepfake?</p>
+          <p className="text-xs uppercase tracking-wide text-pink">{t("learnShareTitle")}</p>
           <p className="font-display mt-2 text-5xl text-ink">{score}</p>
-          <p className="mt-1 text-sm text-ink/65">points · screenshot to share</p>
+          <p className="mt-1 text-sm text-ink/65">{t("learnSharePoints")}</p>
         </GlassCard>
       </div>
 
       <div className="space-y-4">
-        {CARDS.map((c) => (
+        {CARD_KEYS.map((c) => (
           <GlassCard key={c.title}>
-            <h3 className="font-display text-lg text-ink">{c.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink/80">{c.body}</p>
+            <h3 className="font-display text-lg text-ink">{t(c.title)}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink/80">{t(c.body)}</p>
           </GlassCard>
         ))}
       </div>

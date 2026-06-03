@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { loadScanSession } from "@/lib/scanSession";
-import { verdictLabel } from "@/lib/riskScoring";
+import { verdictLabelKey } from "@/lib/riskScoring";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function CyberReportForm() {
+  const { t } = useLanguage();
   const [incident, setIncident] = useState("");
   const [platform, setPlatform] = useState("");
   const [notes, setNotes] = useState("");
@@ -15,18 +17,16 @@ export function CyberReportForm() {
     const scan = loadScanSession();
     if (!scan) return;
     setIncident(
-      `Deepfake / morphed image concern. Scan: ${verdictLabel(scan.risk.verdict)} (${scan.risk.finalRisk}% risk). ${scan.explain?.explanation?.slice(0, 200) ?? ""}`,
+      `${t("cyberIncidentScanPrefix")} ${t(verdictLabelKey(scan.risk.verdict))} (${scan.risk.finalRisk}% risk). ${scan.explain?.explanation?.slice(0, 200) ?? ""}`,
     );
     setNotes(scan.explain?.recommendation ?? "");
-  }, []);
+  }, [t]);
 
   return (
     <GlassCard className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-pink">
-        Cybercrime portal prep (anonymous here)
-      </p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-pink">{t("cyberFormTitle")}</p>
       <label className="block text-sm text-ink/75">
-        Incident summary
+        {t("cyberIncidentLabel")}
         <textarea
           className="input-field mt-1"
           rows={4}
@@ -35,7 +35,7 @@ export function CyberReportForm() {
         />
       </label>
       <label className="block text-sm text-ink/75">
-        Platform / URL (if known)
+        {t("cyberPlatformLabel")}
         <input
           className="input-field mt-1"
           value={platform}
@@ -43,7 +43,7 @@ export function CyberReportForm() {
         />
       </label>
       <label className="block text-sm text-ink/75">
-        Additional notes
+        {t("cyberNotesLabel")}
         <textarea
           className="input-field mt-1"
           rows={2}
@@ -51,15 +51,13 @@ export function CyberReportForm() {
           onChange={(e) => setNotes(e.target.value)}
         />
       </label>
-      <p className="text-xs text-ink/55">
-        Copy these fields when filing. DeepShield does not submit on your behalf.
-      </p>
+      <p className="text-xs text-ink/55">{t("cyberCopyHint")}</p>
       <Button
         variant="primary"
         className="w-full"
         onClick={() => {
           const blob = new Blob(
-            [`Incident:\n${incident}\n\nPlatform:\n${platform}\n\nNotes:\n${notes}`],
+            [`${t("cyberIncidentLabel")}:\n${incident}\n\n${t("cyberPlatformLabel")}:\n${platform}\n\n${t("cyberNotesLabel")}:\n${notes}`],
             { type: "text/plain" },
           );
           const url = URL.createObjectURL(blob);
@@ -70,7 +68,7 @@ export function CyberReportForm() {
           URL.revokeObjectURL(url);
         }}
       >
-        Download draft for portal
+        {t("cyberDownloadDraft")}
       </Button>
       <a
         href="https://cybercrime.gov.in/"
@@ -78,7 +76,7 @@ export function CyberReportForm() {
         rel="noopener noreferrer"
         className="block text-center text-sm text-pink underline"
       >
-        Open cybercrime.gov.in →
+        {t("cyberOpenPortal")}
       </a>
     </GlassCard>
   );

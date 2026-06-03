@@ -2,20 +2,12 @@
 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
-const PILLARS = [
-  {
-    title: "Detect with confidence",
-    body: "Deepfakes are no longer rare experiments — they are weapons used to humiliate, extort, and silence. DeepShield combines a production deepfake classifier with browser-side face and compression analysis so you get a number you can understand, not just a black-box label.",
-  },
-  {
-    title: "Document for authorities",
-    body: "Courts and cyber cells need more than a screenshot. We help you bundle the scan image, heatmap, risk breakdown, trace log, and plain-language legal summary into one PDF aligned with Indian reporting channels.",
-  },
-  {
-    title: "Recover with dignity",
-    body: "Asha is not a generic chatbot. She is scoped to emotional support and rights education — with crisis numbers visible, eight languages, and pre-written law cards so you never have to start from zero.",
-  },
+const PILLAR_KEYS = [
+  { title: "missionPillar1Title" as I18nKey, body: "missionPillar1Body" as I18nKey },
+  { title: "missionPillar2Title" as I18nKey, body: "missionPillar2Body" as I18nKey },
+  { title: "missionPillar3Title" as I18nKey, body: "missionPillar3Body" as I18nKey },
 ];
 
 export function HomeMission() {
@@ -31,10 +23,10 @@ export function HomeMission() {
         {t("missionIntro")}
       </p>
       <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {PILLARS.map((p) => (
+        {PILLAR_KEYS.map((p) => (
           <GlassCard key={p.title} className="p-6" tilt>
-            <h3 className="font-display text-lg text-ink">{p.title}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-ink/75">{p.body}</p>
+            <h3 className="font-display text-lg text-ink">{t(p.title)}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-ink/75">{t(p.body)}</p>
           </GlassCard>
         ))}
       </div>

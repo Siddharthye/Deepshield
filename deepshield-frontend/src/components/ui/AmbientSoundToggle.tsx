@@ -39,7 +39,7 @@ export function AmbientSoundToggle() {
       type="button"
       onClick={toggle}
       className="fixed bottom-20 right-4 z-50 rounded-full border border-sage/50 bg-cream/90 px-3 py-2 text-xs text-ink shadow-md backdrop-blur md:bottom-6"
-      aria-label="Toggle ambient sound"
+      aria-label={t("toggleSoundAria")}
     >
       {on ? `🔊 ${t("soundOn")}` : `🔇 ${t("soundOff")}`}
     </button>

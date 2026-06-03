@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { moderatePost } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
 type Post = {
   id: string;
@@ -16,19 +17,25 @@ type Post = {
   createdAt: string;
 };
 
-const TAGS = ["deepfake", "morphed image", "harassment", "sextortion", "account hacking"];
+const TAG_KEYS: I18nKey[] = [
+  "communityTagDeepfake",
+  "communityTagMorphed",
+  "communityTagHarassment",
+  "communityTagSextortion",
+  "communityTagHacking",
+];
 
-function randomAuthor() {
-  const birds = ["Brave Sparrow", "Calm Heron", "Quiet Lark"];
-  const cities = ["Mumbai", "Delhi", "Chennai", "Bengaluru"];
-  return `${birds[Math.floor(Math.random() * birds.length)]} from ${cities[Math.floor(Math.random() * cities.length)]}`;
-}
+const AUTHOR_KEYS: I18nKey[] = [
+  "communityAuthor1",
+  "communityAuthor2",
+  "communityAuthor3",
+];
 
 export default function CommunityPage() {
   const { language, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [text, setText] = useState("");
-  const [tag, setTag] = useState(TAGS[0]);
+  const [tagKey, setTagKey] = useState<I18nKey>(TAG_KEYS[0]);
   const [error, setError] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
 
@@ -42,6 +49,10 @@ export default function CommunityPage() {
     localStorage.setItem("deepshield_community", JSON.stringify(next));
   }
 
+  function randomAuthor() {
+    return t(AUTHOR_KEYS[Math.floor(Math.random() * AUTHOR_KEYS.length)]);
+  }
+
   async function publish() {
     if (!text.trim() || text.length > 300) return;
     setPosting(true);
@@ -49,21 +60,21 @@ export default function CommunityPage() {
     try {
       const mod = await moderatePost({ text, language });
       if (!mod.allowed) {
-        setError(mod.reason || "Post not allowed");
+        setError(mod.reason || t("communityPostNotAllowed"));
         return;
       }
       const post: Post = {
         id: crypto.randomUUID(),
         author: randomAuthor(),
         text: text.trim(),
-        tag,
+        tag: t(tagKey),
         hearts: 0,
         createdAt: new Date().toISOString(),
       };
       save([post, ...posts]);
       setText("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
+      setError(e instanceof Error ? e.message : t("communityPostFailed"));
     } finally {
       setPosting(false);
     }
@@ -79,33 +90,33 @@ export default function CommunityPage() {
 
       <GlassCard className="mb-8 space-y-4">
         <select
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
+          value={tagKey}
+          onChange={(e) => setTagKey(e.target.value as I18nKey)}
           className="input-field"
         >
-          {TAGS.map((t) => (
-            <option key={t}>{t}</option>
+          {TAG_KEYS.map((key) => (
+            <option key={key} value={key}>
+              {t(key)}
+            </option>
           ))}
         </select>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, 300))}
           rows={3}
-          placeholder="Share advice or solidarity (max 300 chars)…"
+          placeholder={t("communityPlaceholder")}
           className="input-field"
         />
         <p className="text-right text-xs text-ink/50">{text.length}/300</p>
         <Button variant="primary" onClick={publish} disabled={posting} className="w-full">
-          {posting ? "Checking…" : "Post anonymously"}
+          {posting ? t("communityChecking") : t("communityPost")}
         </Button>
         {error && <p className="text-sm text-pink">{error}</p>}
       </GlassCard>
 
       <div className="space-y-4">
         {posts.length === 0 && (
-          <p className="text-center text-sm text-ink/60">
-            No posts yet. You can be the first voice of support.
-          </p>
+          <p className="text-center text-sm text-ink/60">{t("communityEmpty")}</p>
         )}
         {posts.map((p) => (
           <GlassCard key={p.id}>
@@ -117,11 +128,7 @@ export default function CommunityPage() {
             <button
               type="button"
               onClick={() =>
-                save(
-                  posts.map((x) =>
-                    x.id === p.id ? { ...x, hearts: x.hearts + 1 } : x,
-                  ),
-                )
+                save(posts.map((x) => (x.id === p.id ? { ...x, hearts: x.hearts + 1 } : x)))
               }
               className="mt-4 text-sm font-medium text-pink transition hover:text-ink"
             >

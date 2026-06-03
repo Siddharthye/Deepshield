@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import type { HeatmapCell } from "@/lib/clientAnalysis";
 
 export function HeatmapOverlay({
@@ -14,6 +15,7 @@ export function HeatmapOverlay({
   grid?: number;
   showBaseImage?: boolean;
 }) {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -87,7 +89,7 @@ export function HeatmapOverlay({
       <canvas
         ref={canvasRef}
         className="h-full w-full"
-        aria-label="Manipulation heatmap — warmer regions indicate higher suspicion"
+        aria-label={t("heatmapAria")}
       />
     </div>
   );

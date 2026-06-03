@@ -43,7 +43,7 @@ export default function HomePage() {
               <AnimatedShield className="absolute -right-2 -top-2 h-12 w-12 opacity-80" />
               <Image
                 src="/images/ds-logo.jpeg"
-                alt="DeepShield"
+                alt={t("brandAlt")}
                 width={140}
                 height={140}
                 className="relative rounded-3xl object-contain shadow-lg ring-2 ring-sage/50"

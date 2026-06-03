@@ -3,20 +3,22 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
 
 const KEY = "deepshield_intro_seen";
 
 export function IntroLoader() {
+  const { t } = useLanguage();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem(KEY)) return;
     setShow(true);
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       sessionStorage.setItem(KEY, "1");
       setShow(false);
     }, 2600);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -35,7 +37,7 @@ export function IntroLoader() {
           >
             <Image
               src="/images/ds-logo.jpeg"
-              alt=""
+              alt={t("brandAlt")}
               width={100}
               height={100}
               className="rounded-2xl"
@@ -48,7 +50,7 @@ export function IntroLoader() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            Your armor against digital violence
+            {t("heroTitle")}
           </motion.p>
         </motion.div>
       )}

@@ -9,7 +9,7 @@ import { CyberReportForm } from "@/components/report/CyberReportForm";
 import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { fetchLegalReportSummary } from "@/lib/api";
 import { loadScanSession } from "@/lib/scanSession";
-import { verdictLabel } from "@/lib/riskScoring";
+import { verdictLabelKey } from "@/lib/riskScoring";
 import { generateEvidencePdf, downloadBlob } from "@/lib/pdf-generator";
 import { loadTraceHits, loadTraceUrls } from "@/lib/traceStorage";
 import { useLanguage } from "@/context/LanguageContext";
@@ -41,7 +41,7 @@ export default function ReportPage() {
       }
       const traceHits = loadTraceHits();
       const traceUrls = loadTraceUrls();
-      const blob = await generateEvidencePdf(scan, traceUrls, summary, traceHits);
+      const blob = await generateEvidencePdf(scan, traceUrls, summary, traceHits, language);
       if (pdfPreview) URL.revokeObjectURL(pdfPreview);
       setPdfPreview(URL.createObjectURL(blob));
       return blob;
@@ -71,9 +71,9 @@ export default function ReportPage() {
       {!scan ? (
         <GlassCard>
           <p className="text-sm text-ink/80">
-            No scan yet.{" "}
+            {t("reportNoScan")}{" "}
             <Link href="/scan" className="font-medium text-pink underline">
-              Run a scan first
+              {t("reportRunScanFirst")}
             </Link>
             .
           </p>
@@ -82,7 +82,7 @@ export default function ReportPage() {
         <div className="space-y-8">
           <GlassCard className="space-y-4">
             <p className="font-display text-2xl text-ink">
-              {verdictLabel(scan.risk.verdict)} · {scan.risk.finalRisk}%
+              {t(verdictLabelKey(scan.risk.verdict))} · {scan.risk.finalRisk}%
             </p>
             {scan.explain && (
               <p className="text-sm leading-relaxed">{scan.explain.explanation}</p>
@@ -100,27 +100,27 @@ export default function ReportPage() {
                 }
               }}
             >
-              {summaryLoading ? "Generating legal summary…" : "Generate LLM legal summary"}
+              {summaryLoading ? t("reportGeneratingSummary") : t("reportGenerateSummary")}
             </Button>
             {legalSummary && (
               <p className="rounded-xl bg-blue/30 p-4 text-sm leading-relaxed">{legalSummary}</p>
             )}
             <div className="flex flex-wrap gap-3">
               <Button variant="primary" onClick={() => void downloadPdf()} disabled={pdfLoading}>
-                {pdfLoading ? "Building PDF…" : "Download PDF"}
+                {pdfLoading ? t("reportBuildingPdf") : t("reportDownloadPdf")}
               </Button>
               <Button variant="secondary" onClick={() => void buildPdf()} disabled={pdfLoading}>
-                Preview PDF
+                {t("reportPreviewPdf")}
               </Button>
             </div>
           </GlassCard>
 
           {pdfPreview && (
             <GlassCard>
-              <p className="mb-3 text-sm font-medium text-ink">PDF preview</p>
+              <p className="mb-3 text-sm font-medium text-ink">{t("reportPdfPreview")}</p>
               <iframe
                 src={pdfPreview}
-                title="Evidence PDF preview"
+                title={t("reportPdfIframeTitle")}
                 className="h-[min(520px,70vh)] w-full rounded-xl border border-sage/40 bg-cream"
               />
             </GlassCard>

@@ -10,6 +10,7 @@ import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { extractFramesFfmpeg } from "@/lib/ffmpegExtract";
 import { extractVideoFrames } from "@/lib/videoFrames";
 import { computeRisk } from "@/lib/riskScoring";
+import { useLanguage } from "@/context/LanguageContext";
 
 type ScoredFrame = {
   timeSec: number;
@@ -19,6 +20,7 @@ type ScoredFrame = {
 };
 
 export function VideoScanner() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [frames, setFrames] = useState<ScoredFrame[]>([]);
   const [selected, setSelected] = useState(0);
@@ -42,7 +44,7 @@ export function VideoScanner() {
 
   async function onVideo(file: File) {
     if (file.size > 50 * 1024 * 1024) {
-      setError("Video must be under 50MB");
+      setError(t("videoTooLarge"));
       return;
     }
     setError(null);
@@ -80,7 +82,7 @@ export function VideoScanner() {
       const avg = scored.reduce((s, f) => s + f.finalRisk, 0) / (scored.length || 1);
       setOverallRisk(Math.round(avg));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Video scan failed");
+      setError(e instanceof Error ? e.message : t("videoScanFailed"));
     } finally {
       setLoading(false);
     }
@@ -92,8 +94,8 @@ export function VideoScanner() {
     <div className="space-y-6">
       <GlassCard>
         <label className="upload-zone">
-          <span className="font-display text-lg text-ink">Upload MP4 or MOV</span>
-          <span className="mt-2 text-sm text-ink/60">FFmpeg.wasm keyframes · full pipeline per frame</span>
+          <span className="font-display text-lg text-ink">{t("videoUploadTitle")}</span>
+          <span className="mt-2 text-sm text-ink/60">{t("videoUploadHint")}</span>
           <input
             type="file"
             accept="video/mp4,video/quicktime,video/webm"
@@ -108,7 +110,7 @@ export function VideoScanner() {
 
       {loading && (
         <GlassCard>
-          <p className="animate-pulse text-center text-sm text-ink">Extracting & analyzing frames…</p>
+          <p className="animate-pulse text-center text-sm text-ink">{t("videoAnalyzing")}</p>
         </GlassCard>
       )}
 
@@ -121,9 +123,9 @@ export function VideoScanner() {
       {overallRisk !== null && frames.length > 0 && (
         <div ref={resultsRef} className="min-h-[120vh] space-y-6">
           <GlassCard>
-            <p className="text-sm text-ink/70">Overall video risk</p>
+            <p className="text-sm text-ink/70">{t("videoOverallRisk")}</p>
             <p className="font-display text-4xl text-ink">{overallRisk}%</p>
-            <p className="mt-1 text-xs text-ink/55">Scroll to scrub timeline · tap segments</p>
+            <p className="mt-1 text-xs text-ink/55">{t("videoScrollHint")}</p>
           </GlassCard>
 
           <div className="flex gap-1 rounded-full bg-cream/80 p-1">
@@ -151,11 +153,13 @@ export function VideoScanner() {
                   />
                 </div>
                 <p className="mt-2 text-center text-xs text-ink/60">
-                  {current.timeSec.toFixed(1)}s · {current.finalRisk}% · scroll to change frame
+                  {t("videoFrameLine")
+                    .replace("{time}", current.timeSec.toFixed(1))
+                    .replace("{risk}", String(current.finalRisk))}
                 </p>
               </GlassCard>
               <GlassCard>
-                <p className="text-sm font-medium text-ink">Per-frame scores</p>
+                <p className="text-sm font-medium text-ink">{t("videoPerFrame")}</p>
                 <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto text-sm">
                   {frames.map((f, i) => (
                     <li

@@ -6,53 +6,49 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { streamAshaChat } from "@/lib/api";
 import { useLanguage } from "@/context/LanguageContext";
-import { RIGHTS_QUICK_PROMPTS } from "@/components/asha/BasicRights";
+import { RIGHTS_PROMPT_KEYS } from "@/components/asha/BasicRights";
 import type { ChatMessage } from "@/lib/types";
+import type { I18nKey } from "@/lib/i18n";
 
 const SESSION_KEY = "deepshield-asha-messages";
 
-const CRISIS = [
-  "Cyber Crime Helpline: 1930",
-  "NCW Helpline: 181",
-  "iCall: 9152987821",
-];
-
-const WELCOME =
-  "I'm Asha — your companion for emotional support and understanding your legal rights. I'm here to listen, validate what you're going through, and help with rights-related questions only. You're not alone.";
-
-function loadMessages(): ChatMessage[] {
-  if (typeof window === "undefined") {
-    return [{ role: "assistant", content: WELCOME }];
-  }
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    if (!raw) return [{ role: "assistant", content: WELCOME }];
-    const parsed = JSON.parse(raw) as ChatMessage[];
-    return Array.isArray(parsed) && parsed.length > 0
-      ? parsed
-      : [{ role: "assistant", content: WELCOME }];
-  } catch {
-    return [{ role: "assistant", content: WELCOME }];
-  }
-}
+const CRISIS_KEYS: I18nKey[] = ["ashaCrisis1", "ashaCrisis2", "ashaCrisis3"];
 
 export function AshaChat({
   onQuickPrompt,
 }: {
   onQuickPrompt?: (q: string) => void;
 }) {
-  const { language } = useLanguage();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: WELCOME },
-  ]);
+  const { language, t } = useLanguage();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [crisisOpen, setCrisisOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMessages(loadMessages());
-  }, []);
+    const welcome = t("ashaWelcome");
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      if (!raw) {
+        setMessages([{ role: "assistant", content: welcome }]);
+        return;
+      }
+      const parsed = JSON.parse(raw) as ChatMessage[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const first = parsed[0];
+        if (first.role === "assistant") {
+          setMessages([{ role: "assistant", content: welcome }, ...parsed.slice(1)]);
+        } else {
+          setMessages(parsed);
+        }
+      } else {
+        setMessages([{ role: "assistant", content: welcome }]);
+      }
+    } catch {
+      setMessages([{ role: "assistant", content: welcome }]);
+    }
+  }, [language, t]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -76,8 +72,8 @@ export function AshaChat({
     await streamAshaChat({
       messages: next,
       language,
-      onToken: (t) => {
-        assistantText += t;
+      onToken: (tok) => {
+        assistantText += tok;
         setMessages([...next, { role: "assistant", content: assistantText }]);
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
       },
@@ -86,7 +82,7 @@ export function AshaChat({
           ...next,
           {
             role: "assistant",
-            content: `I'm having trouble connecting right now. (${msg}) You can still call 1930 for immediate help.`,
+            content: t("ashaConnectionError").replace("{msg}", msg),
           },
         ]);
       },
@@ -95,7 +91,8 @@ export function AshaChat({
     setStreaming(false);
   }
 
-  function handleQuick(q: string) {
+  function handleQuick(key: I18nKey) {
+    const q = t(key);
     onQuickPrompt?.(q);
     void send(q);
   }
@@ -106,36 +103,30 @@ export function AshaChat({
         <div className="flex items-center gap-4 border-b border-white/30 bg-peach/30 px-6 py-4">
           <Image
             src="/images/asha-logo.jpeg"
-            alt="Asha"
+            alt={t("ashaCompanionAlt")}
             width={56}
             height={56}
             className="rounded-full object-cover"
             unoptimized
           />
           <div>
-            <h2 className="font-display text-lg font-semibold text-ink">
-              Chat with Asha
-            </h2>
-            <p className="text-xs text-ink/70">
-              Emotional support & legal rights questions only
-            </p>
+            <h2 className="font-display text-lg font-semibold text-ink">{t("ashaChatTitle")}</h2>
+            <p className="text-xs text-ink/70">{t("ashaChatSubtitle")}</p>
           </div>
         </div>
 
         <div className="border-b border-white/20 px-4 py-3">
-          <p className="mb-2 text-xs font-medium text-ink/70">
-            Quick rights questions
-          </p>
+          <p className="mb-2 text-xs font-medium text-ink/70">{t("ashaQuickRights")}</p>
           <div className="flex flex-wrap gap-2">
-            {RIGHTS_QUICK_PROMPTS.map((q) => (
+            {RIGHTS_PROMPT_KEYS.map((key) => (
               <button
-                key={q}
+                key={key}
                 type="button"
-                onClick={() => handleQuick(q)}
+                onClick={() => handleQuick(key)}
                 disabled={streaming}
                 className="rounded-full bg-peach/80 px-3 py-1.5 text-xs text-ink transition hover:bg-pink/50 disabled:opacity-50"
               >
-                {q}
+                {t(key)}
               </button>
             ))}
           </div>
@@ -173,18 +164,14 @@ export function AshaChat({
                           }}
                         />
                       ))}
-                      <span className="ml-2 text-xs text-ink/60">
-                        Asha is thinking…
-                      </span>
+                      <span className="ml-2 text-xs text-ink/60">{t("ashaThinking")}</span>
                     </span>
                   )}
                 {streaming &&
                   i === messages.length - 1 &&
                   m.role === "assistant" &&
                   m.content && (
-                    <span className="ml-1 inline-block animate-pulse text-pink">
-                      ▍
-                    </span>
+                    <span className="ml-1 inline-block animate-pulse text-pink">▍</span>
                   )}
               </motion.div>
             ))}
@@ -198,7 +185,7 @@ export function AshaChat({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
-              placeholder="Share how you feel, or ask about your rights…"
+              placeholder={t("ashaPlaceholder")}
               className="input-field flex-1 rounded-full"
             />
             <button
@@ -207,7 +194,7 @@ export function AshaChat({
               disabled={streaming}
               className="rounded-full bg-gradient-to-r from-pink to-peach px-5 py-2.5 text-sm font-medium text-ink shadow-md transition hover:brightness-105 disabled:opacity-50"
             >
-              Send
+              {t("ashaSend")}
             </button>
           </div>
         </div>
@@ -219,13 +206,13 @@ export function AshaChat({
           onClick={() => setCrisisOpen((o) => !o)}
           className="w-full rounded-full border border-pink/50 bg-gradient-to-r from-pink/40 to-peach/50 px-5 py-3 text-sm font-semibold text-ink transition hover:from-pink/55 hover:to-peach/60"
         >
-          I need immediate help
+          {t("ashaImmediateHelp")}
         </button>
         {crisisOpen && (
           <GlassCard className="mt-3 border-pink/30 bg-peach/20">
             <ul className="space-y-1 text-sm text-ink/85">
-              {CRISIS.map((c) => (
-                <li key={c}>{c}</li>
+              {CRISIS_KEYS.map((key) => (
+                <li key={key}>{t(key)}</li>
               ))}
             </ul>
           </GlassCard>

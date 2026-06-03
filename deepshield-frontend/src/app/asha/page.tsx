@@ -22,7 +22,7 @@ export default function AshaPage() {
             <div className="absolute -inset-2 rounded-2xl bg-blue/35 blur-lg" aria-hidden />
             <Image
               src="/images/asha-logo.jpeg"
-              alt="Asha companion"
+              alt={t("ashaCompanionAlt")}
               width={80}
               height={80}
               className="relative rounded-2xl object-cover shadow-md ring-2 ring-sage/50"
@@ -39,7 +39,7 @@ export default function AshaPage() {
       </div>
 
       <section
-        aria-label="Chat with Asha"
+        aria-label={t("ashaChatAria")}
         className="flex min-h-[calc(100vh-12rem)] flex-col rounded-3xl border border-sage/40 bg-gradient-to-b from-blue/20 to-cream/40 p-1 shadow-lg md:min-h-[calc(100vh-10rem)]"
       >
         <AshaChat />

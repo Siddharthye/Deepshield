@@ -1,10 +1,10 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { t, type LanguageCode } from "@/lib/i18n";
 import type { ScanSession } from "./types";
 import type { TraceHit } from "./traceStorage";
-import { verdictLabel } from "./riskScoring";
+import { verdictLabelKey } from "./riskScoring";
 
 const INK = rgb(0.35, 0.33, 0.3);
-const PINK = rgb(0.99, 0.79, 0.76);
 const PEACH = rgb(0.99, 0.84, 0.76);
 
 async function embedScanImage(doc: PDFDocument, dataUrl: string) {
@@ -22,7 +22,9 @@ export async function generateEvidencePdf(
   traceUrls: string[],
   legalSummary?: string,
   traceHits: TraceHit[] = [],
+  lang: LanguageCode = "en",
 ) {
+  const L = (key: Parameters<typeof t>[1]) => t(lang, key);
   const doc = await PDFDocument.create();
   let page = doc.addPage([595, 842]);
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -46,7 +48,7 @@ export async function generateEvidencePdf(
   };
 
   page.drawRectangle({ x: 0, y: 780, width: 595, height: 62, color: PEACH });
-  page.drawText("DeepShield — Legal Evidence Report", {
+  page.drawText(L("pdfTitle"), {
     x: 50,
     y: 805,
     size: 18,
@@ -55,9 +57,9 @@ export async function generateEvidencePdf(
   });
 
   y = 740;
-  draw(`Generated: ${new Date(scan.scannedAt).toLocaleString()}`, 10);
+  draw(`${L("pdfGenerated")} ${new Date(scan.scannedAt).toLocaleString()}`, 10);
   draw(
-    `Verdict: ${verdictLabel(scan.risk.verdict)} (${scan.risk.finalRisk}% manipulation risk)`,
+    `${L("pdfVerdict")} ${L(verdictLabelKey(scan.risk.verdict))} (${scan.risk.finalRisk}% ${L("pdfManipulationRisk")})`,
     12,
     true,
   );
@@ -72,44 +74,46 @@ export async function generateEvidencePdf(
       }
       page.drawImage(img, { x: 50, y: y - dims.height, width: dims.width, height: dims.height });
       y -= dims.height + 16;
-      draw("Annotated scan capture (evidence exhibit)", 9);
+      draw(L("pdfScanCapture"), 9);
     }
   } catch {
     /* skip image if embed fails */
   }
 
-  draw(`Model: ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}% · Artifacts: ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}% · Symmetry: ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`);
+  draw(
+    `${L("pdfModelLine")} ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}% · ${L("pdfArtifacts")} ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}% · ${L("pdfSymmetry")} ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`,
+  );
 
   if (legalSummary) {
     y -= 6;
-    draw("Legal summary (for authorities)", 13, true);
+    draw(L("pdfLegalSummary"), 13, true);
     draw(legalSummary);
   } else if (scan.explain) {
     y -= 6;
-    draw("Summary", 13, true);
+    draw(L("pdfSummary"), 13, true);
     draw(scan.explain.explanation);
-    draw(`Recommendation: ${scan.explain.recommendation}`, 10, true);
+    draw(`${L("pdfRecommendation")} ${scan.explain.recommendation}`, 10, true);
   }
 
   y -= 6;
-  draw("Applicable laws (India)", 13, true);
-  draw("IT Act §66E, §67, §67A · IPC §354C");
+  draw(L("pdfApplicableLaws"), 13, true);
+  draw(L("pdfLawsList"));
 
   if (traceHits.length) {
     y -= 6;
-    draw("Reverse trace log", 13, true);
+    draw(L("pdfTraceLog"), 13, true);
     traceHits.slice(0, 10).forEach((h) => {
       draw(`${h.platform} — ${h.title}`, 10, true);
       draw(h.url, 9);
-      draw(`First seen: ${h.firstSeen}`, 9);
+      draw(`${L("pdfFirstSeen")} ${h.firstSeen}`, 9);
     });
   } else if (traceUrls.length) {
     y -= 6;
-    draw("URLs found (reverse trace)", 13, true);
+    draw(L("pdfUrlsFound"), 13, true);
     traceUrls.slice(0, 12).forEach((u) => draw(`• ${u}`, 9));
   }
 
-  draw("File at https://cybercrime.gov.in/ · Helpline 1930", 10, true);
+  draw(L("pdfFilingHint"), 10, true);
 
   const bytes = await doc.save();
   return new Blob([new Uint8Array(bytes)], { type: "application/pdf" });

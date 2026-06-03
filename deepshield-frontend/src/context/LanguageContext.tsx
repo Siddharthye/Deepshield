@@ -19,6 +19,7 @@ type LanguageContextValue = {
   language: LanguageCode;
   setLanguage: (code: LanguageCode) => void;
   t: (key: I18nKey) => string;
+  ready: boolean;
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
@@ -43,13 +44,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = useCallback((key: I18nKey) => translate(language, key), [language]);
 
-  if (!ready) {
-    return <div className="min-h-screen bg-cream/30" aria-busy="true" />;
-  }
-
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
+    <LanguageContext.Provider value={{ language, setLanguage, t, ready }}>
+      {!ready ? (
+        <div className="min-h-screen bg-cream/30" aria-busy="true" />
+      ) : (
+        children
+      )}
     </LanguageContext.Provider>
   );
 }

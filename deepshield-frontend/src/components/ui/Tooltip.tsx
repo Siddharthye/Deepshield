@@ -2,6 +2,7 @@
 
 import { useId, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Tooltip({
   label,
@@ -12,6 +13,7 @@ export function Tooltip({
   children: ReactNode;
   learnMoreHref?: string;
 }) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const id = useId();
 
@@ -43,7 +45,7 @@ export function Tooltip({
           >
             {label}
             {learnMoreHref && (
-              <span className="mt-1 block text-pink">Learn more →</span>
+              <span className="mt-1 block text-pink">{t("learnMore")}</span>
             )}
           </motion.span>
         )}

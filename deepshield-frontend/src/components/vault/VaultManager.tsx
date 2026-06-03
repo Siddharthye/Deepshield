@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   loadVaultRecords,
   saveVaultRecords,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/encryption";
 
 export function VaultManager() {
+  const { t } = useLanguage();
   const [digits, setDigits] = useState(["", "", "", ""]);
   const [pin, setPin] = useState<string | null>(null);
   const [records, setRecords] = useState<VaultRecord[]>([]);
@@ -93,42 +95,42 @@ export function VaultManager() {
   }
 
   function deleteAll() {
-    if (!pin || !confirm("Delete all vault items?")) return;
+    if (!pin || !confirm(t("vaultDeleteConfirm"))) return;
     persist([]);
   }
 
   if (!pin) {
     return (
       <>
-      <ShieldOverlay show={shield} />
-      <GlassCard className="mx-auto max-w-sm">
-        <p className="mb-6 text-center text-sm text-ink/75">Enter a 4-digit PIN (AES-256 encrypted)</p>
-        <motion.div
-          animate={shake ? { x: [-8, 8, 0] } : {}}
-          className="mb-6 flex justify-center gap-3"
-        >
-          {digits.map((d, i) => (
-            <motion.div
-              key={i}
-              animate={burst ? { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] } : {}}
-              className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
-            >
-              {d ? "•" : ""}
-            </motion.div>
-          ))}
-        </motion.div>
-        <input
-          type="password"
-          inputMode="numeric"
-          maxLength={4}
-          className="sr-only"
-          aria-label="Vault PIN"
-          onChange={(e) => handlePinChange(e.target.value)}
-        />
-        <Button variant="dark" className="w-full" onClick={() => unlock(digits.join(""))}>
-          Unlock vault
-        </Button>
-      </GlassCard>
+        <ShieldOverlay show={shield} />
+        <GlassCard className="mx-auto max-w-sm">
+          <p className="mb-6 text-center text-sm text-ink/75">{t("vaultPinPrompt")}</p>
+          <motion.div
+            animate={shake ? { x: [-8, 8, 0] } : {}}
+            className="mb-6 flex justify-center gap-3"
+          >
+            {digits.map((d, i) => (
+              <motion.div
+                key={i}
+                animate={burst ? { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] } : {}}
+                className={`pin-dot flex items-center justify-center ${d ? "filled" : ""}`}
+              >
+                {d ? "•" : ""}
+              </motion.div>
+            ))}
+          </motion.div>
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength={4}
+            className="sr-only"
+            aria-label={t("vaultPinAria")}
+            onChange={(e) => handlePinChange(e.target.value)}
+          />
+          <Button variant="dark" className="w-full" onClick={() => unlock(digits.join(""))}>
+            {t("vaultUnlock")}
+          </Button>
+        </GlassCard>
       </>
     );
   }
@@ -139,17 +141,17 @@ export function VaultManager() {
       <GlassCard>
         <div className="flex flex-wrap gap-3">
           <Button variant="primary" onClick={() => fileRef.current?.click()}>
-            Add file
+            {t("vaultAddFile")}
           </Button>
           <Button
             variant="secondary"
             onClick={() => void exportAll()}
             disabled={!records.length}
           >
-            Export ZIP
+            {t("vaultExportZip")}
           </Button>
           <Button variant="ghost" onClick={deleteAll} disabled={!records.length}>
-            Delete all
+            {t("vaultDeleteAll")}
           </Button>
           <input
             ref={fileRef}
@@ -162,15 +164,13 @@ export function VaultManager() {
           />
         </div>
         <p className="mt-4 text-xs text-ink/55">
-          {records.length} item(s) · encrypted in localStorage
+          {records.length} {t("vaultItemCount")}
         </p>
       </GlassCard>
 
       {records.length === 0 ? (
         <GlassCard>
-          <p className="text-center text-sm text-ink/70">
-            Vault is empty. Save scans, traces, or notes here.
-          </p>
+          <p className="text-center text-sm text-ink/70">{t("vaultEmpty")}</p>
         </GlassCard>
       ) : (
         <ul className="space-y-3">
@@ -183,7 +183,9 @@ export function VaultManager() {
                   {new Date(r.savedAt).toLocaleString()}
                 </p>
               </div>
-              <span className="rounded-full bg-sage/40 px-2 py-0.5 text-xs">encrypted</span>
+              <span className="rounded-full bg-sage/40 px-2 py-0.5 text-xs">
+                {t("vaultEncryptedBadge")}
+              </span>
             </GlassCard>
           ))}
         </ul>

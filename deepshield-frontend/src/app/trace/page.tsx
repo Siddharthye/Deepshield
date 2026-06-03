@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/Button";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 import { TraceResults } from "@/components/trace/TraceResults";
 import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
-const REPORT_LINKS = [
-  { name: "Meta (Facebook/Instagram)", url: "https://www.facebook.com/help/contact/571927962448785" },
-  { name: "X (Twitter)", url: "https://help.twitter.com/forms/privacy" },
-  { name: "Telegram", url: "https://telegram.org/support" },
+const REPORT_LINKS: { nameKey: I18nKey; url: string }[] = [
+  { nameKey: "tracePlatformMeta", url: "https://www.facebook.com/help/contact/571927962448785" },
+  { nameKey: "tracePlatformX", url: "https://help.twitter.com/forms/privacy" },
+  { nameKey: "tracePlatformTelegram", url: "https://telegram.org/support" },
 ];
 
 export default function TracePage() {
@@ -38,7 +39,7 @@ export default function TracePage() {
 
       <GlassCard className="mb-6 space-y-4">
         <label className="upload-zone py-8">
-          <span className="text-sm font-medium text-ink">Upload image to trace</span>
+          <span className="text-sm font-medium text-ink">{t("traceUploadLabel")}</span>
           <input
             type="file"
             accept="image/*"
@@ -51,21 +52,23 @@ export default function TracePage() {
         </label>
         {preview && (
           <div className="relative mx-auto aspect-video max-h-48 w-full overflow-hidden rounded-xl">
-            <Image src={preview} alt="Trace preview" fill className="object-contain" unoptimized />
+            <Image
+              src={preview}
+              alt={t("tracePreviewAlt")}
+              fill
+              className="object-contain"
+              unoptimized
+            />
           </div>
         )}
-        {preview && (
-          <p className="text-center text-xs text-ink/55">
-            Upload this image in Lens/TinEye manually, or use TinEye URL search if available.
-          </p>
-        )}
+        {preview && <p className="text-center text-xs text-ink/55">{t("traceLensHint")}</p>}
         <a
           href="https://lens.google.com/"
           target="_blank"
           rel="noopener noreferrer"
           className="block rounded-2xl bg-gradient-to-r from-pink/55 to-peach/60 py-3.5 text-center text-sm font-medium text-ink"
         >
-          Open Google Lens
+          {t("traceOpenLens")}
         </a>
         <a
           href="https://tineye.com/"
@@ -73,7 +76,7 @@ export default function TracePage() {
           rel="noopener noreferrer"
           className="block rounded-2xl border border-sage/50 bg-blue/45 py-3.5 text-center text-sm font-medium text-ink"
         >
-          Open TinEye
+          {t("traceOpenTinEye")}
         </a>
         <textarea
           value={note}
@@ -81,7 +84,7 @@ export default function TracePage() {
             setNote(e.target.value);
             setSaved(false);
           }}
-          placeholder="Paste URLs you found (one per line)…"
+          placeholder={t("traceUrlPlaceholder")}
           rows={5}
           className="input-field"
         />
@@ -110,28 +113,29 @@ export default function TracePage() {
             setVaultSaved(ok);
           }}
         >
-          Save URLs for report
+          {t("traceSaveUrls")}
         </Button>
         {saved && (
           <p className="text-center text-sm text-pink">
-            Saved locally.{vaultSaved ? " Added to vault." : " Unlock vault to auto-save."}
+            {t("traceSavedLocal")}
+            {vaultSaved ? t("traceSavedVault") : t("traceSavedVaultHint")}
           </p>
         )}
       </GlassCard>
 
       <TraceResults />
 
-      <h2 className="font-display mb-4 mt-12 text-xl text-ink">Report to platforms</h2>
+      <h2 className="font-display mb-4 mt-12 text-xl text-ink">{t("traceReportPlatforms")}</h2>
       <div className="space-y-3">
         {REPORT_LINKS.map((l) => (
-          <GlassCard key={l.name}>
+          <GlassCard key={l.nameKey}>
             <a
               href={l.url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium text-pink underline underline-offset-4"
             >
-              {l.name}
+              {t(l.nameKey)}
             </a>
           </GlassCard>
         ))}

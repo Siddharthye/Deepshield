@@ -34,10 +34,10 @@ export default function RootLayout({
         />
       </head>
       <body className="relative flex min-h-full flex-col pb-16 md:pb-0">
-        <IntroLoader />
         <AmbientBackground />
         <ScrollProgress />
         <LanguageProvider>
+          <IntroLoader />
           <ClientProviders>
             <Navbar />
             <PageTransition>

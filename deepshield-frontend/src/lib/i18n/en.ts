@@ -173,5 +173,3 @@ export const EN = {
   soundOn: "Sound on",
   soundOff: "Sound off",
 } as const;
-
-export type I18nKey = keyof typeof EN;

@@ -11,20 +11,20 @@ import { analyzeFaceSymmetryScore } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
 import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
-import { computeRisk, verdictLabel } from "@/lib/riskScoring";
+import { computeRisk, verdictLabelKey } from "@/lib/riskScoring";
 import { saveScanSession } from "@/lib/scanSession";
 import { tryAddToVault } from "@/lib/vaultHelpers";
 import { playScanChime } from "@/lib/ambientSound";
 import { useLanguage } from "@/context/LanguageContext";
 import type { ExplainResult, RiskResult } from "@/lib/types";
 
-const SCAN_STEPS = [
-  "Analyzing facial geometry (face-api)…",
-  "OpenCV artifact pass…",
-  "Running deepfake model…",
-  "Building heatmap…",
-  "Preparing explanation…",
-];
+const SCAN_STEP_KEYS = [
+  "scanStep1",
+  "scanStep2",
+  "scanStep3",
+  "scanStep4",
+  "scanStep5",
+] as const;
 
 function AnimatedRisk({ value }: { value: number }) {
   const [n, setN] = useState(0);
@@ -55,7 +55,7 @@ export function ImageScanner() {
 
   useEffect(() => {
     if (!loading) return;
-    const id = setInterval(() => setStepIndex((i) => (i + 1) % SCAN_STEPS.length), 1100);
+    const id = setInterval(() => setStepIndex((i) => (i + 1) % SCAN_STEP_KEYS.length), 1100);
     return () => clearInterval(id);
   }, [loading]);
 
@@ -130,7 +130,7 @@ export function ImageScanner() {
         playScanChime();
         setTimeout(() => setShield(false), 900);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Scan failed");
+        setError(e instanceof Error ? e.message : t("scanFailed"));
       } finally {
         setLoading(false);
       }
@@ -186,7 +186,7 @@ export function ImageScanner() {
                   ))}
                 </div>
               )}
-              <p className="text-center text-sm text-ink">{SCAN_STEPS[stepIndex]}</p>
+              <p className="text-center text-sm text-ink">{t(SCAN_STEP_KEYS[stepIndex])}</p>
             </GlassCard>
           </motion.div>
         )}
@@ -236,18 +236,18 @@ export function ImageScanner() {
           <GlassCard>
             <p className="text-sm text-ink/70">{t("manipulationRisk")}</p>
             <AnimatedRisk value={risk.finalRisk} />
-            <p className="mt-2 text-xl font-medium text-pink">{verdictLabel(risk.verdict)}</p>
+            <p className="mt-2 text-xl font-medium text-pink">{t(verdictLabelKey(risk.verdict))}</p>
             <ul className="mt-4 space-y-2 text-sm text-ink/80">
               <li className="flex justify-between">
-                <span>HF model</span>
+                <span>{t("breakdownHf")}</span>
                 <span>{(risk.breakdown.modelScore * 100).toFixed(0)}%</span>
               </li>
               <li className="flex justify-between">
-                <span>OpenCV artifacts</span>
+                <span>{t("breakdownOpenCv")}</span>
                 <span>{(risk.breakdown.artifactScore * 100).toFixed(0)}%</span>
               </li>
               <li className="flex justify-between">
-                <span>face-api symmetry</span>
+                <span>{t("breakdownFace")}</span>
                 <span>{(risk.breakdown.symmetryScore * 100).toFixed(0)}%</span>
               </li>
             </ul>

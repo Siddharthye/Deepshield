@@ -1,72 +1,54 @@
+"use client";
+
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { useLanguage } from "@/context/LanguageContext";
+import type { I18nKey } from "@/lib/i18n";
 
-/** Pre-written reference — not AI-generated (PRD §6.8). */
-export const BASIC_RIGHTS = [
-  {
-    title: "IT Act Section 66E",
-    subtitle: "Privacy violation",
-    tip: "Criminalises capturing or sharing intimate images without consent under Indian cyber law.",
-    body: "Capturing, publishing, or transmitting images of private areas without consent is a criminal offence. You can report this to cybercrime.gov.in and preserve screenshots as evidence.",
-  },
-  {
-    title: "IT Act Section 67",
-    subtitle: "Obscene material",
-    tip: "Covers publishing obscene electronic content, including non-consensual morphed images.",
-    body: "Publishing or transmitting obscene material electronically is punishable. This can apply when morphed or sexualised images are shared without consent.",
-  },
-  {
-    title: "IT Act Section 67A",
-    subtitle: "Sexually explicit material",
-    tip: "Applies to sexually explicit deepfakes shared online — imprisonment and fines possible.",
-    body: "Sharing sexually explicit content electronically — including deepfakes — can lead to imprisonment and fines under Indian cyber law.",
-  },
-  {
-    title: "IPC Section 354C",
-    subtitle: "Voyeurism",
-    tip: "Watching or disseminating images of a woman without consent — FIR and legal aid available.",
-    body: "Watching, capturing, or disseminating images of a woman without her consent is voyeurism. You may file an FIR and seek legal aid.",
-  },
-  {
-    title: "POCSO Act",
-    subtitle: "If the victim is a minor",
-    tip: "Enhanced protections when the person harmed is under 18 — report to police and NCPCR immediately.",
-    body: "Enhanced protections and dedicated procedures apply when the person depicted or harmed is under 18. Report immediately to police and the NCPCR helpline.",
-  },
+export const LAW_CARD_KEYS = [
+  { title: "law1Title", subtitle: "law1Subtitle", tip: "law1Tip", body: "law1Body" },
+  { title: "law2Title", subtitle: "law2Subtitle", tip: "law2Tip", body: "law2Body" },
+  { title: "law3Title", subtitle: "law3Subtitle", tip: "law3Tip", body: "law3Body" },
+  { title: "law4Title", subtitle: "law4Subtitle", tip: "law4Tip", body: "law4Body" },
+  { title: "law5Title", subtitle: "law5Subtitle", tip: "law5Tip", body: "law5Body" },
 ] as const;
 
-export const RIGHTS_QUICK_PROMPTS = [
-  "Can I get them arrested?",
-  "How do I file a complaint online?",
-  "What if the perpetrator is abroad?",
-  "What are my rights if someone morphed my photo?",
+export const RIGHTS_PROMPT_KEYS = [
+  "rightsPrompt1",
+  "rightsPrompt2",
+  "rightsPrompt3",
+  "rightsPrompt4",
 ] as const;
+
+/** @deprecated use RIGHTS_PROMPT_KEYS with t() */
+export const RIGHTS_QUICK_PROMPTS = RIGHTS_PROMPT_KEYS;
 
 export function BasicRights() {
+  const { t } = useLanguage();
+
   return (
     <section aria-labelledby="basic-rights-heading">
       <h2
         id="basic-rights-heading"
         className="font-display mb-4 text-2xl font-semibold text-ink"
       >
-        Know your basic rights
+        {t("rightsHeading")}
       </h2>
-      <p className="mb-6 text-sm text-ink/75">
-        These summaries are for quick reference. Ask Asha below for personalised
-        guidance in plain language.
-      </p>
+      <p className="mb-6 text-sm text-ink/75">{t("rightsIntro")}</p>
       <div className="grid gap-4 sm:grid-cols-2">
-        {BASIC_RIGHTS.map((law) => (
+        {LAW_CARD_KEYS.map((law) => (
           <GlassCard key={law.title}>
             <p className="text-xs font-medium uppercase tracking-wide text-pink">
-              {law.subtitle}
+              {t(law.subtitle as I18nKey)}
             </p>
             <h3 className="mt-1 font-semibold text-ink">
-              <Tooltip label={law.tip} learnMoreHref="/asha">
-                {law.title}
+              <Tooltip label={t(law.tip as I18nKey)} learnMoreHref="/asha">
+                {t(law.title as I18nKey)}
               </Tooltip>
             </h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink/85">{law.body}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink/85">
+              {t(law.body as I18nKey)}
+            </p>
           </GlassCard>
         ))}
       </div>
