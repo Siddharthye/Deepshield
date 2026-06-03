@@ -19,7 +19,16 @@ export const EN = {
   transitionTagline: "Your armor against digital violence",
   heroTitle: "Your armor against digital violence",
   heroExtra:
-    "DeepShield is a complete safety toolkit for anyone facing morphed photos, deepfake videos, or non-consensual intimate imagery. Scan suspicious media, build a legal evidence pack, trace where your image was posted, and speak with Asha — all without creating an account.",
+    "For anyone facing morphed photos, deepfake videos, or non-consensual intimate imagery — gather evidence privately, at your own pace, without creating an account.",
+  heroInfoPrivateTitle: "Built for privacy first",
+  heroInfoPrivateBody:
+    "Uploads are used only for model scoring — we do not build a cloud gallery of your files. Your vault and saved sessions stay encrypted in your browser.",
+  heroInfoRemindTitle: "You are not alone",
+  heroInfoRemindBody:
+    "Image-based abuse is real harm, not shame you have to carry quietly. If you are in immediate danger, contact local police first — then document when you are ready.",
+  heroInfoLawTitle: "Laws that may apply in India",
+  heroInfoLawBody:
+    "IT Act §66E, §67, §67A and IPC §354C can apply to morphed and non-consensual intimate images. DeepShield helps you document; cybercrime.gov.in or a lawyer guides filing.",
   trust1: "Browser-first privacy",
   trust2: "No account required",
   trust3: "Free for survivors",

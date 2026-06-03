@@ -17,7 +17,7 @@ import { HomeFaq } from "@/components/sections/HomeFaq";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { WaveDivider } from "@/components/sections/WaveDivider";
 import { TypewriterSubtitle } from "@/components/home/TypewriterSubtitle";
-import { HeroPanel } from "@/components/home/HeroPanel";
+import { HeroInfoCards } from "@/components/home/HeroInfoCards";
 import { OdometerNumber } from "@/components/ui/OdometerNumber";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -30,68 +30,67 @@ export default function HomePage() {
     <div key={language} className="relative overflow-x-hidden pt-16">
       <HeroParticles />
 
-      <section className="relative mx-auto max-w-6xl px-4 py-16 md:py-20 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-14 xl:gap-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex min-w-0 flex-col justify-center gap-8 lg:gap-9"
-          >
-            <div className="flex flex-col gap-5 sm:gap-6">
-              <div className="relative w-fit">
-                <AnimatedShield className="pointer-events-none absolute -right-1 -top-1 h-8 w-8 opacity-70 md:h-9 md:w-9" />
-                <Image
-                  src="/images/ds-logo.jpeg"
-                  alt={t("brandAlt")}
-                  width={88}
-                  height={88}
-                  className="relative h-[4.5rem] w-[4.5rem] rounded-2xl object-contain shadow-md ring-2 ring-secondary/30 md:h-20 md:w-20"
-                  priority
-                  unoptimized
-                />
-              </div>
-              <p className="page-badge !mb-0 w-fit">{t("tagline")}</p>
+      <section className="relative mx-auto max-w-5xl px-4 py-16 md:py-20 lg:py-28">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col gap-10 md:gap-12"
+        >
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-8">
+            <div className="relative shrink-0">
+              <AnimatedShield className="pointer-events-none absolute -right-1 -top-1 h-9 w-9 opacity-70 md:h-10 md:w-10" />
+              <Image
+                src="/images/ds-logo.jpeg"
+                alt={t("brandAlt")}
+                width={96}
+                height={96}
+                className="relative h-20 w-20 rounded-2xl object-contain shadow-md ring-2 ring-secondary/30 md:h-24 md:w-24"
+                priority
+                unoptimized
+              />
             </div>
-
-            <div className="max-w-xl space-y-4">
-              <h1 className="font-display text-3xl leading-[1.12] text-ink md:text-4xl lg:text-[2.65rem]">
+            <div className="min-w-0 space-y-4">
+              <p className="page-badge !mb-0 w-fit">{t("tagline")}</p>
+              <h1 className="font-display max-w-3xl text-3xl leading-[1.1] text-ink md:text-4xl lg:text-5xl">
                 {t("heroTitle")}
               </h1>
               <TypewriterSubtitle />
             </div>
-
-            <div className="max-w-xl space-y-3 border-l-2 border-accent/25 pl-4 text-ink-muted">
-              <p className="text-base leading-relaxed">{t("homeHero")}</p>
-              <p className="text-sm leading-relaxed">{t("heroExtra")}</p>
-            </div>
-
-            <div className="flex w-full max-w-xl flex-col gap-5">
-              <ul className="flex flex-wrap gap-2">
-                {TRUST_KEYS.map((key) => (
-                  <li
-                    key={key}
-                    className="ui-nowrap rounded-full bg-cream-tan/80 px-3 py-1.5 text-xs font-medium text-ink-muted ring-1 ring-secondary/15"
-                  >
-                    {t(key)}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="grid w-full grid-cols-1 gap-3 sm:max-w-md sm:grid-cols-2">
-                <ButtonLink href="/scan" className="w-full justify-center">
-                  {t("scanNow")}
-                </ButtonLink>
-                <ButtonLink href="/asha" variant="secondary" className="w-full justify-center">
-                  {t("talkToAsha")}
-                </ButtonLink>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="flex min-h-0 w-full min-w-0 lg:max-w-[420px] lg:justify-self-end">
-            <HeroPanel />
           </div>
-        </div>
+
+          <div className="max-w-3xl space-y-4 text-ink-muted">
+            <p className="text-lg leading-relaxed md:text-xl">{t("homeHero")}</p>
+            <p className="text-base leading-relaxed">{t("heroExtra")}</p>
+          </div>
+
+          <HeroInfoCards />
+
+          <div className="flex flex-col gap-6 border-t border-secondary/15 pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <ul className="flex flex-wrap gap-2">
+              {TRUST_KEYS.map((key) => (
+                <li
+                  key={key}
+                  className="ui-nowrap rounded-full bg-cream-tan/80 px-3 py-1.5 text-xs font-medium text-ink-muted ring-1 ring-secondary/15"
+                >
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
+
+            <div className="grid w-full grid-cols-1 gap-3 sm:w-auto sm:min-w-[20rem] sm:grid-cols-2">
+              <ButtonLink href="/scan" className="w-full justify-center">
+                {t("scanNow")}
+              </ButtonLink>
+              <ButtonLink href="/asha" variant="secondary" className="w-full justify-center">
+                {t("talkToAsha")}
+              </ButtonLink>
+            </div>
+          </div>
+
+          <p className="text-center text-sm font-medium text-ink-muted md:text-left">
+            {t("footerLine1")}
+          </p>
+        </motion.div>
       </section>
 
       <HomeCrisisStrip />
