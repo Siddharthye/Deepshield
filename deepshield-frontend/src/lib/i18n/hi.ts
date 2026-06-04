@@ -226,5 +226,11 @@ export const HI: Record<keyof typeof EN, string> = {
   authSignInFailed: "गलत ईमेल या पासवर्ड।",
   authEmailExists: "यह ईमेल पहले से पंजीकृत है — साइन इन करें।",
   authGoogleNote:
-    "OAuth जुड़ने तक Google साइन-इन पूर्वावलोकन है। ईमेल पंजीकरण इस डिवाइस पर काम करता है।",
+    "आप Google पर रीडायरेक्ट होंगे और खाता चुन सकेंगे। हमें केवल नाम और ईमेल मिलता है।",
+  authGoogleRedirecting: "Google पर भेजा जा रहा है…",
+  authCompletingGoogle: "साइन-इन पूरा हो रहा है…",
+  authGoogleNotConfigured:
+    "Google साइन-इन अभी कॉन्फ़िगर नहीं है। व्यवस्थापक से GOOGLE_CLIENT_ID और GOOGLE_CLIENT_SECRET सेट करवाएँ।",
+  authGoogleDenied: "Google साइन-इन रद्द किया गया।",
+  authGoogleFailed: "Google साइन-इन विफल। फिर कोशिश करें।",
 };

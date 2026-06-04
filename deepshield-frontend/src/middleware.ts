@@ -4,8 +4,15 @@ const AUTH_COOKIE = "deepshield_auth";
 
 const LOGIN_PATH = "/login";
 
+const PUBLIC_PREFIXES = ["/api/auth", "/auth/"];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
   const authed = request.cookies.get(AUTH_COOKIE)?.value === "1";
 
   if (pathname === LOGIN_PATH) {

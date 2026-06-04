@@ -11,7 +11,7 @@ import {
   readSession,
   registerWithEmail,
   signInWithEmail,
-  signInWithGoogleMock,
+  signInWithGoogleProfile,
   signOut as clearSession,
   syncAuthCookieFromSession,
   type AuthUser,
@@ -26,7 +26,7 @@ type AuthContextValue = {
     password: string,
     name: string,
   ) => ReturnType<typeof registerWithEmail>;
-  signInGoogle: () => AuthUser;
+  completeOAuth: (user: AuthUser) => void;
   signOut: () => void;
 };
 
@@ -55,10 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, []);
 
-  const signInGoogle = useCallback(() => {
-    const next = signInWithGoogleMock();
+  const completeOAuth = useCallback((sessionUser: AuthUser) => {
+    const next = signInWithGoogleProfile(sessionUser);
     setUser(next);
-    return next;
   }, []);
 
   const signOut = useCallback(() => {
@@ -68,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, ready, signInEmail, registerEmail, signInGoogle, signOut }}
+      value={{ user, ready, signInEmail, registerEmail, completeOAuth, signOut }}
     >
       {children}
     </AuthContext.Provider>

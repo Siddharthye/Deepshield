@@ -11,9 +11,9 @@ import { LanguageMenu } from "@/components/layout/LanguageMenu";
 import { IntroLoader } from "@/components/ui/IntroLoader";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isLogin = pathname === "/login";
+  const isAuthFlow = pathname === "/login" || pathname.startsWith("/auth/");
 
-  if (isLogin) {
+  if (isAuthFlow) {
     return (
       <>
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2.5">

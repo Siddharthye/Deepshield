@@ -4,6 +4,7 @@ export type AuthUser = {
   email: string;
   name: string;
   provider: AuthProvider;
+  picture?: string;
 };
 
 export const AUTH_COOKIE = "deepshield_auth";
@@ -116,15 +117,39 @@ export function signInWithEmail(
   return { ok: true, user };
 }
 
-/** Placeholder until Google OAuth is wired — creates a signed-in session for UX testing. */
-export function signInWithGoogleMock(): AuthUser {
+export function signInWithGoogleProfile(profile: {
+  email: string;
+  name: string;
+  picture?: string;
+}): AuthUser {
   const user: AuthUser = {
-    email: "google.user@example.com",
-    name: "Google user",
+    email: normalizeEmail(profile.email),
+    name: profile.name.trim() || profile.email.split("@")[0] || "User",
     provider: "google",
+    picture: profile.picture,
   };
   writeSession(user);
   return user;
+}
+
+/** Read one-time user payload set by OAuth callback, then clear the cookie. */
+export function consumePendingUserCookie(cookieName: string): AuthUser | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${cookieName}=`));
+  if (!match) return null;
+
+  const raw = decodeURIComponent(match.slice(cookieName.length + 1));
+  document.cookie = `${cookieName}=; path=/; max-age=0; SameSite=Lax`;
+
+  try {
+    const parsed = JSON.parse(raw) as AuthUser;
+    if (!parsed?.email || parsed.provider !== "google") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 export function signOut() {

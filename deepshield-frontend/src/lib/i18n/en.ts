@@ -225,5 +225,11 @@ export const EN = {
   authSignInFailed: "Incorrect email or password.",
   authEmailExists: "An account with this email already exists. Sign in instead.",
   authGoogleNote:
-    "Google sign-in is a preview until OAuth is connected. Email registration works on this device.",
+    "You will be redirected to Google to choose an account. We only receive your name and email.",
+  authGoogleRedirecting: "Redirecting to Google…",
+  authCompletingGoogle: "Finishing sign-in…",
+  authGoogleNotConfigured:
+    "Google sign-in is not configured yet. Ask your admin to set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
+  authGoogleDenied: "Google sign-in was cancelled.",
+  authGoogleFailed: "Google sign-in failed. Please try again.",
 } as const;

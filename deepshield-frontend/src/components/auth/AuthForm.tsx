@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -8,8 +8,18 @@ import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { SAFETY } from "@/lib/safetyContacts";
+import type { I18nKey } from "@/lib/i18n";
 
 type Mode = "signin" | "register";
+
+const OAUTH_ERROR_KEYS: Record<string, I18nKey> = {
+  google_not_configured: "authGoogleNotConfigured",
+  google_denied: "authGoogleDenied",
+  google_failed: "authGoogleFailed",
+  oauth_state: "authGoogleFailed",
+  oauth_missing: "authGoogleFailed",
+  access_denied: "authGoogleDenied",
+};
 
 function GoogleIcon() {
   return (
@@ -36,7 +46,7 @@ function GoogleIcon() {
 
 export function AuthForm() {
   const { t } = useLanguage();
-  const { signInEmail, registerEmail, signInGoogle } = useAuth();
+  const { signInEmail, registerEmail } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
@@ -51,6 +61,13 @@ export function AuthForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (!oauthError) return;
+    const key = OAUTH_ERROR_KEYS[oauthError];
+    setError(key ? t(key) : t("authGoogleFailed"));
+  }, [searchParams, t]);
 
   function switchMode(next: Mode) {
     setMode(next);
@@ -97,12 +114,9 @@ export function AuthForm() {
   function handleGoogle() {
     setError(null);
     setLoading(true);
-    try {
-      signInGoogle();
-      router.push("/");
-    } finally {
-      setLoading(false);
-    }
+    const url = new URL("/api/auth/google", window.location.origin);
+    url.searchParams.set("from", returnTo);
+    window.location.assign(url.toString());
   }
 
   return (
@@ -155,7 +169,7 @@ export function AuthForm() {
           className="mt-6 flex w-full items-center justify-center gap-3 rounded-full border border-secondary/25 bg-cream-deep px-4 py-2.5 text-sm font-medium text-ink shadow-sm transition hover:bg-parchment disabled:opacity-60"
         >
           <GoogleIcon />
-          {t("authContinueGoogle")}
+          {loading ? t("authGoogleRedirecting") : t("authContinueGoogle")}
         </button>
 
         <div className="my-5 flex items-center gap-3">
