@@ -1,10 +1,13 @@
 export type Verdict = "authentic" | "likely_manipulated" | "highly_suspicious";
 
 export type DetectionScores = {
+  /** Combined server score (max of HF + Sightengine). */
   modelScore: number;
   artifactScore: number;
   symmetryScore: number;
   morphScore?: number;
+  hfModelScore?: number;
+  sightengineScore?: number;
 };
 
 export type RiskResult = {

@@ -98,10 +98,16 @@ export function VideoScanner() {
         const frame = extracted[i];
         setProgress(t("videoFrameProgress").replace("{n}", String(i + 1)).replace("{total}", String(extracted.length)));
 
-        const { modelScore, modelUnavailable: hfDown } = await scanImage({
+        const scan = await scanImage({
           imageBase64: frame.dataUrl,
           mimeType: "image/jpeg",
         });
+        const {
+          modelScore,
+          hfModelScore,
+          sightengineScore,
+          modelUnavailable: modelsDown,
+        } = scan;
         await yieldToMain();
         const { symmetryScore, faceBox } = await analyzeFaceOnce(frame.dataUrl);
         const [artifactScore, morphScore] = await Promise.all([
@@ -123,8 +129,15 @@ export function VideoScanner() {
         }
         await yieldToMain();
         const risk = computeRisk(
-          { modelScore, artifactScore, symmetryScore, morphScore },
-          { modelUnavailable: hfDown },
+          {
+            modelScore,
+            artifactScore,
+            symmetryScore,
+            morphScore,
+            hfModelScore,
+            sightengineScore,
+          },
+          { modelUnavailable: modelsDown },
         );
         scored.push({
           timeSec: frame.timeSec,

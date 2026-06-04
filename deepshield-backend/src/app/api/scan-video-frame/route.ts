@@ -7,6 +7,7 @@ import {
   stripDataUrlPrefix,
 } from "@/lib/media";
 import { callHfDeepfakeModelSafe } from "@/lib/huggingface";
+import { callSightengineDeepfakeSafe } from "@/lib/sightengine";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -109,19 +110,27 @@ export async function POST(request: Request) {
     }
 
     const t0 = Date.now();
-    const { modelScore, modelUnavailable } = await callHfDeepfakeModelSafe({
-      base64: base64Raw,
-      mimeType,
-    });
+    const [hf, sightengine] = await Promise.all([
+      callHfDeepfakeModelSafe({ base64: base64Raw, mimeType }),
+      callSightengineDeepfakeSafe({ base64: base64Raw, mimeType }),
+    ]);
     const t1 = Date.now();
+
+    const hfModelScore = hf.modelScore;
+    const sightengineScore = sightengine.sightengineScore;
+    const modelScore = Math.max(hfModelScore, sightengineScore);
+    const modelUnavailable =
+      hf.modelUnavailable && sightengine.sightengineUnavailable;
 
     return NextResponse.json({
       frameIndex,
       timestampSec,
       modelScore,
+      hfModelScore,
+      sightengineScore,
       modelUnavailable,
       requestId,
-      timingsMs: { hf: t1 - t0 },
+      timingsMs: { models: t1 - t0 },
       meta: meta && typeof meta === "object" ? meta : undefined,
     });
   } catch (e: any) {

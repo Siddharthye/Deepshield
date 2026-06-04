@@ -62,8 +62,12 @@ export async function scanImage(args: {
 
 }): Promise<{
   modelScore: number;
+  hfModelScore?: number;
+  sightengineScore?: number;
   requestId: string;
   modelUnavailable?: boolean;
+  hfUnavailable?: boolean;
+  sightengineUnavailable?: boolean;
 }> {
 
   return postJson("/api/scan-image", {

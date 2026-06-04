@@ -47,6 +47,8 @@ export function computeRisk(
       artifactScore: scores.artifactScore,
       symmetryScore: scores.symmetryScore,
       morphScore: scores.morphScore,
+      hfModelScore: scores.hfModelScore,
+      sightengineScore: scores.sightengineScore,
     },
   };
 }

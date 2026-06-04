@@ -101,6 +101,8 @@ export async function POST(request: Request) {
     const userPrompt = `Here are the detector outputs (scores only; do NOT analyze the image):
 
 model_score: ${typedRisk.breakdown.modelScore}
+hf_model_score: ${typeof (typedRisk.breakdown as { hfModelScore?: number }).hfModelScore === "number" ? (typedRisk.breakdown as { hfModelScore?: number }).hfModelScore : "n/a"}
+sightengine_score: ${typeof (typedRisk.breakdown as { sightengineScore?: number }).sightengineScore === "number" ? (typedRisk.breakdown as { sightengineScore?: number }).sightengineScore : "n/a"}
 artifact_score: ${typedRisk.breakdown.artifactScore}
 symmetry_score: ${typedRisk.breakdown.symmetryScore}
 morph_score: ${typeof (typedRisk.breakdown as { morphScore?: number }).morphScore === "number" ? (typedRisk.breakdown as { morphScore?: number }).morphScore : "n/a"}

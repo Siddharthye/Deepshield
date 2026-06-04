@@ -70,11 +70,17 @@ export function ImageScanner() {
       await yieldToMain();
 
       setStepKey("scanStep3");
-      const { modelScore, modelUnavailable: hfDown } = await scanImage({
+      const scan = await scanImage({
         imageBase64: dataUrl,
         mimeType,
       });
-      setModelUnavailable(!!hfDown);
+      const {
+        modelScore,
+        hfModelScore,
+        sightengineScore,
+        modelUnavailable: modelsDown,
+      } = scan;
+      setModelUnavailable(!!modelsDown);
       await yieldToMain();
 
       setStepKey("scanStep1");
@@ -97,8 +103,15 @@ export function ImageScanner() {
       setHeatmap(cells);
 
       const riskResult = computeRisk(
-        { modelScore, artifactScore, symmetryScore },
-        { modelUnavailable: hfDown },
+        {
+          modelScore,
+          artifactScore,
+          symmetryScore,
+          morphScore,
+          hfModelScore,
+          sightengineScore,
+        },
+        { modelUnavailable: modelsDown },
       );
       setRisk(riskResult);
       setLoading(false);
@@ -251,9 +264,21 @@ export function ImageScanner() {
             )}
             <ul className="mt-4 space-y-2 text-sm text-ink-muted">
               <li className="flex justify-between">
-                <span>{t("breakdownHf")}</span>
+                <span>{t("breakdownCombinedModel")}</span>
                 <span>{(risk.breakdown.modelScore * 100).toFixed(0)}%</span>
               </li>
+              {risk.breakdown.hfModelScore != null && (
+                <li className="flex justify-between pl-2 text-xs">
+                  <span>{t("breakdownHf")}</span>
+                  <span>{(risk.breakdown.hfModelScore * 100).toFixed(0)}%</span>
+                </li>
+              )}
+              {risk.breakdown.sightengineScore != null && (
+                <li className="flex justify-between pl-2 text-xs">
+                  <span>{t("breakdownSightengine")}</span>
+                  <span>{(risk.breakdown.sightengineScore * 100).toFixed(0)}%</span>
+                </li>
+              )}
               <li className="flex justify-between">
                 <span>{t("breakdownOpenCv")}</span>
                 <span>{(risk.breakdown.artifactScore * 100).toFixed(0)}%</span>
