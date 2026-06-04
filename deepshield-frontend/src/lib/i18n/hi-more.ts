@@ -269,6 +269,8 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   reportPreviewPdf: "PDF पूर्वावलोकन",
   reportPdfPreview: "PDF पूर्वावलोकन",
   reportPdfIframeTitle: "सबूत PDF पूर्वावलोकन",
+  reportPdfError: "PDF नहीं बन सका। स्कैन पूरा होने के बाद फिर कोशिश करें, या पहले पूर्वावलोकन दबाएँ।",
+  reportOpenPdfTab: "नए टैब में खोलें",
   cyberFormBadge: "आधिकारिक दायरा",
   cyberFormTitle: "साइबर अपराध पोर्टल तैयारी",
   cyberFormFieldsTitle: "आपके बयान के फ़ील्ड",

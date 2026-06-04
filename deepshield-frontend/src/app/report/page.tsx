@@ -21,6 +21,7 @@ export default function ReportPage() {
   const [legalSummary, setLegalSummary] = useState<string | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [shield, setShield] = useState(false);
 
@@ -28,16 +29,30 @@ export default function ReportPage() {
     setScan(loadScanSession());
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (pdfPreview) URL.revokeObjectURL(pdfPreview);
+    };
+  }, [pdfPreview]);
+
   async function buildPdf() {
     if (!scan) return;
     setPdfLoading(true);
+    setPdfError(null);
     try {
-      let summary = legalSummary;
+      let summary = legalSummary ?? undefined;
       if (!summary) {
         setSummaryLoading(true);
-        summary = await fetchLegalReportSummary(scan, apiLanguage);
-        setLegalSummary(summary);
-        setSummaryLoading(false);
+        try {
+          summary = await fetchLegalReportSummary(scan, "en");
+          setLegalSummary(summary);
+        } catch {
+          summary =
+            scan.explain?.explanation ??
+            `Deepfake scan completed. Verdict: ${scan.risk.verdict}. Risk: ${scan.risk.finalRisk}%.`;
+        } finally {
+          setSummaryLoading(false);
+        }
       }
       const traceHits = loadTraceHits();
       const traceUrls = loadTraceUrls();
@@ -45,6 +60,10 @@ export default function ReportPage() {
       if (pdfPreview) URL.revokeObjectURL(pdfPreview);
       setPdfPreview(URL.createObjectURL(blob));
       return blob;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : t("reportPdfError");
+      setPdfError(message);
+      return null;
     } finally {
       setPdfLoading(false);
     }
@@ -120,16 +139,37 @@ export default function ReportPage() {
                 {t("reportPreviewPdf")}
               </Button>
             </div>
+            {pdfError && (
+              <p className="text-sm text-red-800" role="alert">
+                {pdfError}
+              </p>
+            )}
           </GlassCard>
 
           {pdfPreview && (
             <GlassCard>
-              <p className="mb-3 text-sm font-medium text-ink">{t("reportPdfPreview")}</p>
-              <iframe
-                src={pdfPreview}
-                title={t("reportPdfIframeTitle")}
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium text-ink">{t("reportPdfPreview")}</p>
+                <a
+                  href={pdfPreview}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-link underline"
+                >
+                  {t("reportOpenPdfTab")}
+                </a>
+              </div>
+              <object
+                data={pdfPreview}
+                type="application/pdf"
                 className="h-[min(520px,70vh)] w-full rounded-xl border border-sage/40 bg-cream"
-              />
+              >
+                <embed
+                  src={pdfPreview}
+                  type="application/pdf"
+                  className="h-[min(520px,70vh)] w-full rounded-xl"
+                />
+              </object>
             </GlassCard>
           )}
         </div>

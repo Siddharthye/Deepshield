@@ -4,6 +4,23 @@ import type { ScanSession } from "./types";
 import type { TraceHit } from "./traceStorage";
 import { verdictLabelKey } from "./riskScoring";
 
+/** Court-ready PDF labels stay in English (Helvetica / WinAnsi only). */
+const PDF_LANG: LanguageCode = "en";
+
+/** pdf-lib standard fonts cannot encode Devanagari, em dashes, etc. */
+export function toPdfText(text: string): string {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/[\u2014\u2013]/g, "-")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/[^\n\t\x20-\x7E\xa0-\xff]/g, " ")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 const MARGIN_X = 50;
 const MARGIN_BOTTOM = 72;
 const CONTENT_WIDTH = 495;
@@ -26,7 +43,7 @@ async function embedScanImage(doc: PDFDocument, dataUrl: string) {
 }
 
 function wrapParagraph(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
-  const normalized = text.replace(/\r\n/g, "\n").trim();
+  const normalized = toPdfText(text).replace(/\r\n/g, "\n").trim();
   if (!normalized) return [];
 
   const lines: string[] = [];
@@ -158,9 +175,10 @@ export async function generateEvidencePdf(
   traceUrls: string[],
   legalSummary?: string,
   traceHits: TraceHit[] = [],
-  lang: LanguageCode = "en",
+  _lang: LanguageCode = "en",
 ) {
-  const L = (key: Parameters<typeof t>[1]) => t(lang, key);
+  const L = (key: Parameters<typeof t>[1]) => t(PDF_LANG, key);
+  const safeSummary = legalSummary ? toPdfText(legalSummary) : undefined;
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -238,10 +256,10 @@ export async function generateEvidencePdf(
     `${L("pdfModelLine")} ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}% · ${L("pdfArtifacts")} ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}% · ${L("pdfSymmetry")} ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`,
   );
 
-  if (legalSummary) {
+  if (safeSummary) {
     w.drawRule();
     w.drawSectionTitle(L("pdfLegalSummary"));
-    w.drawLines(legalSummary, { size: 10, gap: 5 });
+    w.drawLines(safeSummary, { size: 10, gap: 5 });
   } else if (scan.explain) {
     w.drawRule();
     w.drawSectionTitle(L("pdfSummary"));
@@ -263,7 +281,7 @@ export async function generateEvidencePdf(
     w.drawRule();
     w.drawSectionTitle(L("pdfTraceLog"));
     traceHits.slice(0, 10).forEach((h) => {
-      w.drawLines(`${h.platform} — ${h.title}`, { bold: true, color: INK });
+      w.drawLines(`${toPdfText(h.platform)} - ${toPdfText(h.title)}`, { bold: true, color: INK });
       w.drawLines(h.url, { size: 9 });
       w.drawLines(`${L("pdfFirstSeen")} ${h.firstSeen}`, { size: 9 });
       w.y -= 4;
@@ -294,6 +312,9 @@ export function downloadBlob(blob: Blob, filename: string) {
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  a.rel = "noopener";
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  window.setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
