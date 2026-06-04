@@ -14,6 +14,7 @@ import {
 } from "@/lib/reverseTrace";
 import { appendTraceHits, type TraceHit } from "@/lib/traceStorage";
 import { tryAddToVault } from "@/lib/vaultHelpers";
+import { TraceMatchRow } from "@/components/trace/TraceMatchRow";
 
 type Props = {
   preview: string;
@@ -120,17 +121,11 @@ export function AutomaticTrace({ preview, fileName, onHitsImported }: Props) {
       )}
 
       {previewHits.length > 0 && (
-        <ul className="max-h-36 space-y-1 overflow-y-auto rounded-lg border border-secondary/15 bg-cream-tan/50 p-2 text-xs">
+        <div className="max-h-[28rem] space-y-3 overflow-y-auto">
           {previewHits.map((h) => (
-            <li key={h.id}>
-              <span className="font-medium text-ink">{h.platform}</span>
-              {" — "}
-              <a href={h.url} target="_blank" rel="noopener noreferrer" className="text-link break-all">
-                {h.title || h.url}
-              </a>
-            </li>
+            <TraceMatchRow key={h.id} hit={h} queryPreview={preview} />
           ))}
-        </ul>
+        </div>
       )}
 
       <div className="flex flex-wrap gap-2">

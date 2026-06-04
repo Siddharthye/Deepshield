@@ -338,6 +338,7 @@ export type ReverseTraceHit = {
   title: string;
   url: string;
   firstSeen: string;
+  thumbnailUrl?: string;
 };
 
 export async function uploadTraceImageFile(

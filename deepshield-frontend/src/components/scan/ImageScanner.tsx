@@ -7,7 +7,7 @@ import { CompareSlider } from "@/components/ui/CompareSlider";
 import { HeatmapOverlay } from "@/components/scan/HeatmapOverlay";
 import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { explainRisk, scanImage } from "@/lib/api";
-import { analyzeFaceOnce } from "@/lib/faceAnalysis";
+import { analyzeFaceOnce, preloadFaceApi } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
 import type { HeatmapCell } from "@/lib/clientAnalysis";
@@ -39,6 +39,9 @@ function AnimatedRisk({ value }: { value: number }) {
 
 export function ImageScanner() {
   const { apiLanguage, t } = useLanguage();
+  useEffect(() => {
+    preloadFaceApi();
+  }, []);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [stepKey, setStepKey] = useState<I18nKey>("scanStepPrepare");
@@ -73,10 +76,11 @@ export function ImageScanner() {
       await yieldToMain();
 
       setStepKey("scanStep1");
-      const [{ symmetryScore, faceBox }, artifactScore] = await Promise.all([
-        analyzeFaceOnce(dataUrl),
-        analyzeOpenCvArtifactScore(dataUrl),
-      ]);
+      const { symmetryScore, faceBox } = await analyzeFaceOnce(dataUrl);
+      await yieldToMain();
+
+      setStepKey("scanStep2");
+      const artifactScore = await analyzeOpenCvArtifactScore(dataUrl);
       await yieldToMain();
 
       setStepKey("scanStep4");

@@ -4,6 +4,7 @@ export type TraceHit = {
   title: string;
   url: string;
   firstSeen: string;
+  thumbnailUrl?: string;
 };
 
 const RESULTS_KEY = "deepshield_trace_results";
@@ -44,7 +45,13 @@ export function appendTraceHits(newHits: TraceHit[]): TraceHit[] {
   const seen = new Set(existing.map((h) => h.url));
   const merged = [...existing];
   for (const h of newHits) {
-    if (seen.has(h.url)) continue;
+    if (seen.has(h.url)) {
+      const idx = merged.findIndex((x) => x.url === h.url);
+      if (idx >= 0 && !merged[idx].thumbnailUrl && h.thumbnailUrl) {
+        merged[idx] = { ...merged[idx], thumbnailUrl: h.thumbnailUrl };
+      }
+      continue;
+    }
     seen.add(h.url);
     merged.unshift(h);
   }

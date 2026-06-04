@@ -199,6 +199,9 @@ export const EN_MORE = {
   verdictAuthentic: "Authentic",
   traceUploadLabel: "Upload image to trace",
   tracePreviewAlt: "Trace preview",
+  traceYourImage: "Your image",
+  traceMatchFound: "Match found online",
+  traceNoThumbnail: "No preview available",
   traceLensHint: "Upload this image in Lens/TinEye manually, or use TinEye URL search if available.",
   traceOpenLens: "Open Google Lens",
   traceOpenTinEye: "Open TinEye",
@@ -211,7 +214,7 @@ export const EN_MORE = {
   traceAutoHosting: "Preparing a public search link for your image…",
   traceAutoPublishFailed:
     "Could not host the image for search. Use manual search tabs below, then paste URLs.",
-  traceAutoSearching: "Checking Yandex, Bing, and Google for your image…",
+  traceAutoSearching: "Searching with Google Lens (SerpAPI) for your image…",
   traceAutoFound: "Found {n} match(es) — saved to your trace log.",
   traceAutoNoApiKey:
     "Image hosted. In-app matching needs SERPAPI_API_KEY or SERPER_API_KEY on the backend (Vercel → deepshield-xi → Environment). Free tiers: serpapi.com or serper.dev.",

@@ -3,6 +3,7 @@ export type TraceLookupHit = {
   title: string;
   url: string;
   firstSeen: string;
+  thumbnailUrl?: string;
 };
 
 const PLATFORM_RULES: { match: RegExp; name: string }[] = [
@@ -52,15 +53,26 @@ function normalizeUrl(raw: string): string | null {
   }
 }
 
-function addHit(seen: Set<string>, hits: TraceLookupHit[], url: string, title?: string) {
+function normalizeThumb(raw: unknown): string | undefined {
+  if (typeof raw !== "string" || !raw.startsWith("http")) return undefined;
+  return normalizeUrl(raw) ?? undefined;
+}
+
+function addHit(
+  seen: Set<string>,
+  hits: TraceLookupHit[],
+  url: string,
+  opts?: { title?: string; thumbnailUrl?: string },
+) {
   const normalized = normalizeUrl(url);
   if (!normalized || seen.has(normalized)) return;
   seen.add(normalized);
   hits.push({
     platform: detectPlatform(normalized),
-    title: (title?.trim() || titleFromUrl(normalized)).slice(0, 120),
+    title: (opts?.title?.trim() || titleFromUrl(normalized)).slice(0, 120),
     url: normalized,
     firstSeen: new Date().toISOString().slice(0, 10),
+    thumbnailUrl: opts?.thumbnailUrl,
   });
 }
 
@@ -89,10 +101,10 @@ async function fetchYandex(imageUrl: string): Promise<TraceLookupHit[]> {
   for (const block of data.blocks ?? []) {
     for (const site of block.sites ?? []) {
       const url = site.url ?? site.link;
-      if (url) addHit(seen, hits, url, site.title);
+      if (url) addHit(seen, hits, url, { title: site.title });
     }
     for (const row of block.params?.text ?? []) {
-      if (row.url) addHit(seen, hits, row.url, row.title);
+      if (row.url) addHit(seen, hits, row.url, { title: row.title });
     }
   }
 
@@ -112,9 +124,32 @@ function addLensRows(
   rows: Array<Record<string, unknown>>,
 ) {
   for (const row of rows) {
-    const link = row.link ?? row.url ?? row.imageUrl ?? row.image;
+    const pageUrl =
+      typeof row.link === "string"
+        ? row.link
+        : typeof row.url === "string" && !String(row.url).match(/\.(jpe?g|png|webp|gif)(\?|$)/i)
+          ? row.url
+          : undefined;
+    const imageOnly =
+      typeof row.image === "string"
+        ? row.image
+        : typeof row.imageUrl === "string"
+          ? row.imageUrl
+          : undefined;
+    const target = pageUrl ?? imageOnly;
+    if (!target) continue;
+
     const title = row.title ?? row.source ?? row.name;
-    if (typeof link === "string") addHit(seen, hits, link, typeof title === "string" ? title : undefined);
+    const thumbnailUrl =
+      normalizeThumb(row.thumbnail) ??
+      normalizeThumb(row.thumbnailUrl) ??
+      normalizeThumb(row.image) ??
+      normalizeThumb(row.imageUrl);
+
+    addHit(seen, hits, target, {
+      title: typeof title === "string" ? title : undefined,
+      thumbnailUrl: thumbnailUrl && thumbnailUrl !== normalizeUrl(target) ? thumbnailUrl : thumbnailUrl,
+    });
   }
 }
 
@@ -253,25 +288,35 @@ export async function lookupReverseImage(imageUrl: string): Promise<{
     if (batch.length === 0) return;
     sources.push(label);
     for (const hit of batch) {
+      const existingIdx = merged.findIndex((h) => h.url === hit.url);
+      if (existingIdx >= 0) {
+        if (!merged[existingIdx].thumbnailUrl && hit.thumbnailUrl) {
+          merged[existingIdx] = { ...merged[existingIdx], thumbnailUrl: hit.thumbnailUrl };
+        }
+        continue;
+      }
       if (seen.has(hit.url)) continue;
       seen.add(hit.url);
       merged.push(hit);
     }
   };
 
-  const [serp, serper, yandex, yandexHtml, bing] = await Promise.all([
-    fetchSerpApi(imageUrl).catch(() => []),
-    fetchSerperLens(imageUrl).catch(() => []),
-    fetchYandex(imageUrl).catch(() => []),
-    fetchYandexHtml(imageUrl).catch(() => []),
-    fetchBingHtml(imageUrl).catch(() => []),
-  ]);
-
+  const hasSerpApi = Boolean(process.env.SERPAPI_API_KEY?.trim());
+  const serp = hasSerpApi ? await fetchSerpApi(imageUrl).catch(() => []) : [];
   addBatch("serpapi", serp);
-  addBatch("serper", serper);
-  addBatch("yandex", yandex);
-  addBatch("yandex-html", yandexHtml);
-  addBatch("bing", bing);
+
+  if (serp.length < 5) {
+    const [serper, yandex, yandexHtml, bing] = await Promise.all([
+      fetchSerperLens(imageUrl).catch(() => []),
+      fetchYandex(imageUrl).catch(() => []),
+      fetchYandexHtml(imageUrl).catch(() => []),
+      fetchBingHtml(imageUrl).catch(() => []),
+    ]);
+    addBatch("serper", serper);
+    addBatch("yandex", yandex);
+    addBatch("yandex-html", yandexHtml);
+    addBatch("bing", bing);
+  }
 
   const hits = merged.slice(0, 40);
   let lookupHint: string | null = null;

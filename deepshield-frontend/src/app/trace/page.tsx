@@ -113,7 +113,7 @@ export default function TracePage() {
         )}
       </GlassCard>
 
-      <TraceResults refreshKey={resultsKey} />
+      <TraceResults refreshKey={resultsKey} queryPreview={preview} />
 
       <h2 className="font-display mb-4 mt-12 text-xl text-ink">{t("traceReportPlatforms")}</h2>
       <div className="space-y-3">

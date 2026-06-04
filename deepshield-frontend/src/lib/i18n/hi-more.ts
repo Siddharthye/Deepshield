@@ -200,6 +200,9 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   verdictAuthentic: "प्रामाणिक",
   traceUploadLabel: "ट्रेस के लिए छवि अपलोड करें",
   tracePreviewAlt: "ट्रेस पूर्वावलोकन",
+  traceYourImage: "आपकी छवि",
+  traceMatchFound: "ऑनलाइन मिला मिलान",
+  traceNoThumbnail: "पूर्वावलोकन उपलब्ध नहीं",
   traceLensHint:
     "यह छवि Lens/TinEye में मैन्युअल अपलोड करें, या TinEye URL खोज उपलब्ध हो तो उसका उपयोग करें।",
   traceOpenLens: "Google Lens खोलें",
@@ -213,7 +216,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   traceAutoHosting: "आपकी छवि के लिए सार्वजनिक खोज लिंक तैयार हो रहा है…",
   traceAutoPublishFailed:
     "खोज के लिए छवि होस्ट नहीं हो सकी। नीचे मैन्युअल खोज खोलें, फिर URL चिपकाएँ।",
-  traceAutoSearching: "Yandex, Bing और Google पर आपकी छवि खोज रहे हैं…",
+  traceAutoSearching: "Google Lens (SerpAPI) से आपकी छवि खोज रहे हैं…",
   traceAutoFound: "{n} मिलान मिले — ट्रेस लॉग में सहेजे।",
   traceAutoNoApiKey:
     "छवि होस्ट हो गई। इन-ऐप मिलान के लिए backend पर SERPAPI_API_KEY या SERPER_API_KEY चाहिए (Vercel → deepshield-xi → Environment)।",
