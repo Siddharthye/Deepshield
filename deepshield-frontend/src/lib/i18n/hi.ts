@@ -242,6 +242,18 @@ export const HI: Record<keyof typeof EN, string> = {
     "Google साइन-इन अभी कॉन्फ़िगर नहीं है। व्यवस्थापक से GOOGLE_CLIENT_ID और GOOGLE_CLIENT_SECRET सेट करवाएँ।",
   authGoogleDenied: "Google साइन-इन रद्द किया गया।",
   authGoogleFailed: "Google साइन-इन विफल। फिर कोशिश करें।",
+  authGoogleRedirectMismatch:
+    "Redirect URI मेल नहीं खाता। /api/auth/google/setup का redirectUri Google Console → Authorized redirect URIs में ठीक वैसा चिपकाएँ।",
+  authGoogleCredentials:
+    "Vercel (frontend) पर Google client ID/secret गलत है। GOOGLE_CLIENT_ID और GOOGLE_CLIENT_SECRET जाँचें।",
+  authGoogleTokenFailed:
+    "Google token exchange विफल। OAuth client Web application हो और redirect URI पंजीकृत हो।",
+  authGoogleUserinfoFailed:
+    "Google खाता मिला पर ईमेल नहीं पढ़ा। OAuth consent में email scope हो।",
+  authGoogleStateFailed:
+    "साइन-इन सत्र समाप्त (state cookie गायब)। एक टैब, एक URL, ad blocker बंद करके फिर कोशिश करें।",
+  authGoogleSessionFailed:
+    "साइन-इन लगभग हुआ पर session cookie खो गई। फिर कोशिश करें या ईमेल से साइन इन करें।",
   authAlreadySignedIn: "आप पहले से साइन इन हैं —",
   authContinueApp: "ऐप पर जाएँ",
   authSignOutSwitch: "साइन आउट",

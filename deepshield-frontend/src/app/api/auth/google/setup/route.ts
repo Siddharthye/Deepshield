@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { resolveGoogleRedirectUri } from "@/lib/googleOAuth";
+import {
+  getGoogleClientId,
+  isGoogleOAuthConfigured,
+  resolveGoogleRedirectUri,
+} from "@/lib/googleOAuth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -8,11 +12,16 @@ export const runtime = "nodejs";
 /** Returns the redirect URI to register in Google Cloud Console (for setup debugging). */
 export async function GET(request: NextRequest) {
   const redirectUri = resolveGoogleRedirectUri(request);
+  const clientId = getGoogleClientId();
   return NextResponse.json(
     {
+      ok: isGoogleOAuthConfigured(),
+      origin: request.nextUrl.origin,
       redirectUri,
+      clientIdHint: clientId ? `${clientId.slice(0, 12)}…` : null,
+      envRedirectOverride: Boolean(process.env.GOOGLE_REDIRECT_URI?.trim()),
       instructions:
-        "Google Cloud Console → APIs & Services → Credentials → your OAuth Web client → Authorized redirect URIs → add redirectUri exactly (including https and path).",
+        "Add redirectUri exactly under Google Cloud Console → Credentials → OAuth Web client → Authorized redirect URIs. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET on the FRONTEND Vercel project.",
     },
     {
       headers: {

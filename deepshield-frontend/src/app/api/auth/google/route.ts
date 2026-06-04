@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import {
   buildGoogleAuthUrl,
+  getGoogleClientId,
   GOOGLE_AUTH_COOKIE_FROM,
+  GOOGLE_AUTH_COOKIE_REDIRECT,
   GOOGLE_AUTH_COOKIE_STATE,
   isGoogleOAuthConfigured,
+  oauthCookieSecure,
   resolveGoogleRedirectUri,
 } from "@/lib/googleOAuth";
 
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const clientId = process.env.GOOGLE_CLIENT_ID!;
+  const clientId = getGoogleClientId();
   const redirectUri = resolveGoogleRedirectUri(request);
   const state = crypto.randomUUID();
   const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
@@ -31,10 +34,9 @@ export async function GET(request: NextRequest) {
     buildGoogleAuthUrl({ clientId, redirectUri, state }),
   );
 
-  const secure = process.env.NODE_ENV === "production";
   const cookieBase = {
     httpOnly: true,
-    secure,
+    secure: oauthCookieSecure(request),
     sameSite: "lax" as const,
     path: "/",
     maxAge: 600,
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
 
   response.cookies.set(GOOGLE_AUTH_COOKIE_STATE, state, cookieBase);
   response.cookies.set(GOOGLE_AUTH_COOKIE_FROM, returnTo, cookieBase);
+  response.cookies.set(GOOGLE_AUTH_COOKIE_REDIRECT, redirectUri, cookieBase);
 
   return response;
 }

@@ -241,6 +241,18 @@ export const EN = {
     "Google sign-in is not configured yet. Ask your admin to set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
   authGoogleDenied: "Google sign-in was cancelled.",
   authGoogleFailed: "Google sign-in failed. Please try again.",
+  authGoogleRedirectMismatch:
+    "Redirect URI mismatch. Copy the redirectUri from /api/auth/google/setup into Google Console → Credentials → Authorized redirect URIs (exact match).",
+  authGoogleCredentials:
+    "Invalid Google OAuth client ID or secret on Vercel (frontend project). Check GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
+  authGoogleTokenFailed:
+    "Google token exchange failed. Confirm OAuth client type is Web application and redirect URI is registered.",
+  authGoogleUserinfoFailed:
+    "Google returned your account but we could not read your email. Ensure the OAuth consent screen includes email scope.",
+  authGoogleStateFailed:
+    "Sign-in session expired (state cookie missing). Disable ad blockers, use one tab, and try again on the same site URL.",
+  authGoogleSessionFailed:
+    "Sign-in almost worked but the session cookie was lost. Try again, or use email sign-in.",
   authAlreadySignedIn: "You are already signed in as",
   authContinueApp: "Continue to app",
   authSignOutSwitch: "Sign out",

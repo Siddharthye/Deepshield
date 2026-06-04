@@ -5,15 +5,29 @@ import type { AuthUser } from "@/lib/authStorage";
 import {
   exchangeGoogleCode,
   fetchGoogleUserInfo,
+  getGoogleClientId,
+  getGoogleClientSecret,
   GOOGLE_AUTH_COOKIE_FROM,
+  GOOGLE_AUTH_COOKIE_REDIRECT,
   GOOGLE_AUTH_COOKIE_STATE,
   isGoogleOAuthConfigured,
+  mapGoogleOAuthError,
+  oauthCookieSecure,
   PENDING_USER_COOKIE,
   resolveGoogleRedirectUri,
 } from "@/lib/googleOAuth";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 function clearAuthCookies(response: NextResponse) {
-  for (const name of [AUTH_COOKIE, PENDING_USER_COOKIE, GOOGLE_AUTH_COOKIE_STATE, GOOGLE_AUTH_COOKIE_FROM]) {
+  for (const name of [
+    AUTH_COOKIE,
+    PENDING_USER_COOKIE,
+    GOOGLE_AUTH_COOKIE_STATE,
+    GOOGLE_AUTH_COOKIE_FROM,
+    GOOGLE_AUTH_COOKIE_REDIRECT,
+  ]) {
     response.cookies.set(name, "", { path: "/", maxAge: 0 });
   }
 }
@@ -45,12 +59,19 @@ export async function GET(request: NextRequest) {
   const savedState = request.cookies.get(GOOGLE_AUTH_COOKIE_STATE)?.value;
 
   if (!code || !state || !savedState || state !== savedState) {
+    console.error("[google/callback] oauth_state mismatch", {
+      hasCode: Boolean(code),
+      hasState: Boolean(state),
+      hasSavedState: Boolean(savedState),
+    });
     return redirectToLogin(request, "oauth_state");
   }
 
-  const clientId = process.env.GOOGLE_CLIENT_ID!;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET!;
-  const redirectUri = resolveGoogleRedirectUri(request);
+  const clientId = getGoogleClientId();
+  const clientSecret = getGoogleClientSecret();
+  const redirectUri =
+    request.cookies.get(GOOGLE_AUTH_COOKIE_REDIRECT)?.value ||
+    resolveGoogleRedirectUri(request);
   const returnTo =
     request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value?.startsWith("/") &&
     !request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value?.startsWith("//")
@@ -72,21 +93,21 @@ export async function GET(request: NextRequest) {
     completeUrl.searchParams.set("from", returnTo);
 
     const response = NextResponse.redirect(completeUrl);
-    const secure = process.env.NODE_ENV === "production";
 
-    // Session cookie is set only after /auth/complete writes sessionStorage.
     response.cookies.set(PENDING_USER_COOKIE, JSON.stringify(user), {
       path: "/",
       maxAge: 300,
       sameSite: "lax",
-      secure,
+      secure: oauthCookieSecure(request),
       httpOnly: false,
     });
     response.cookies.set(GOOGLE_AUTH_COOKIE_STATE, "", { path: "/", maxAge: 0 });
     response.cookies.set(GOOGLE_AUTH_COOKIE_FROM, "", { path: "/", maxAge: 0 });
+    response.cookies.set(GOOGLE_AUTH_COOKIE_REDIRECT, "", { path: "/", maxAge: 0 });
 
     return response;
-  } catch {
-    return redirectToLogin(request, "google_failed");
+  } catch (error) {
+    console.error("[google/callback]", error);
+    return redirectToLogin(request, mapGoogleOAuthError(error));
   }
 }

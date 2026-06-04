@@ -16,8 +16,12 @@ const OAUTH_ERROR_KEYS: Record<string, I18nKey> = {
   google_not_configured: "authGoogleNotConfigured",
   google_denied: "authGoogleDenied",
   google_failed: "authGoogleFailed",
-  oauth_state: "authGoogleFailed",
-  oauth_missing: "authGoogleFailed",
+  google_redirect: "authGoogleRedirectMismatch",
+  google_credentials: "authGoogleCredentials",
+  google_token: "authGoogleTokenFailed",
+  google_userinfo: "authGoogleUserinfoFailed",
+  oauth_state: "authGoogleStateFailed",
+  oauth_missing: "authGoogleSessionFailed",
   access_denied: "authGoogleDenied",
 };
 
