@@ -61,6 +61,7 @@ export function AuthForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleRedirectUri, setGoogleRedirectUri] = useState<string | null>(null);
 
   useEffect(() => {
     const oauthError = searchParams.get("error");
@@ -68,6 +69,17 @@ export function AuthForm() {
     const key = OAUTH_ERROR_KEYS[oauthError];
     setError(key ? t(key) : t("authGoogleFailed"));
   }, [searchParams, t]);
+
+  useEffect(() => {
+    void fetch("/api/auth/google/setup")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { redirectUri?: string } | null) => {
+        if (data?.redirectUri) setGoogleRedirectUri(data.redirectUri);
+      })
+      .catch(() => {
+        /* optional setup hint */
+      });
+  }, []);
 
   function switchMode(next: Mode) {
     setMode(next);
@@ -267,9 +279,15 @@ export function AuthForm() {
           </button>
         </p>
 
-        <p className="mt-4 rounded-2xl bg-secondary/8 px-3 py-2 text-center text-[11px] leading-relaxed text-ink-subtle">
-          {t("authGoogleNote")}
-        </p>
+        <div className="mt-4 space-y-2 rounded-2xl bg-secondary/8 px-3 py-2.5 text-center text-[11px] leading-relaxed text-ink-subtle">
+          <p>{t("authGoogleNote")}</p>
+          {googleRedirectUri && (
+            <p className="break-all font-mono text-[10px] text-ink-muted">
+              {googleRedirectUri}
+            </p>
+          )}
+          <p className="text-[10px]">{t("authGoogleRedirectHelp")}</p>
+        </div>
       </GlassCard>
 
       <p className="mt-4 text-center text-xs text-ink-subtle">

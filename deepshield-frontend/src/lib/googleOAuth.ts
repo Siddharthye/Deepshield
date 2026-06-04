@@ -1,9 +1,43 @@
+import type { NextRequest } from "next/server";
+
 export const GOOGLE_AUTH_COOKIE_STATE = "google_oauth_state";
 export const GOOGLE_AUTH_COOKIE_FROM = "google_oauth_from";
 export const PENDING_USER_COOKIE = "deepshield_user_pending";
 
-export function getGoogleRedirectUri(origin: string): string {
-  return `${origin.replace(/\/$/, "")}/api/auth/google/callback`;
+/** Canonical site origin for OAuth (must match Google Console redirect URIs). */
+export function getGoogleOAuthBaseUrl(request: NextRequest): string {
+  const explicit = process.env.GOOGLE_REDIRECT_URI?.trim();
+  if (explicit) {
+    return explicit
+      .replace(/\/api\/auth\/google\/callback\/?$/i, "")
+      .replace(/\/$/, "");
+  }
+
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  if (forwardedHost) {
+    const proto = request.headers.get("x-forwarded-proto") ?? "https";
+    const host = forwardedHost.split(",")[0]?.trim();
+    if (host) return `${proto}://${host}`.replace(/\/$/, "");
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+    if (appUrl) return appUrl.replace(/\/$/, "");
+  }
+
+  return request.nextUrl.origin.replace(/\/$/, "");
+}
+
+export function getGoogleRedirectUri(baseUrl: string): string {
+  return `${baseUrl.replace(/\/$/, "")}/api/auth/google/callback`;
+}
+
+export function resolveGoogleRedirectUri(request: NextRequest): string {
+  return getGoogleRedirectUri(getGoogleOAuthBaseUrl(request));
+}
+
+export function appUrl(request: NextRequest, pathname: string): URL {
+  return new URL(pathname, `${getGoogleOAuthBaseUrl(request)}/`);
 }
 
 export function buildGoogleAuthUrl(params: {

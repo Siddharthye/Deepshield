@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import {
   buildGoogleAuthUrl,
-  getGoogleRedirectUri,
   GOOGLE_AUTH_COOKIE_FROM,
   GOOGLE_AUTH_COOKIE_STATE,
   isGoogleOAuthConfigured,
+  resolveGoogleRedirectUri,
 } from "@/lib/googleOAuth";
 
 function safeReturnPath(from: string | null): string {
@@ -23,8 +23,7 @@ export async function GET(request: NextRequest) {
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID!;
-  const origin = request.nextUrl.origin;
-  const redirectUri = getGoogleRedirectUri(origin);
+  const redirectUri = resolveGoogleRedirectUri(request);
   const state = crypto.randomUUID();
   const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
 

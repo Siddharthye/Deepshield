@@ -3,19 +3,22 @@ import type { NextRequest } from "next/server";
 import { AUTH_COOKIE } from "@/lib/authStorage";
 import type { AuthUser } from "@/lib/authStorage";
 import {
+  appUrl,
   exchangeGoogleCode,
   fetchGoogleUserInfo,
-  getGoogleRedirectUri,
   GOOGLE_AUTH_COOKIE_FROM,
   GOOGLE_AUTH_COOKIE_STATE,
   isGoogleOAuthConfigured,
   PENDING_USER_COOKIE,
+  resolveGoogleRedirectUri,
 } from "@/lib/googleOAuth";
 
 const COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
 
 function redirectToLogin(request: NextRequest, error: string) {
-  return NextResponse.redirect(new URL(`/login?error=${error}`, request.url));
+  const login = appUrl(request, "/login");
+  login.searchParams.set("error", error);
+  return NextResponse.redirect(login);
 }
 
 export async function GET(request: NextRequest) {
@@ -39,8 +42,7 @@ export async function GET(request: NextRequest) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID!;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET!;
-  const origin = request.nextUrl.origin;
-  const redirectUri = getGoogleRedirectUri(origin);
+  const redirectUri = resolveGoogleRedirectUri(request);
   const returnTo =
     request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value?.startsWith("/") &&
     !request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value?.startsWith("//")
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
       picture: profile.picture,
     };
 
-    const completeUrl = new URL("/auth/complete", request.url);
+    const completeUrl = appUrl(request, "/auth/complete");
     completeUrl.searchParams.set("from", returnTo);
 
     const response = NextResponse.redirect(completeUrl);
