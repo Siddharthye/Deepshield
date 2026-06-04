@@ -1,12 +1,14 @@
 {
   "rewrites": [
-    {
-      "source": "/api/auth/:path*",
-      "destination": "/api/auth/:path*"
-    },
-    {
-      "source": "/api/:path*",
-      "destination": "https://deepshield-xi.vercel.app/api/:path*"
-    }
+    { "source": "/api/scan-image", "destination": "https://deepshield-xi.vercel.app/api/scan-image" },
+    { "source": "/api/scan-video-frame", "destination": "https://deepshield-xi.vercel.app/api/scan-video-frame" },
+    { "source": "/api/explain", "destination": "https://deepshield-xi.vercel.app/api/explain" },
+    { "source": "/api/asha-chat", "destination": "https://deepshield-xi.vercel.app/api/asha-chat" },
+    { "source": "/api/rights-explainer", "destination": "https://deepshield-xi.vercel.app/api/rights-explainer" },
+    { "source": "/api/translate", "destination": "https://deepshield-xi.vercel.app/api/translate" },
+    { "source": "/api/moderate-post", "destination": "https://deepshield-xi.vercel.app/api/moderate-post" },
+    { "source": "/api/reverse-trace", "destination": "https://deepshield-xi.vercel.app/api/reverse-trace" },
+    { "source": "/api/trace-upload", "destination": "https://deepshield-xi.vercel.app/api/trace-upload" },
+    { "source": "/api/trace-image-proxy", "destination": "https://deepshield-xi.vercel.app/api/trace-image-proxy" }
   ]
 }
