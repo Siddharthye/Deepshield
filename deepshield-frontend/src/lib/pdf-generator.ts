@@ -1,11 +1,19 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import { t, type LanguageCode } from "@/lib/i18n";
 import type { ScanSession } from "./types";
 import type { TraceHit } from "./traceStorage";
 import { verdictLabelKey } from "./riskScoring";
 
-const INK = rgb(0.35, 0.33, 0.3);
-const PEACH = rgb(0.99, 0.84, 0.76);
+const MARGIN_X = 50;
+const MARGIN_BOTTOM = 72;
+const CONTENT_WIDTH = 495;
+const PAGE_HEIGHT = 842;
+
+const INK = rgb(0.17, 0.11, 0.09);
+const INK_MUTED = rgb(0.29, 0.2, 0.18);
+const HEADER_BG = rgb(0.29, 0.04, 0.04);
+const HEADER_TEXT = rgb(0.95, 0.91, 0.84);
+const RULE = rgb(0.75, 0.65, 0.55);
 
 async function embedScanImage(doc: PDFDocument, dataUrl: string) {
   const base64 = dataUrl.split(",")[1];
@@ -17,6 +25,134 @@ async function embedScanImage(doc: PDFDocument, dataUrl: string) {
   return doc.embedJpg(bytes);
 }
 
+function wrapParagraph(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+  const normalized = text.replace(/\r\n/g, "\n").trim();
+  if (!normalized) return [];
+
+  const lines: string[] = [];
+  for (const paragraph of normalized.split("\n")) {
+    const words = paragraph.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) {
+      lines.push("");
+      continue;
+    }
+    let line = "";
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (font.widthOfTextAtSize(candidate, size) > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    }
+    if (line) lines.push(line);
+  }
+  return lines;
+}
+
+type PdfWriter = {
+  doc: PDFDocument;
+  page: PDFPage;
+  font: PDFFont;
+  bold: PDFFont;
+  y: number;
+  pageIndex: number;
+  ensureSpace: (needed: number) => void;
+  drawLines: (
+    text: string,
+    opts?: { size?: number; bold?: boolean; color?: ReturnType<typeof rgb>; gap?: number },
+  ) => void;
+  drawSectionTitle: (text: string) => void;
+  drawRule: () => void;
+};
+
+function createWriter(doc: PDFDocument, font: PDFFont, bold: PDFFont): PdfWriter {
+  let page = doc.addPage([595, PAGE_HEIGHT]);
+  let y = 760;
+  let pageIndex = 1;
+
+  const ensureSpace = (needed: number) => {
+    if (y - needed >= MARGIN_BOTTOM) return;
+    page = doc.addPage([595, PAGE_HEIGHT]);
+    pageIndex += 1;
+    y = 760;
+    page.drawText(`DeepShield · ${pageIndex}`, {
+      x: MARGIN_X,
+      y: 36,
+      size: 8,
+      font,
+      color: INK_MUTED,
+    });
+  };
+
+  const drawLines = (
+    text: string,
+    opts?: { size?: number; bold?: boolean; color?: ReturnType<typeof rgb>; gap?: number },
+  ) => {
+    const size = opts?.size ?? 10;
+    const f = opts?.bold ? bold : font;
+    const color = opts?.color ?? INK_MUTED;
+    const gap = opts?.gap ?? 3;
+    const lineHeight = size + gap;
+
+    for (const line of wrapParagraph(text, f, size, CONTENT_WIDTH)) {
+      ensureSpace(lineHeight);
+      if (line) {
+        page.drawText(line, { x: MARGIN_X, y, size, font: f, color });
+      }
+      y -= lineHeight;
+    }
+  };
+
+  const drawSectionTitle = (text: string) => {
+    ensureSpace(28);
+    y -= 8;
+    page.drawText(text, { x: MARGIN_X, y, size: 12, font: bold, color: INK });
+    y -= 18;
+  };
+
+  const drawRule = () => {
+    ensureSpace(12);
+    y -= 4;
+    page.drawLine({
+      start: { x: MARGIN_X, y },
+      end: { x: MARGIN_X + CONTENT_WIDTH, y },
+      thickness: 0.5,
+      color: RULE,
+    });
+    y -= 10;
+  };
+
+  return {
+    doc,
+    get page() {
+      return page;
+    },
+    set page(p: PDFPage) {
+      page = p;
+    },
+    font,
+    bold,
+    get y() {
+      return y;
+    },
+    set y(v: number) {
+      y = v;
+    },
+    get pageIndex() {
+      return pageIndex;
+    },
+    set pageIndex(v: number) {
+      pageIndex = v;
+    },
+    ensureSpace,
+    drawLines,
+    drawSectionTitle,
+    drawRule,
+  };
+}
+
 export async function generateEvidencePdf(
   scan: ScanSession,
   traceUrls: string[],
@@ -26,112 +162,128 @@ export async function generateEvidencePdf(
 ) {
   const L = (key: Parameters<typeof t>[1]) => t(lang, key);
   const doc = await PDFDocument.create();
-  let page = doc.addPage([595, 842]);
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const w = createWriter(doc, font, bold);
 
-  let y = 800;
-  const draw = (text: string, size = 11, useBold = false) => {
-    if (y < 80) {
-      page = doc.addPage([595, 842]);
-      y = 800;
-    }
-    page.drawText(text, {
-      x: 50,
-      y,
-      size,
-      font: useBold ? bold : font,
-      color: INK,
-      maxWidth: 495,
-    });
-    y -= size + 10;
-  };
-
-  page.drawRectangle({ x: 0, y: 780, width: 595, height: 62, color: PEACH });
-  page.drawText(L("pdfTitle"), {
-    x: 50,
-    y: 805,
-    size: 18,
+  w.page.drawRectangle({ x: 0, y: 778, width: 595, height: 64, color: HEADER_BG });
+  w.page.drawText(L("pdfTitle"), {
+    x: MARGIN_X,
+    y: 808,
+    size: 16,
     font: bold,
-    color: INK,
+    color: HEADER_TEXT,
+  });
+  w.page.drawText(`${L("pdfGenerated")} ${new Date(scan.scannedAt).toLocaleString()}`, {
+    x: MARGIN_X,
+    y: 788,
+    size: 9,
+    font,
+    color: HEADER_TEXT,
   });
 
-  y = 740;
-  draw(`${L("pdfGenerated")} ${new Date(scan.scannedAt).toLocaleString()}`, 10);
-  draw(
+  w.y = 748;
+  w.drawLines(
     `${L("pdfVerdict")} ${L(verdictLabelKey(scan.risk.verdict))} (${scan.risk.finalRisk}% ${L("pdfManipulationRisk")})`,
-    12,
-    true,
+    { size: 11, bold: true, color: INK, gap: 4 },
   );
+  w.drawRule();
 
   try {
     const img = await embedScanImage(doc, scan.imageDataUrl);
     if (img) {
-      const dims = img.scale(0.35);
-      if (y - dims.height < 60) {
-        page = doc.addPage([595, 842]);
-        y = 750;
-      }
-      page.drawImage(img, { x: 50, y: y - dims.height, width: dims.width, height: dims.height });
-      y -= dims.height + 16;
-      draw(L("pdfScanCapture"), 9);
+      const maxW = 220;
+      const scale = Math.min(maxW / img.width, 1);
+      const dims = img.scale(scale);
+      w.ensureSpace(dims.height + 28);
+      w.page.drawImage(img, {
+        x: MARGIN_X,
+        y: w.y - dims.height,
+        width: dims.width,
+        height: dims.height,
+      });
+      w.y -= dims.height + 10;
+      w.drawLines(L("pdfScanCapture"), { size: 9 });
+      w.y -= 4;
     }
   } catch {
-    /* skip image if embed fails */
+    /* skip */
   }
 
   if (scan.heatmapDataUrl) {
     try {
       const hm = await embedScanImage(doc, scan.heatmapDataUrl);
       if (hm) {
-        const dims = hm.scale(0.35);
-        if (y - dims.height < 60) {
-          page = doc.addPage([595, 842]);
-          y = 750;
-        }
-        page.drawImage(hm, { x: 50, y: y - dims.height, width: dims.width, height: dims.height });
-        y -= dims.height + 16;
-        draw(L("pdfHeatmapCapture"), 9);
+        const maxW = 220;
+        const scale = Math.min(maxW / hm.width, 1);
+        const dims = hm.scale(scale);
+        w.ensureSpace(dims.height + 28);
+        w.page.drawImage(hm, {
+          x: MARGIN_X,
+          y: w.y - dims.height,
+          width: dims.width,
+          height: dims.height,
+        });
+        w.y -= dims.height + 10;
+        w.drawLines(L("pdfHeatmapCapture"), { size: 9 });
+        w.y -= 4;
       }
     } catch {
-      /* skip heatmap if embed fails */
+      /* skip */
     }
   }
 
-  draw(
+  w.drawSectionTitle(L("pdfRiskAnalysis"));
+  w.drawLines(
     `${L("pdfModelLine")} ${(scan.risk.breakdown.modelScore * 100).toFixed(0)}% · ${L("pdfArtifacts")} ${(scan.risk.breakdown.artifactScore * 100).toFixed(0)}% · ${L("pdfSymmetry")} ${(scan.risk.breakdown.symmetryScore * 100).toFixed(0)}%`,
   );
 
   if (legalSummary) {
-    y -= 6;
-    draw(L("pdfLegalSummary"), 13, true);
-    draw(legalSummary);
+    w.drawRule();
+    w.drawSectionTitle(L("pdfLegalSummary"));
+    w.drawLines(legalSummary, { size: 10, gap: 5 });
   } else if (scan.explain) {
-    y -= 6;
-    draw(L("pdfSummary"), 13, true);
-    draw(scan.explain.explanation);
-    draw(`${L("pdfRecommendation")} ${scan.explain.recommendation}`, 10, true);
+    w.drawRule();
+    w.drawSectionTitle(L("pdfSummary"));
+    w.drawLines(scan.explain.explanation, { size: 10, gap: 5 });
+    w.y -= 4;
+    w.drawLines(`${L("pdfRecommendation")} ${scan.explain.recommendation}`, {
+      size: 10,
+      bold: true,
+      color: INK,
+      gap: 5,
+    });
   }
 
-  y -= 6;
-  draw(L("pdfApplicableLaws"), 13, true);
-  draw(L("pdfLawsList"));
+  w.drawRule();
+  w.drawSectionTitle(L("pdfApplicableLaws"));
+  w.drawLines(L("pdfLawsList"));
 
   if (traceHits.length) {
-    y -= 6;
-    draw(L("pdfTraceLog"), 13, true);
+    w.drawRule();
+    w.drawSectionTitle(L("pdfTraceLog"));
     traceHits.slice(0, 10).forEach((h) => {
-      draw(`${h.platform} — ${h.title}`, 10, true);
-      draw(h.url, 9);
-      draw(`${L("pdfFirstSeen")} ${h.firstSeen}`, 9);
+      w.drawLines(`${h.platform} — ${h.title}`, { bold: true, color: INK });
+      w.drawLines(h.url, { size: 9 });
+      w.drawLines(`${L("pdfFirstSeen")} ${h.firstSeen}`, { size: 9 });
+      w.y -= 4;
     });
   } else if (traceUrls.length) {
-    y -= 6;
-    draw(L("pdfUrlsFound"), 13, true);
-    traceUrls.slice(0, 12).forEach((u) => draw(`• ${u}`, 9));
+    w.drawRule();
+    w.drawSectionTitle(L("pdfUrlsFound"));
+    traceUrls.slice(0, 12).forEach((u) => w.drawLines(`• ${u}`, { size: 9 }));
   }
 
-  draw(L("pdfFilingHint"), 10, true);
+  w.drawRule();
+  w.drawLines(L("pdfFilingHint"), { size: 10, bold: true, color: INK });
+
+  w.page.drawText(`DeepShield · ${w.pageIndex}`, {
+    x: MARGIN_X,
+    y: 36,
+    size: 8,
+    font,
+    color: INK_MUTED,
+  });
 
   const bytes = await doc.save();
   return new Blob([new Uint8Array(bytes)], { type: "application/pdf" });

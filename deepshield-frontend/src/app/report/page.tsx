@@ -103,7 +103,14 @@ export default function ReportPage() {
               {summaryLoading ? t("reportGeneratingSummary") : t("reportGenerateSummary")}
             </Button>
             {legalSummary && (
-              <p className="rounded-xl bg-blue/30 p-4 text-sm leading-relaxed">{legalSummary}</p>
+              <div className="rounded-xl border border-secondary/12 bg-cream-deep/90 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
+                  {t("pdfLegalSummary")}
+                </p>
+                <div className="mt-3 max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-[1.65] text-ink-muted">
+                  {legalSummary}
+                </div>
+              </div>
             )}
             <div className="flex flex-wrap gap-3">
               <Button variant="primary" onClick={() => void downloadPdf()} disabled={pdfLoading}>
@@ -128,7 +135,7 @@ export default function ReportPage() {
         </div>
       )}
 
-      <div className="mt-10">
+      <div className="mt-12 border-t border-secondary/15 pt-10">
         <CyberReportForm />
       </div>
     </div>

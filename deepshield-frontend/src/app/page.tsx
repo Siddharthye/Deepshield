@@ -21,11 +21,12 @@ export default function HomePage() {
     <div key={language} className="relative overflow-x-hidden pt-16">
       <HeroSection />
 
+      <div className="home-flow">
       <HomeCrisisStrip />
       <HomeProblem />
       <WaveDivider />
 
-      <section className="mx-auto max-w-6xl px-4 pb-8">
+      <section className="mx-auto max-w-6xl px-4 pb-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <GlassCard className="py-8 text-center" tilt>
             <p className="font-display text-4xl text-ink">
@@ -61,6 +62,7 @@ export default function HomePage() {
       <HowItWorksPinned />
       <Testimonials />
       <HomeFaq />
+      </div>
     </div>
   );
 }
