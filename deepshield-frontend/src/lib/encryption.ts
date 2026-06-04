@@ -38,3 +38,9 @@ export function saveVaultRecords(pin: string, records: VaultRecord[]) {
   const encrypted = encryptPayload(JSON.stringify(records), pin);
   localStorage.setItem(VAULT_KEY, encrypted);
 }
+
+/** Removes encrypted vault blob from localStorage (forgot-PIN reset). */
+export function clearVault(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(VAULT_KEY);
+}

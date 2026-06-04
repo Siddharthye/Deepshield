@@ -9,6 +9,7 @@ import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { useLanguage } from "@/context/LanguageContext";
 import type { I18nKey } from "@/lib/i18n";
 import {
+  clearVault,
   loadVaultRecords,
   saveVaultRecords,
   vaultExists,
@@ -93,9 +94,18 @@ export function VaultManager() {
   const [preview, setPreview] = useState<VaultRecord | null>(null);
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
+  const [resetWarningOpen, setResetWarningOpen] = useState(false);
+  const [changePinOpen, setChangePinOpen] = useState(false);
+  const [changePinStep, setChangePinStep] = useState<"create" | "confirm">("create");
+  const [changePinDraft, setChangePinDraft] = useState("");
+  const [changePinValue, setChangePinValue] = useState("");
+  const [changeConfirmValue, setChangeConfirmValue] = useState("");
+  const [changePinNotice, setChangePinNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const pinInputRef = useRef<HTMLInputElement>(null);
   const confirmInputRef = useRef<HTMLInputElement>(null);
+  const changePinInputRef = useRef<HTMLInputElement>(null);
+  const changeConfirmInputRef = useRef<HTMLInputElement>(null);
   const pinAdvanceTimer = useRef<number | null>(null);
   const confirmAdvanceTimer = useRef<number | null>(null);
 
@@ -145,6 +155,18 @@ export function VaultManager() {
     }, 200);
     return () => window.clearTimeout(id);
   }, [pin, mode, setupStep]);
+
+  useEffect(() => {
+    if (!changePinOpen) return;
+    const id = window.setTimeout(() => {
+      if (changePinStep === "confirm") {
+        changeConfirmInputRef.current?.focus();
+      } else {
+        changePinInputRef.current?.focus();
+      }
+    }, 200);
+    return () => window.clearTimeout(id);
+  }, [changePinOpen, changePinStep]);
 
   function flashShield() {
     setShield(true);
@@ -233,7 +255,73 @@ export function VaultManager() {
     setConfirmValue("");
     setDraftPin("");
     setSetupStep("create");
+    setResetWarningOpen(false);
+    setChangePinOpen(false);
     setMode(vaultExists() ? "unlock" : "setup");
+  }
+
+  function resetVaultPin() {
+    clearVault();
+    sessionStorage.removeItem("deepshield_vault_pin");
+    setPin(null);
+    setRecords([]);
+    setPinValue("");
+    setConfirmValue("");
+    setDraftPin("");
+    setSetupStep("create");
+    setResetWarningOpen(false);
+    setMode("setup");
+    flashShield();
+  }
+
+  function closeChangePin() {
+    setChangePinOpen(false);
+    setChangePinStep("create");
+    setChangePinDraft("");
+    setChangePinValue("");
+    setChangeConfirmValue("");
+    setPinMismatch(false);
+  }
+
+  function goToChangePinConfirm(entered: string) {
+    setChangePinDraft(entered);
+    setChangePinStep("confirm");
+    setChangeConfirmValue("");
+    window.setTimeout(() => changeConfirmInputRef.current?.focus(), 50);
+  }
+
+  function applyNewPin(entered: string, confirm: string) {
+    if (!pin) return;
+    if (entered !== confirm) {
+      setPinMismatch(true);
+      setShake(true);
+      setChangeConfirmValue("");
+      setTimeout(() => {
+        setShake(false);
+        setPinMismatch(false);
+        changeConfirmInputRef.current?.focus();
+      }, 500);
+      return;
+    }
+    saveVaultRecords(entered, records);
+    sessionStorage.setItem("deepshield_vault_pin", entered);
+    setPin(entered);
+    closeChangePin();
+    setChangePinNotice(t("vaultChangePinSuccess"));
+    setTimeout(() => setChangePinNotice(null), 4000);
+    flashShield();
+  }
+
+  function onChangePinValueChange(value: string) {
+    setChangePinValue(value);
+    if (value.length !== 4) return;
+    window.setTimeout(() => goToChangePinConfirm(value), PIN_COMPLETE_DELAY_MS);
+  }
+
+  function onChangeConfirmValueChange(value: string) {
+    setChangeConfirmValue(value);
+    if (value.length !== 4) return;
+    window.setTimeout(() => applyNewPin(changePinDraft, value), PIN_COMPLETE_DELAY_MS);
   }
 
   function persist(next: VaultRecord[]) {
@@ -332,59 +420,87 @@ export function VaultManager() {
       <>
         <ShieldOverlay show={shield} />
         <GlassCard className="mx-auto max-w-sm">
-          <p className="mb-2 text-center font-display text-lg text-ink">
-            {mode === "setup" ? t("vaultSetupTitle") : t("vaultUnlock")}
-          </p>
-          <p className="mb-6 text-center text-sm text-ink-muted">
-            {mode === "setup" ? t("vaultSetupHint") : t("vaultPinPrompt")}
-          </p>
-          <div className="mb-4 space-y-4">
-            {mode === "setup" && setupStep === "confirm" ? (
-              <>
-                <p className="text-center text-xs text-ink-subtle">{t("vaultConfirmPin")}</p>
-                <PinPad
-                  value={confirmValue}
-                  onChange={onConfirmValueChange}
-                  inputRef={confirmInputRef}
-                  shake={shake}
-                  burst={burst}
-                />
-              </>
-            ) : (
-              <PinPad
-                value={pinValue}
-                onChange={onPinValueChange}
-                inputRef={pinInputRef}
-                shake={shake}
-                burst={burst}
-              />
-            )}
-          </div>
-          {pinMismatch && (
-            <p className="mb-4 text-center text-sm text-danger">{t("vaultPinMismatch")}</p>
+          {resetWarningOpen ? (
+            <div className="space-y-4">
+              <p className="text-center font-display text-lg text-ink">{t("vaultResetPinLink")}</p>
+              <p className="text-center text-sm leading-relaxed text-ink-muted">
+                {t("vaultResetWarning")}
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button variant="primary" className="w-full" onClick={resetVaultPin}>
+                  {t("vaultResetConfirm")}
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={() => setResetWarningOpen(false)}>
+                  {t("vaultResetCancel")}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="mb-2 text-center font-display text-lg text-ink">
+                {mode === "setup" ? t("vaultSetupTitle") : t("vaultUnlock")}
+              </p>
+              <p className="mb-6 text-center text-sm text-ink-muted">
+                {mode === "setup" ? t("vaultSetupHint") : t("vaultPinPrompt")}
+              </p>
+              <div className="mb-4 space-y-4">
+                {mode === "setup" && setupStep === "confirm" ? (
+                  <>
+                    <p className="text-center text-xs text-ink-subtle">{t("vaultConfirmPin")}</p>
+                    <PinPad
+                      value={confirmValue}
+                      onChange={onConfirmValueChange}
+                      inputRef={confirmInputRef}
+                      shake={shake}
+                      burst={burst}
+                    />
+                  </>
+                ) : (
+                  <PinPad
+                    value={pinValue}
+                    onChange={onPinValueChange}
+                    inputRef={pinInputRef}
+                    shake={shake}
+                    burst={burst}
+                  />
+                )}
+              </div>
+              {pinMismatch && (
+                <p className="mb-4 text-center text-sm text-danger">{t("vaultPinMismatch")}</p>
+              )}
+              <p className="mb-4 text-center text-xs text-ink-subtle">{t("vaultPinTapHint")}</p>
+              <Button
+                variant="dark"
+                className="w-full"
+                onClick={() => {
+                  if (mode === "setup") {
+                    if (setupStep === "create" && pinValue.length === 4) {
+                      goToConfirmStep(pinValue);
+                    } else if (setupStep === "confirm" && confirmValue.length === 4) {
+                      setupVault(draftPin, confirmValue);
+                    }
+                  } else if (pinValue.length === 4) {
+                    unlock(pinValue);
+                  }
+                }}
+              >
+                {mode === "setup"
+                  ? setupStep === "confirm"
+                    ? t("vaultCreate")
+                    : t("vaultConfirmPin")
+                  : t("vaultUnlock")}
+              </Button>
+              {mode === "unlock" && vaultExists() && (
+                <button
+                  type="button"
+                  onClick={() => setResetWarningOpen(true)}
+                  className="mt-4 w-full text-center text-xs font-medium text-link underline-offset-2 hover:underline"
+                >
+                  {t("vaultResetPinLink")}
+                </button>
+              )}
+            </>
           )}
-          <p className="mb-4 text-center text-xs text-ink-subtle">{t("vaultPinTapHint")}</p>
-          <Button
-            variant="dark"
-            className="w-full"
-            onClick={() => {
-              if (mode === "setup") {
-                if (setupStep === "create" && pinValue.length === 4) {
-                  goToConfirmStep(pinValue);
-                } else if (setupStep === "confirm" && confirmValue.length === 4) {
-                  setupVault(draftPin, confirmValue);
-                }
-              } else if (pinValue.length === 4) {
-                unlock(pinValue);
-              }
-            }}
-          >
-            {mode === "setup"
-              ? setupStep === "confirm"
-                ? t("vaultCreate")
-                : t("vaultConfirmPin")
-              : t("vaultUnlock")}
-          </Button>
         </GlassCard>
       </>
     );
@@ -411,6 +527,9 @@ export function VaultManager() {
           <Button variant="ghost" onClick={deleteAll} disabled={!records.length}>
             {t("vaultDeleteAll")}
           </Button>
+          <Button variant="ghost" onClick={() => setChangePinOpen(true)}>
+            {t("vaultChangePin")}
+          </Button>
           <Button variant="ghost" onClick={lockVault}>
             {t("vaultLock")}
           </Button>
@@ -428,7 +547,73 @@ export function VaultManager() {
         <p className="mt-4 text-xs text-ink-subtle">
           {records.length} {t("vaultItemCount")}
         </p>
+        {changePinNotice && (
+          <p className="mt-2 text-sm text-sage-deep" role="status">
+            {changePinNotice}
+          </p>
+        )}
       </GlassCard>
+
+      <AnimatePresence>
+        {changePinOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeChangePin}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+              <GlassCard className="mx-auto w-full max-w-sm space-y-4">
+                <p className="text-center font-display text-lg text-ink">{t("vaultChangePinTitle")}</p>
+                <p className="text-center text-sm text-ink-muted">{t("vaultChangePinHint")}</p>
+                <div className="space-y-4">
+                  {changePinStep === "confirm" ? (
+                    <>
+                      <p className="text-center text-xs text-ink-subtle">{t("vaultConfirmPin")}</p>
+                      <PinPad
+                        value={changeConfirmValue}
+                        onChange={onChangeConfirmValueChange}
+                        inputRef={changeConfirmInputRef}
+                        shake={shake}
+                      />
+                    </>
+                  ) : (
+                    <PinPad
+                      value={changePinValue}
+                      onChange={onChangePinValueChange}
+                      inputRef={changePinInputRef}
+                      shake={shake}
+                    />
+                  )}
+                </div>
+                {pinMismatch && (
+                  <p className="text-center text-sm text-danger">{t("vaultPinMismatch")}</p>
+                )}
+                <p className="text-center text-xs text-ink-subtle">{t("vaultPinTapHint")}</p>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => {
+                      if (changePinStep === "create" && changePinValue.length === 4) {
+                        goToChangePinConfirm(changePinValue);
+                      } else if (changePinStep === "confirm" && changeConfirmValue.length === 4) {
+                        applyNewPin(changePinDraft, changeConfirmValue);
+                      }
+                    }}
+                  >
+                    {changePinStep === "confirm" ? t("vaultChangePin") : t("vaultConfirmPin")}
+                  </Button>
+                  <Button variant="ghost" className="w-full" onClick={closeChangePin}>
+                    {t("vaultClose")}
+                  </Button>
+                </div>
+              </GlassCard>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {noteOpen && (
