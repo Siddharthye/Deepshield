@@ -206,8 +206,184 @@ body::before {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.hero-apple-glow {
-  backdrop-filter: blur(12px);
+/* Hero right panel — Apple-style product showcase (decorative only) */
+.hero-visual-shell {
+  border-radius: 2.75rem;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 252, 245, 0.92) 0%,
+    rgba(242, 232, 213, 0.55) 48%,
+    rgba(228, 210, 188, 0.35) 100%
+  );
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 32px 64px -12px rgba(75, 10, 10, 0.12),
+    0 8px 24px -8px rgba(75, 10, 10, 0.08);
+  border: 1px solid rgba(75, 10, 10, 0.08);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-visual-ambient {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    circle at 50% 35%,
+    rgba(244, 196, 208, 0.35) 0%,
+    transparent 55%
+  );
+}
+
+.hero-visual-mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 80%, rgba(163, 184, 142, 0.2), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 85% 20%, rgba(244, 196, 208, 0.25), transparent 45%);
+}
+
+.hero-visual-ring {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  border-radius: 50%;
+  border: 1px solid rgba(75, 10, 10, 0.07);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hero-visual-ring--a {
+  width: 78%;
+  height: 78%;
+  animation: hero-visual-spin 48s linear infinite;
+}
+
+.hero-visual-ring--b {
+  width: 58%;
+  height: 58%;
+  border-color: rgba(244, 196, 208, 0.22);
+  animation: hero-visual-spin 36s linear infinite reverse;
+}
+
+.hero-visual-flare {
+  position: absolute;
+  right: -8%;
+  top: 8%;
+  width: 45%;
+  height: 35%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 70%);
+  filter: blur(8px);
+}
+
+.hero-visual-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+.hero-visual-pedestal {
+  position: relative;
+  width: 72%;
+  max-width: 15.5rem;
+  transform: perspective(1200px) rotateY(-6deg) rotateX(3deg);
+  transform-style: preserve-3d;
+}
+
+.hero-visual-pedestal-shine {
+  position: absolute;
+  inset: -4%;
+  border-radius: 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0) 42%
+  );
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.hero-visual-pedestal-inner {
+  position: relative;
+  border-radius: 1.85rem;
+  background: linear-gradient(180deg, #fffdf9 0%, #f8f2e8 100%);
+  padding: 1.35rem 1.25rem 1.5rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 28px 56px -16px rgba(75, 10, 10, 0.18),
+    0 12px 28px -12px rgba(75, 10, 10, 0.1);
+  border: 1px solid rgba(75, 10, 10, 0.06);
+}
+
+.hero-visual-logo {
+  width: 100%;
+  height: auto;
+  border-radius: 1.25rem;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 20px rgba(75, 10, 10, 0.08));
+}
+
+.hero-visual-bezel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+}
+
+.hero-visual-bezel-dot {
+  position: absolute;
+  left: 1.35rem;
+  top: 1.35rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(75, 10, 10, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+.hero-visual-footer {
+  text-align: center;
+}
+
+.hero-visual-divider {
+  height: 1px;
+  width: 3rem;
+  margin: 0 auto 1rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(75, 10, 10, 0.15),
+    transparent
+  );
+}
+
+.hero-visual-caption {
+  margin: 0 auto;
+  max-width: 16rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: var(--color-ink-muted, #5c4a52);
+}
+
+@keyframes hero-visual-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-visual-ring--a,
+  .hero-visual-ring--b {
+    animation: none;
+  }
 }
 
 .hero-apple-card {

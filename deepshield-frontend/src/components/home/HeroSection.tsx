@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { ButtonLink } from "@/components/ui/Button";
+import { HeroVisualPanel } from "@/components/home/HeroVisualPanel";
 import { useLanguage } from "@/context/LanguageContext";
 import type { I18nKey } from "@/lib/i18n";
 
@@ -35,7 +35,7 @@ export function HeroSection() {
         aria-hidden
       />
 
-      <div className="relative grid items-center gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)] lg:gap-16">
+      <div className="relative grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(300px,0.95fr)] lg:gap-12 xl:gap-16">
         <motion.div
           {...fadeUp}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
@@ -80,31 +80,7 @@ export function HeroSection() {
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.12, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto flex w-full max-w-sm flex-col items-center lg:max-w-none"
-        >
-          <div className="hero-apple-glow relative flex aspect-square w-full max-w-[min(100%,22rem)] items-center justify-center rounded-[2.5rem] bg-gradient-to-b from-cream-deep/90 to-parchment/40 p-10 shadow-[0_24px_80px_rgba(75,10,10,0.08)] ring-1 ring-secondary/10 md:rounded-[3rem] md:p-12">
-            <div
-              className="pointer-events-none absolute inset-6 rounded-[2rem] bg-gradient-to-br from-pink/25 via-transparent to-sage/15"
-              aria-hidden
-            />
-            <Image
-              src="/images/ds-logo.jpeg"
-              alt={t("brandAlt")}
-              width={160}
-              height={160}
-              className="relative h-28 w-28 rounded-[1.75rem] object-contain shadow-lg ring-1 ring-secondary/15 md:h-36 md:w-36"
-              priority
-              unoptimized
-            />
-          </div>
-          <p className="mt-8 max-w-xs text-center text-sm leading-relaxed text-ink-muted lg:max-w-sm">
-            {t("heroVisualCaption")}
-          </p>
-        </motion.div>
+        <HeroVisualPanel logoAlt={t("brandAlt")} caption={t("heroVisualCaption")} />
       </div>
 
       <motion.div
