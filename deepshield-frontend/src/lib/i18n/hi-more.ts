@@ -169,6 +169,8 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   scanStepPrepare: "छवि तैयार हो रही है…",
   scanPleaseWait: "विश्लेषण पृष्ठभूमि में चल रहा है — कुछ सेकंड लग सकते हैं।",
   scanExplainLoading: "व्याख्या तैयार हो रही है…",
+  scanSightengineUnavailable:
+    "Sightengine तक नहीं पहुँचे (backend पर SIGHTENGINE_API_USER और SIGHTENGINE_API_SECRET जाँचें)। मॉर्फ और HF स्कोर अभी भी लागू हैं।",
   scanModelUnavailable:
     "क्लाउड डीपफेक मॉडल अस्थायी रूप से उपलब्ध नहीं — स्कोर केवल OpenCV और चेहरा विश्लेषण पर आधारित है।",
   scanServiceUnavailable:

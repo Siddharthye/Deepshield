@@ -54,6 +54,7 @@ export function ImageScanner() {
   const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
   const [shield, setShield] = useState(false);
   const [modelUnavailable, setModelUnavailable] = useState(false);
+  const [sightengineUnavailable, setSightengineUnavailable] = useState(false);
 
   async function onFile(file: File) {
     setError(null);
@@ -61,6 +62,7 @@ export function ImageScanner() {
     setExplain(null);
     setHeatmap([]);
     setModelUnavailable(false);
+    setSightengineUnavailable(false);
     setLoading(true);
 
     try {
@@ -260,6 +262,11 @@ export function ImageScanner() {
             {modelUnavailable && (
               <p className="mt-2 rounded-xl bg-peach/35 px-3 py-2 text-xs text-ink-muted">
                 {t("scanModelUnavailable")}
+              </p>
+            )}
+            {sightengineUnavailable && !modelUnavailable && (
+              <p className="mt-2 rounded-xl bg-peach/35 px-3 py-2 text-xs text-ink-muted">
+                {t("scanSightengineUnavailable")}
               </p>
             )}
             <ul className="mt-4 space-y-2 text-sm text-ink-muted">

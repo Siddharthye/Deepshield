@@ -168,6 +168,8 @@ export const EN_MORE = {
   scanStepPrepare: "Preparing image…",
   scanPleaseWait: "Analysis runs in the background — this may take a few seconds.",
   scanExplainLoading: "Generating explanation…",
+  scanSightengineUnavailable:
+    "Sightengine was not reached (check SIGHTENGINE_API_USER and SIGHTENGINE_API_SECRET on the backend). Morph and HF scores still apply.",
   scanModelUnavailable:
     "Cloud deepfake model is temporarily unavailable — score uses OpenCV and face analysis only.",
   scanServiceUnavailable:

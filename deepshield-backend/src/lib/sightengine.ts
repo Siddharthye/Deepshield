@@ -13,18 +13,19 @@ function credentials(): { user: string; secret: string } | null {
   return { user, secret };
 }
 
-function parseDeepfakeScore(data: unknown): number {
+function parseSightengineScores(data: unknown): number {
   const d = data as {
     status?: string;
-    type?: { deepfake?: number };
+    type?: { deepfake?: number; genai?: number };
     error?: { message?: string };
   };
   if (d.status === "failure") {
     throw new Error(d.error?.message ?? "Sightengine request failed");
   }
-  const score = d.type?.deepfake;
-  if (typeof score === "number") return clamp01(score);
-  return 0;
+  const deepfake =
+    typeof d.type?.deepfake === "number" ? clamp01(d.type.deepfake) : 0;
+  const genai = typeof d.type?.genai === "number" ? clamp01(d.type.genai) : 0;
+  return Math.max(deepfake, genai * 0.85);
 }
 
 export function isSightengineConfigured(): boolean {
@@ -47,7 +48,7 @@ export async function callSightengineDeepfake(args: {
       : "jpg";
 
   const form = new FormData();
-  form.append("models", "deepfake");
+  form.append("models", "deepfake,genai");
   form.append("api_user", creds.user);
   form.append("api_secret", creds.secret);
   form.append(
@@ -70,7 +71,7 @@ export async function callSightengineDeepfake(args: {
     );
   }
 
-  return parseDeepfakeScore(data);
+  return parseSightengineScores(data);
 }
 
 export async function callSightengineDeepfakeSafe(args: {

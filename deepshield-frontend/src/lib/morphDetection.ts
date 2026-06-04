@@ -55,7 +55,44 @@ function halfFaceMismatch(data: Uint8ClampedArray, w: number, r: Region): number
   }
   if (!n) return 0.2;
   const norm = diff / (n * 255 * 3);
-  return Math.min(0.95, Math.max(0.12, norm * 3.2));
+  return Math.min(0.95, Math.max(0.12, norm * 4.8));
+}
+
+/** Left vs right eye-band color mismatch (e.g. different eye colors in a morph). */
+function eyeBandAsymmetry(data: Uint8ClampedArray, w: number, r: Region): number {
+  const bandH = Math.max(8, Math.floor((r.y1 - r.y0) * 0.42));
+  const y0 = r.y0 + Math.floor((r.y1 - r.y0) * 0.18);
+  const y1 = Math.min(r.y1, y0 + bandH);
+  const mid = Math.floor((r.x0 + r.x1) / 2);
+  const left: number[] = [0, 0, 0];
+  const right: number[] = [0, 0, 0];
+  let ln = 0;
+  let rn = 0;
+
+  for (let y = y0; y < y1; y++) {
+    for (let x = r.x0; x < mid; x++) {
+      const i = (y * w + x) * 4;
+      left[0] += data[i];
+      left[1] += data[i + 1];
+      left[2] += data[i + 2];
+      ln++;
+    }
+    for (let x = mid; x < r.x1; x++) {
+      const i = (y * w + x) * 4;
+      right[0] += data[i];
+      right[1] += data[i + 1];
+      right[2] += data[i + 2];
+      rn++;
+    }
+  }
+  if (!ln || !rn) return 0.15;
+
+  const lc = left.map((v) => v / ln);
+  const rc = right.map((v) => v / rn);
+  const diff =
+    (Math.abs(lc[0] - rc[0]) + Math.abs(lc[1] - rc[1]) + Math.abs(lc[2] - rc[2])) /
+    (255 * 3);
+  return Math.min(0.95, Math.max(0.15, diff * 5.5));
 }
 
 /** Strong vertical edge on face midline (blend seam). */
@@ -156,8 +193,10 @@ export async function analyzeMorphScore(
 
   const half = halfFaceMismatch(data, size, region);
   const seam = centerSeamScore(data, size, region);
+  const eyes = eyeBandAsymmetry(data, size, region);
   const ela = await elaScore(canvas);
 
-  const combined = half * 0.45 + seam * 0.35 + ela * 0.2;
+  const combined =
+    Math.max(half, eyes) * 0.4 + seam * 0.3 + eyes * 0.2 + ela * 0.1;
   return Math.min(0.95, Math.max(0.15, combined));
 }

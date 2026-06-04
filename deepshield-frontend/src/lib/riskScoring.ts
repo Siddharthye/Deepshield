@@ -18,8 +18,8 @@ export function computeRisk(
   const morph = scores.morphScore ?? 0;
 
   const weights = opts?.modelUnavailable
-    ? { model: 0, artifact: 0.3, symmetry: 0.25, morph: 0.45 }
-    : { model: 0.42, artifact: 0.18, symmetry: 0.12, morph: 0.28 };
+    ? { model: 0, artifact: 0.22, symmetry: 0.18, morph: 0.6 }
+    : { model: 0.32, artifact: 0.14, symmetry: 0.1, morph: 0.44 };
 
   const weighted =
     model * weights.model +
@@ -28,14 +28,25 @@ export function computeRisk(
     morph * weights.morph;
 
   const peak = Math.max(model, artifact, symmetry, morph);
-  const blended = weighted * 0.55 + peak * 0.45;
+  let blended = weighted * 0.5 + peak * 0.5;
+
+  // Server models often miss subtle morphs; trust visible blend / eye mismatch cues.
+  if (morph >= 0.22 && model < 0.25) {
+    blended = Math.max(blended, morph * 0.92);
+  }
+  if (morph >= 0.3) {
+    blended = Math.max(blended, 0.42);
+  }
+  if (morph >= 0.4) {
+    blended = Math.max(blended, 0.58);
+  }
 
   const finalRisk = Math.round(Math.min(100, Math.max(0, blended * 100)));
 
   const verdict: Verdict =
-    finalRisk >= 62
+    finalRisk >= 58
       ? "highly_suspicious"
-      : finalRisk >= 32
+      : finalRisk >= 28
         ? "likely_manipulated"
         : "authentic";
 
