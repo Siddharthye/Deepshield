@@ -4,6 +4,7 @@ export type DetectionScores = {
   modelScore: number;
   artifactScore: number;
   symmetryScore: number;
+  morphScore?: number;
 };
 
 export type RiskResult = {

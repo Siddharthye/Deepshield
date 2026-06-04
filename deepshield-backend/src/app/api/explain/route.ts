@@ -103,6 +103,7 @@ export async function POST(request: Request) {
 model_score: ${typedRisk.breakdown.modelScore}
 artifact_score: ${typedRisk.breakdown.artifactScore}
 symmetry_score: ${typedRisk.breakdown.symmetryScore}
+morph_score: ${typeof (typedRisk.breakdown as { morphScore?: number }).morphScore === "number" ? (typedRisk.breakdown as { morphScore?: number }).morphScore : "n/a"}
 final_risk: ${typedRisk.finalRisk}
 verdict: "${typedRisk.verdict}"
 

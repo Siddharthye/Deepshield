@@ -8,6 +8,7 @@ import { scanImage } from "@/lib/api";
 import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
 import { analyzeFaceOnce } from "@/lib/faceAnalysis";
+import { analyzeMorphScore } from "@/lib/morphDetection";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { yieldToMain } from "@/lib/yieldToMain";
 import { extractFramesFfmpeg } from "@/lib/ffmpegExtract";
@@ -102,9 +103,10 @@ export function VideoScanner() {
           mimeType: "image/jpeg",
         });
         await yieldToMain();
-        const [{ symmetryScore, faceBox }, artifactScore] = await Promise.all([
-          analyzeFaceOnce(frame.dataUrl),
+        const { symmetryScore, faceBox } = await analyzeFaceOnce(frame.dataUrl);
+        const [artifactScore, morphScore] = await Promise.all([
           analyzeOpenCvArtifactScore(frame.dataUrl),
+          analyzeMorphScore(frame.dataUrl, faceBox),
         ]);
         await yieldToMain();
         let heatmap: HeatmapCell[] = [];
@@ -114,13 +116,14 @@ export function VideoScanner() {
             modelScore,
             8,
             faceBox,
+            morphScore,
           );
         } catch {
           heatmap = await buildArtifactHeatmap(frame.dataUrl);
         }
         await yieldToMain();
         const risk = computeRisk(
-          { modelScore, artifactScore, symmetryScore },
+          { modelScore, artifactScore, symmetryScore, morphScore },
           { modelUnavailable: hfDown },
         );
         scored.push({

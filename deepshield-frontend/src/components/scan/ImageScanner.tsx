@@ -9,6 +9,7 @@ import { ShieldOverlay } from "@/components/ui/ShieldOverlay";
 import { explainRisk, scanImage } from "@/lib/api";
 import { analyzeFaceOnce, preloadFaceApi } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
+import { analyzeMorphScore } from "@/lib/morphDetection";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
 import { withTimeout } from "@/lib/withTimeout";
 import type { HeatmapCell } from "@/lib/clientAnalysis";
@@ -81,12 +82,15 @@ export function ImageScanner() {
       await yieldToMain();
 
       setStepKey("scanStep2");
-      const artifactScore = await analyzeOpenCvArtifactScore(dataUrl);
+      const [artifactScore, morphScore] = await Promise.all([
+        analyzeOpenCvArtifactScore(dataUrl),
+        analyzeMorphScore(dataUrl, faceBox),
+      ]);
       await yieldToMain();
 
       setStepKey("scanStep4");
       const cells = await withTimeout(
-        buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox),
+        buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox, morphScore),
         12_000,
         "heatmap",
       ).catch(() => [] as HeatmapCell[]);
@@ -258,6 +262,12 @@ export function ImageScanner() {
                 <span>{t("breakdownFace")}</span>
                 <span>{(risk.breakdown.symmetryScore * 100).toFixed(0)}%</span>
               </li>
+              {risk.breakdown.morphScore != null && (
+                <li className="flex justify-between">
+                  <span>{t("breakdownMorph")}</span>
+                  <span>{(risk.breakdown.morphScore * 100).toFixed(0)}%</span>
+                </li>
+              )}
             </ul>
             {explainLoading && (
               <p className="mt-6 animate-pulse text-sm text-ink-subtle">{t("scanExplainLoading")}</p>

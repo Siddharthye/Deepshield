@@ -182,6 +182,7 @@ export const EN_MORE = {
   breakdownHf: "HF model",
   breakdownOpenCv: "Artifact edges",
   breakdownFace: "face-api symmetry",
+  breakdownMorph: "Morph / blend signals",
   scanFailed: "Scan failed",
   videoUploadTitle: "Upload MP4 or MOV",
   videoUploadHint: "FFmpeg.wasm keyframes · full pipeline per frame",

@@ -26,16 +26,18 @@ export async function buildModelGuidedHeatmap(
   modelScore: number,
   grid = 8,
   faceBox: FaceBox | null = null,
+  morphScore = 0,
 ): Promise<HeatmapCell[]> {
+  const saliencyBoost = Math.min(1, Math.max(modelScore, morphScore * 0.85));
   const cells = await buildArtifactHeatmap(imageSrc, grid);
 
   if (!faceBox) {
     return normalizeCells(
       cells.map((c) => ({
         ...c,
-        intensity: Math.min(1, c.intensity * (0.5 + modelScore * 0.5)),
+        intensity: Math.min(1, c.intensity * (0.5 + saliencyBoost * 0.55)),
       })),
-      modelScore,
+      saliencyBoost,
     );
   }
 
@@ -51,14 +53,15 @@ export async function buildModelGuidedHeatmap(
     const dx = (gx - cx) / rx;
     const dy = (gy - cy) / ry;
     const gaussian = Math.exp(-(dx * dx + dy * dy));
-    const saliency = gaussian * modelScore;
+    const saliency = gaussian * saliencyBoost;
+    const morphBoost = morphScore > 0.35 ? gaussian * morphScore * 0.35 : 0;
     return {
       ...c,
-      intensity: Math.min(1, c.intensity * 0.45 + saliency * 0.55),
+      intensity: Math.min(1, c.intensity * 0.4 + saliency * 0.5 + morphBoost),
     };
   });
 
-  return normalizeCells(weighted, modelScore);
+  return normalizeCells(weighted, saliencyBoost);
 }
 
 function loadImageSize(src: string): Promise<{ width: number; height: number }> {

@@ -98,14 +98,28 @@ async function readUpstreamError(res: Response): Promise<string> {
   }
 }
 
+function labelScore(
+  arr: Array<{ label?: string; score?: number }>,
+  match: (label: string) => boolean,
+): number | null {
+  const hit = arr.find(
+    (x) => match((x.label ?? "").toLowerCase()) && typeof x.score === "number",
+  );
+  return hit ? clamp01(hit.score as number) : null;
+}
+
 function parseDeepfakeScore(data: HfJson): number {
   if (Array.isArray(data)) {
     const arr = data as Array<{ label?: string; score?: number }>;
-    const fake = arr.find((x) => {
-      const label = (x.label ?? "").toLowerCase();
-      return label.includes("fake") || label.includes("deepfake");
-    });
-    if (fake && typeof fake.score === "number") return clamp01(fake.score);
+    const fake = labelScore(arr, (l) => l.includes("fake") || l.includes("deepfake"));
+    const real = labelScore(arr, (l) => l.includes("real") || l.includes("authentic"));
+
+    if (fake != null && real != null) {
+      const sum = fake + real;
+      return sum > 0 ? clamp01(fake / sum) : fake;
+    }
+    if (fake != null) return fake;
+    if (real != null) return clamp01(1 - real);
 
     const byLabel = (label: string) =>
       arr.find(

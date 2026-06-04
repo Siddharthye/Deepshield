@@ -183,6 +183,7 @@ export const HI_MORE: Record<keyof typeof EN_MORE, string> = {
   breakdownHf: "HF मॉडल",
   breakdownOpenCv: "कलाकृति एज",
   breakdownFace: "face-api सममिति",
+  breakdownMorph: "मॉर्फ / ब्लेंड संकेत",
   scanFailed: "स्कैन विफल",
   videoUploadTitle: "MP4 या MOV अपलोड करें",
   videoUploadHint: "FFmpeg.wasm फ़्रेम · प्रति फ़्रेम पूर्ण पाइपलाइन",
