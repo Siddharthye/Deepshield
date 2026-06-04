@@ -44,7 +44,7 @@ export function CompareSlider({
         <img src={originalSrc} alt={originalLabel} className="h-full w-full object-contain" />
       </div>
       <div
-        className="relative absolute inset-0 overflow-hidden"
+        className="absolute inset-0 h-full w-full overflow-hidden"
         style={{ clipPath: `inset(0 ${100 - pct}% 0 0)` }}
       >
         {overlay}

@@ -52,6 +52,7 @@ export function ImageScanner() {
   const [explain, setExplain] = useState<ExplainResult | null>(null);
   const [explainLoading, setExplainLoading] = useState(false);
   const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
+  const [heatmapSuspicion, setHeatmapSuspicion] = useState(0.35);
   const [shield, setShield] = useState(false);
   const [modelUnavailable, setModelUnavailable] = useState(false);
   const [sightengineUnavailable, setSightengineUnavailable] = useState(false);
@@ -61,6 +62,7 @@ export function ImageScanner() {
     setRisk(null);
     setExplain(null);
     setHeatmap([]);
+    setHeatmapSuspicion(0.35);
     setModelUnavailable(false);
     setSightengineUnavailable(false);
     setLoading(true);
@@ -97,12 +99,21 @@ export function ImageScanner() {
       await yieldToMain();
 
       setStepKey("scanStep4");
+      const suspicion = Math.min(
+        1,
+        Math.max(modelScore, morphScore, modelScore + morphScore * 0.35),
+      );
       const cells = await withTimeout(
         buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox, morphScore),
         12_000,
         "heatmap",
-      ).catch(() => [] as HeatmapCell[]);
+      ).catch(() =>
+        import("@/lib/heatmapBuilder").then((m) =>
+          m.fallbackHeatmapCells(8, suspicion),
+        ),
+      );
       setHeatmap(cells);
+      setHeatmapSuspicion(suspicion);
 
       const riskResult = computeRisk(
         {
@@ -237,7 +248,12 @@ export function ImageScanner() {
             <CompareSlider
               originalSrc={preview}
               overlay={
-                <HeatmapOverlay imageSrc={preview} cells={heatmap} showBaseImage />
+                <HeatmapOverlay
+                  imageSrc={preview}
+                  cells={heatmap}
+                  showBaseImage
+                  suspicion={heatmapSuspicion}
+                />
               }
               originalLabel={t("originalLabel")}
               overlayLabel={t("heatmapLabel")}
@@ -250,6 +266,7 @@ export function ImageScanner() {
                   cells={heatmap}
                   showBaseImage
                   animateReveal
+                  suspicion={heatmapSuspicion}
                 />
               </div>
               <p className="mt-2 text-xs text-ink-subtle">{t("heatmapFullHint")}</p>

@@ -5,8 +5,9 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { HeatmapOverlay } from "@/components/scan/HeatmapOverlay";
 import { CompareSlider } from "@/components/ui/CompareSlider";
 import { scanImage } from "@/lib/api";
-import { buildArtifactHeatmap, type HeatmapCell } from "@/lib/clientAnalysis";
+import type { HeatmapCell } from "@/lib/clientAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
+import { withTimeout } from "@/lib/withTimeout";
 import { analyzeFaceOnce } from "@/lib/faceAnalysis";
 import { analyzeMorphScore } from "@/lib/morphDetection";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
@@ -25,6 +26,7 @@ type ScoredFrame = {
   finalRisk: number;
   verdict: Verdict;
   heatmap: HeatmapCell[];
+  heatmapSuspicion: number;
 };
 
 export function VideoScanner() {
@@ -115,18 +117,25 @@ export function VideoScanner() {
           analyzeMorphScore(frame.dataUrl, faceBox),
         ]);
         await yieldToMain();
-        let heatmap: HeatmapCell[] = [];
-        try {
-          heatmap = await buildModelGuidedHeatmap(
+        const suspicion = Math.min(
+          1,
+          Math.max(modelScore, morphScore, modelScore + morphScore * 0.35),
+        );
+        const heatmap = await withTimeout(
+          buildModelGuidedHeatmap(
             frame.dataUrl,
             modelScore,
             8,
             faceBox,
             morphScore,
-          );
-        } catch {
-          heatmap = await buildArtifactHeatmap(frame.dataUrl);
-        }
+          ),
+          12_000,
+          "heatmap",
+        ).catch(() =>
+          import("@/lib/heatmapBuilder").then((m) =>
+            m.fallbackHeatmapCells(8, suspicion),
+          ),
+        );
         await yieldToMain();
         const risk = computeRisk(
           {
@@ -145,6 +154,7 @@ export function VideoScanner() {
           finalRisk: risk.finalRisk,
           verdict: risk.verdict,
           heatmap,
+          heatmapSuspicion: suspicion,
         });
       }
       setFrames(scored);
@@ -250,8 +260,11 @@ export function VideoScanner() {
 
           {current && (
             <div className="grid gap-6 lg:grid-cols-2">
-              <GlassCard className="space-y-3">
-                <p className="text-sm font-medium text-ink">{t("compareTitle")}</p>
+              <GlassCard className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-ink">{t("compareTitle")}</p>
+                  <p className="text-xs text-ink-subtle">{t("compareHint")}</p>
+                </div>
                 <CompareSlider
                   originalSrc={current.dataUrl}
                   overlay={
@@ -259,12 +272,25 @@ export function VideoScanner() {
                       imageSrc={current.dataUrl}
                       cells={current.heatmap}
                       showBaseImage
-                      animateReveal
+                      suspicion={current.heatmapSuspicion}
                     />
                   }
                   originalLabel={t("originalLabel")}
                   overlayLabel={t("heatmapLabel")}
                 />
+                <div>
+                  <p className="mb-2 text-sm font-medium text-ink">{t("heatmapFullTitle")}</p>
+                  <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-peach/50">
+                    <HeatmapOverlay
+                      imageSrc={current.dataUrl}
+                      cells={current.heatmap}
+                      showBaseImage
+                      animateReveal
+                      suspicion={current.heatmapSuspicion}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-ink-subtle">{t("heatmapFullHint")}</p>
+                </div>
                 <p className="text-center text-xs text-ink-subtle">
                   {t("videoFrameLine")
                     .replace("{time}", current.timeSec.toFixed(1))

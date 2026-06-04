@@ -66,44 +66,21 @@ export async function buildArtifactHeatmap(
   imageSrc: string,
   grid = 8,
 ): Promise<HeatmapCell[]> {
+  const {
+    drawImageLetterboxed,
+    computeArtifactCellsFromCanvas,
+    HEATMAP_CANVAS_SIZE,
+  } = await import("@/lib/heatmapBuilder");
   const img = await loadImage(imageSrc);
   const canvas = document.createElement("canvas");
-  const size = 256;
+  const size = HEATMAP_CANVAS_SIZE;
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (!ctx) return [];
 
-  ctx.drawImage(img, 0, 0, size, size);
-  const cellSize = size / grid;
-  const cells: HeatmapCell[] = [];
-
-  for (let gy = 0; gy < grid; gy++) {
-    for (let gx = 0; gx < grid; gx++) {
-      const { data } = ctx.getImageData(
-        gx * cellSize,
-        gy * cellSize,
-        cellSize,
-        cellSize,
-      );
-      let edge = 0;
-      let n = 0;
-      const w = cellSize;
-      for (let y = 1; y < w - 1; y++) {
-        for (let x = 1; x < w - 1; x++) {
-          const i = (y * w + x) * 4;
-          edge += Math.abs(data[i] - data[i - 4]) + Math.abs(data[i] - data[i - w * 4]);
-          n++;
-        }
-      }
-      cells.push({
-        x: gx,
-        y: gy,
-        intensity: n ? Math.min(1, edge / (n * 400)) : 0,
-      });
-    }
-  }
-  return cells;
+  const layout = drawImageLetterboxed(ctx, img, size);
+  return computeArtifactCellsFromCanvas(ctx, layout, grid, size);
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
