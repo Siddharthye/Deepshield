@@ -21,33 +21,39 @@ export function AshaChat({
   onQuickPrompt?: (q: string) => void;
 }) {
   const { language, apiLanguage, t } = useLanguage();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const welcome = t("ashaWelcome");
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: "assistant", content: welcome },
+  ]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [crisisOpen, setCrisisOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const welcome = t("ashaWelcome");
+    const nextWelcome = t("ashaWelcome");
     try {
       const raw = sessionStorage.getItem(SESSION_KEY);
       if (!raw) {
-        setMessages([{ role: "assistant", content: welcome }]);
+        setMessages([{ role: "assistant", content: nextWelcome }]);
         return;
       }
       const parsed = JSON.parse(raw) as ChatMessage[];
       if (Array.isArray(parsed) && parsed.length > 0) {
         const first = parsed[0];
         if (first.role === "assistant") {
-          setMessages([{ role: "assistant", content: welcome }, ...parsed.slice(1)]);
+          setMessages([
+            { role: "assistant", content: nextWelcome },
+            ...parsed.slice(1),
+          ]);
         } else {
           setMessages(parsed);
         }
       } else {
-        setMessages([{ role: "assistant", content: welcome }]);
+        setMessages([{ role: "assistant", content: nextWelcome }]);
       }
     } catch {
-      setMessages([{ role: "assistant", content: welcome }]);
+      setMessages([{ role: "assistant", content: nextWelcome }]);
     }
   }, [language, t]);
 
@@ -105,8 +111,8 @@ export function AshaChat({
   }
 
   return (
-    <div className="flex h-full min-h-[min(72vh,720px)] flex-col gap-4">
-      <GlassCard className="flex h-full flex-col overflow-hidden p-0">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <GlassCard className="flex h-full min-h-[min(420px,52vh)] flex-col overflow-hidden p-0 lg:min-h-[min(460px,56vh)]">
         <div className="flex items-center gap-4 border-b border-white/30 bg-peach/30 px-6 py-4">
           <Image
             src="/images/asha-logo.jpeg"

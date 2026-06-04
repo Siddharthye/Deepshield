@@ -333,7 +333,7 @@ export const EN_MORE = {
   ashaCompanionAlt: "Asha companion",
   rightsHeading: "Know your basic rights",
   rightsIntro:
-    "These summaries are for quick reference. Ask Asha below for personalised guidance in plain language.",
+    "These summaries are for quick reference. Ask Asha in the chat above for personalised guidance in plain language.",
   law1Title: "IT Act Section 66E",
   law1Subtitle: "Privacy violation",
   law1Tip: "Criminalises capturing or sharing intimate images without consent under Indian cyber law.",
