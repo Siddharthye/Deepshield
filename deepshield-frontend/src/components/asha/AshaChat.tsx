@@ -109,7 +109,7 @@ export function AshaChat({
       <GlassCard className="flex h-full flex-col overflow-hidden p-0">
         <div className="flex items-center gap-4 border-b border-white/30 bg-peach/30 px-6 py-4">
           <Image
-            src="/images/asha-logo.png"
+            src="/images/asha-logo.jpeg"
             alt={t("ashaCompanionAlt")}
             width={56}
             height={56}

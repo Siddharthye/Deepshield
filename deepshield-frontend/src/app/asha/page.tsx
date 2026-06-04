@@ -21,7 +21,7 @@ export default function AshaPage() {
           <div className="relative">
             <div className="absolute -inset-2 rounded-2xl bg-blue/35 blur-lg" aria-hidden />
             <Image
-              src="/images/asha-logo.png"
+              src="/images/asha-logo.jpeg"
               alt={t("ashaCompanionAlt")}
               width={80}
               height={80}
