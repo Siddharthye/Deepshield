@@ -22,6 +22,8 @@ function AuthCompleteInner() {
 
     const user = consumePendingUserCookie(PENDING_USER_COOKIE);
     if (!user) {
+      document.cookie = "deepshield_auth=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = `${PENDING_USER_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
       router.replace("/login?error=oauth_missing");
       return;
     }

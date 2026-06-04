@@ -1,41 +1,67 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-const AUTH_COOKIE = "deepshield_auth";
+import { AUTH_COOKIE } from "@/lib/authStorage";
 
 const LOGIN_PATH = "/login";
 
-const PUBLIC_PREFIXES = ["/api/auth", "/auth/"];
+/** Routes that never require the auth cookie. */
+function isPublicPath(pathname: string): boolean {
+  return (
+    pathname === LOGIN_PATH ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/api/auth/")
+  );
+}
+
+/** App routes that require sign-in. */
+const PROTECTED = [
+  "/scan",
+  "/trace",
+  "/report",
+  "/vault",
+  "/rights",
+  "/community",
+  "/asha",
+  "/learn",
+] as const;
+
+function isProtectedPath(pathname: string): boolean {
+  if (pathname === "/") return true;
+  return PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+  if (isPublicPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  if (!isProtectedPath(pathname)) {
     return NextResponse.next();
   }
 
   const authed = request.cookies.get(AUTH_COOKIE)?.value === "1";
-
-  if (pathname === LOGIN_PATH) {
-    if (authed) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (authed) {
     return NextResponse.next();
   }
 
-  if (!authed) {
-    const login = request.nextUrl.clone();
-    login.pathname = LOGIN_PATH;
-    if (pathname !== "/") {
-      login.searchParams.set("from", pathname);
-    }
-    return NextResponse.redirect(login);
-  }
-
-  return NextResponse.next();
+  const login = request.nextUrl.clone();
+  login.pathname = LOGIN_PATH;
+  login.searchParams.set("from", pathname);
+  return NextResponse.redirect(login);
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images/|api/auth).*)",
+    "/",
+    "/scan/:path*",
+    "/trace/:path*",
+    "/report/:path*",
+    "/vault/:path*",
+    "/rights/:path*",
+    "/community/:path*",
+    "/asha/:path*",
+    "/learn/:path*",
   ],
 };

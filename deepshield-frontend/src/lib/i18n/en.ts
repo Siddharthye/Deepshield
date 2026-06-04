@@ -241,4 +241,7 @@ export const EN = {
     "Google sign-in is not configured yet. Ask your admin to set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
   authGoogleDenied: "Google sign-in was cancelled.",
   authGoogleFailed: "Google sign-in failed. Please try again.",
+  authAlreadySignedIn: "You are already signed in as",
+  authContinueApp: "Continue to app",
+  authSignOutSwitch: "Sign out",
 } as const;

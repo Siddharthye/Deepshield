@@ -242,4 +242,7 @@ export const HI: Record<keyof typeof EN, string> = {
     "Google साइन-इन अभी कॉन्फ़िगर नहीं है। व्यवस्थापक से GOOGLE_CLIENT_ID और GOOGLE_CLIENT_SECRET सेट करवाएँ।",
   authGoogleDenied: "Google साइन-इन रद्द किया गया।",
   authGoogleFailed: "Google साइन-इन विफल। फिर कोशिश करें।",
+  authAlreadySignedIn: "आप पहले से साइन इन हैं —",
+  authContinueApp: "ऐप पर जाएँ",
+  authSignOutSwitch: "साइन आउट",
 };

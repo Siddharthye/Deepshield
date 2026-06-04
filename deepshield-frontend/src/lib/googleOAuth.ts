@@ -4,25 +4,17 @@ export const GOOGLE_AUTH_COOKIE_STATE = "google_oauth_state";
 export const GOOGLE_AUTH_COOKIE_FROM = "google_oauth_from";
 export const PENDING_USER_COOKIE = "deepshield_user_pending";
 
-/** Canonical site origin for OAuth (must match Google Console redirect URIs). */
+/**
+ * Site origin for OAuth redirects.
+ * Prefer GOOGLE_REDIRECT_URI (stable production URL). Otherwise use the current request host
+ * (works for Vercel preview URLs — add each preview callback to Google Console if needed).
+ */
 export function getGoogleOAuthBaseUrl(request: NextRequest): string {
   const explicit = process.env.GOOGLE_REDIRECT_URI?.trim();
   if (explicit) {
     return explicit
       .replace(/\/api\/auth\/google\/callback\/?$/i, "")
       .replace(/\/$/, "");
-  }
-
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  if (forwardedHost) {
-    const proto = request.headers.get("x-forwarded-proto") ?? "https";
-    const host = forwardedHost.split(",")[0]?.trim();
-    if (host) return `${proto}://${host}`.replace(/\/$/, "");
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-    if (appUrl) return appUrl.replace(/\/$/, "");
   }
 
   return request.nextUrl.origin.replace(/\/$/, "");

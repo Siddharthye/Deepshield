@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import { AUTH_COOKIE } from "@/lib/authStorage";
 import type { AuthUser } from "@/lib/authStorage";
 import {
-  appUrl,
   exchangeGoogleCode,
   fetchGoogleUserInfo,
   GOOGLE_AUTH_COOKIE_FROM,
@@ -13,12 +12,18 @@ import {
   resolveGoogleRedirectUri,
 } from "@/lib/googleOAuth";
 
-const COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
+function clearAuthCookies(response: NextResponse) {
+  for (const name of [AUTH_COOKIE, PENDING_USER_COOKIE, GOOGLE_AUTH_COOKIE_STATE, GOOGLE_AUTH_COOKIE_FROM]) {
+    response.cookies.set(name, "", { path: "/", maxAge: 0 });
+  }
+}
 
 function redirectToLogin(request: NextRequest, error: string) {
-  const login = appUrl(request, "/login");
+  const login = new URL("/login", request.url);
   login.searchParams.set("error", error);
-  return NextResponse.redirect(login);
+  const response = NextResponse.redirect(login);
+  clearAuthCookies(response);
+  return response;
 }
 
 export async function GET(request: NextRequest) {
@@ -29,7 +34,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const oauthError = searchParams.get("error");
   if (oauthError) {
-    return redirectToLogin(request, oauthError === "access_denied" ? "google_denied" : "google_failed");
+    return redirectToLogin(
+      request,
+      oauthError === "access_denied" ? "google_denied" : "google_failed",
+    );
   }
 
   const code = searchParams.get("code");
@@ -60,21 +68,16 @@ export async function GET(request: NextRequest) {
       picture: profile.picture,
     };
 
-    const completeUrl = appUrl(request, "/auth/complete");
+    const completeUrl = new URL("/auth/complete", request.url);
     completeUrl.searchParams.set("from", returnTo);
 
     const response = NextResponse.redirect(completeUrl);
     const secure = process.env.NODE_ENV === "production";
 
-    response.cookies.set(AUTH_COOKIE, "1", {
-      path: "/",
-      maxAge: COOKIE_MAX_AGE,
-      sameSite: "lax",
-      secure,
-    });
+    // Session cookie is set only after /auth/complete writes sessionStorage.
     response.cookies.set(PENDING_USER_COOKIE, JSON.stringify(user), {
       path: "/",
-      maxAge: 120,
+      maxAge: 300,
       sameSite: "lax",
       secure,
       httpOnly: false,

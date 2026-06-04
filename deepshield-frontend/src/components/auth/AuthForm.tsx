@@ -46,7 +46,7 @@ function GoogleIcon() {
 
 export function AuthForm() {
   const { t } = useLanguage();
-  const { signInEmail, registerEmail } = useAuth();
+  const { user, signInEmail, registerEmail, signOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
@@ -138,6 +138,32 @@ export function AuthForm() {
       className="mx-auto w-full max-w-md"
     >
       <GlassCard className="glass-card-tint-blue p-6 md:p-8">
+        {user && (
+          <div className="mb-6 rounded-2xl bg-sage/25 px-4 py-3 text-sm text-ink">
+            <p>
+              {t("authAlreadySignedIn")} <strong>{user.name}</strong>
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => router.push(returnTo)}
+                className="rounded-full bg-secondary px-4 py-2 text-xs font-medium text-cream-deep"
+              >
+                {t("authContinueApp")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  signOut();
+                  setError(null);
+                }}
+                className="rounded-full border border-secondary/30 px-4 py-2 text-xs font-medium text-ink"
+              >
+                {t("authSignOutSwitch")}
+              </button>
+            </div>
+          </div>
+        )}
         <p className="page-badge">{t("loginBadge")}</p>
         <h1 className="font-display text-2xl text-ink md:text-3xl">{t("loginTitle")}</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t("loginSubtitle")}</p>
