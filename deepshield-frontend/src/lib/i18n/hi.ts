@@ -232,10 +232,6 @@ export const HI: Record<keyof typeof EN, string> = {
   authPasswordMismatch: "पासवर्ड मेल नहीं खाते।",
   authSignInFailed: "गलत ईमेल या पासवर्ड।",
   authEmailExists: "यह ईमेल पहले से पंजीकृत है — साइन इन करें।",
-  authGoogleNote:
-    "आप Google पर रीडायरेक्ट होंगे और खाता चुन सकेंगे। हमें केवल नाम और ईमेल मिलता है। ब्लॉक होने पर /api/auth/google/setup का redirectUri Google Console में जोड़ें।",
-  authGoogleRedirectHelp:
-    "redirect_uri_mismatch ठीक करें: इस साइट पर /api/auth/google/setup खोलें, redirectUri कॉपी करें, Google Cloud Console → Credentials → OAuth client → Authorized redirect URIs में चिपकाएँ।",
   authGoogleRedirecting: "Google पर भेजा जा रहा है…",
   authCompletingGoogle: "साइन-इन पूरा हो रहा है…",
   authGoogleNotConfigured:

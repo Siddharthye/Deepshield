@@ -231,10 +231,6 @@ export const EN = {
   authPasswordMismatch: "Passwords do not match.",
   authSignInFailed: "Incorrect email or password.",
   authEmailExists: "An account with this email already exists. Sign in instead.",
-  authGoogleNote:
-    "You will be redirected to Google to choose an account. We only receive your name and email. If sign-in is blocked, add the redirect URI from /api/auth/google/setup in Google Cloud Console.",
-  authGoogleRedirectHelp:
-    "Fix redirect_uri_mismatch: open /api/auth/google/setup on this site, copy redirectUri, and paste it under Authorized redirect URIs in Google Cloud Console (Credentials → OAuth client).",
   authGoogleRedirecting: "Redirecting to Google…",
   authCompletingGoogle: "Finishing sign-in…",
   authGoogleNotConfigured:
