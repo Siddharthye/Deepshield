@@ -1,7 +1,6 @@
 "use client";
 
 import { GlassCard } from "@/components/ui/GlassCard";
-import { HeroParticles } from "@/components/hero/HeroParticles";
 import { HowItWorksPinned } from "@/components/sections/HowItWorksPinned";
 import { FeatureOrbs } from "@/components/sections/FeatureOrbs";
 import { HomeCrisisStrip } from "@/components/sections/HomeCrisisStrip";
@@ -20,14 +19,7 @@ export default function HomePage() {
 
   return (
     <div key={language} className="relative overflow-x-hidden pt-16">
-      <div className="relative">
-        <HeroParticles />
-        <div
-          className="pointer-events-none absolute inset-0 bg-parchment/10"
-          aria-hidden
-        />
-        <HeroSection />
-      </div>
+      <HeroSection />
 
       <HomeCrisisStrip />
       <HomeProblem />

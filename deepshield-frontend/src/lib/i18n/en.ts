@@ -6,15 +6,18 @@ export const EN = {
   knowRights: "Support & rights",
   homeHero:
     "Detect deepfakes, build legal proof, and find support — privately, in your browser.",
+  heroHeadline1: "You are not alone.",
+  heroHeadline2: "You have rights.",
   heroLead:
-    "A calm, private space when your image has been used without your consent.",
+    "A calm, private space when your image was used without your consent — move forward only when you choose.",
+  heroTrustLine: "Private in your browser · Free for survivors · No spectacle",
   heroStory1:
     "DeepShield helps you understand whether a photo or video may have been manipulated, document what happened, and prepare material you can share with cybercrime cells or advocates — without posting your evidence on social media or building a public profile you did not ask for.",
   heroStory2:
     "Image-based abuse can feel isolating and urgent at the same time. This site is built for survivors first: uploads are processed for scoring, not kept in a browsable gallery, and your encrypted vault stays on this device. You choose when to look, when to save proof, and when to reach for help.",
   heroStory3:
     "Indian law recognizes serious harm from morphed and non-consensual intimate imagery. You do not have to decode IT Act sections or IPC provisions alone — plain-language guidance, national helplines, and trauma-informed chat are part of the experience below. Take the first step only when you feel ready.",
-  heroCtaScan: "Start with a scan",
+  heroCtaScan: "Begin when you're ready",
   heroCtaAsha: "Talk to Asha",
   heroVisualCaption:
     "Private in your browser. Free for survivors. Designed for dignity — not headlines.",
