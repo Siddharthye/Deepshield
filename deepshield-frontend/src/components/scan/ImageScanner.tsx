@@ -10,6 +10,7 @@ import { explainRisk, scanImage } from "@/lib/api";
 import { analyzeFaceOnce, preloadFaceApi } from "@/lib/faceAnalysis";
 import { analyzeOpenCvArtifactScore } from "@/lib/opencvAnalysis";
 import { buildModelGuidedHeatmap } from "@/lib/modelGuidedHeatmap";
+import { withTimeout } from "@/lib/withTimeout";
 import type { HeatmapCell } from "@/lib/clientAnalysis";
 import { exportHeatmapDataUrl } from "@/lib/heatmapExport";
 import { resizeImageForScan } from "@/lib/resizeImage";
@@ -84,7 +85,11 @@ export function ImageScanner() {
       await yieldToMain();
 
       setStepKey("scanStep4");
-      const cells = await buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox);
+      const cells = await withTimeout(
+        buildModelGuidedHeatmap(dataUrl, modelScore, 8, faceBox),
+        12_000,
+        "heatmap",
+      ).catch(() => [] as HeatmapCell[]);
       setHeatmap(cells);
 
       const riskResult = computeRisk(

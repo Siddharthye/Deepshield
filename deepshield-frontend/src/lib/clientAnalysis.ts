@@ -1,7 +1,9 @@
-/** Browser-side artifact & symmetry heuristics (OpenCV / face-api style signals). */
+import { withTimeout } from "@/lib/withTimeout";
+
+/** Browser-side artifact & symmetry heuristics (canvas edge pass; no opencv.js). */
 
 export async function analyzeArtifactScore(imageSrc: string): Promise<number> {
-  const img = await loadImage(imageSrc);
+  const img = await withTimeout(loadImage(imageSrc), 5_000, "load image");
   const canvas = document.createElement("canvas");
   const size = 128;
   canvas.width = size;
@@ -107,9 +109,8 @@ export async function buildArtifactHeatmap(
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = reject;
+    img.onerror = () => reject(new Error("image load failed"));
     img.src = src;
   });
 }
