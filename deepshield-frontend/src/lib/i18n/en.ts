@@ -6,6 +6,31 @@ export const EN = {
   knowRights: "Support & rights",
   homeHero:
     "Detect deepfakes, build legal proof, and find support — privately, in your browser.",
+  heroLead:
+    "A calm, private space when your image has been used without your consent.",
+  heroStory1:
+    "DeepShield helps you understand whether a photo or video may have been manipulated, document what happened, and prepare material you can share with cybercrime cells or advocates — without posting your evidence on social media or building a public profile you did not ask for.",
+  heroStory2:
+    "Image-based abuse can feel isolating and urgent at the same time. This site is built for survivors first: uploads are processed for scoring, not kept in a browsable gallery, and your encrypted vault stays on this device. You choose when to look, when to save proof, and when to reach for help.",
+  heroStory3:
+    "Indian law recognizes serious harm from morphed and non-consensual intimate imagery. You do not have to decode IT Act sections or IPC provisions alone — plain-language guidance, national helplines, and trauma-informed chat are part of the experience below. Take the first step only when you feel ready.",
+  heroCtaScan: "Start with a scan",
+  heroCtaAsha: "Talk to Asha",
+  heroVisualCaption:
+    "Private in your browser. Free for survivors. Designed for dignity — not headlines.",
+  heroPrinciplesLabel: "How we approach your safety",
+  heroPrinciplesIntro:
+    "Three commitments that shape every part of DeepShield — before you explore the toolkit below.",
+  heroPrinciple1Title: "Privacy by default",
+  heroPrinciple1Body:
+    "Your files are used for analysis, not displayed in a shared cloud album. Sessions and vault data stay under your control on this device.",
+  heroPrinciple2Title: "Dignity over spectacle",
+  heroPrinciple2Body:
+    "You are not a case study. Language here is calm and direct — no shock imagery, no pressure to act before you are ready.",
+  heroPrinciple3Title: "Evidence that can hold up",
+  heroPrinciple3Body:
+    "Screenshots, URLs, timestamps, and scan outputs can support a complaint alongside your own statement. We help you organize — filing still goes through official channels.",
+  heroScrollCue: "Scroll for helplines, the eleven-tool ring, and your path forward.",
   navHome: "Home",
   navScan: "Scan",
   navTrace: "Trace",
@@ -20,24 +45,6 @@ export const EN = {
   heroTitle: "Your armor against digital violence",
   heroExtra:
     "For anyone facing morphed photos, deepfake videos, or non-consensual intimate imagery — gather evidence privately, at your own pace, without creating an account.",
-  heroInfoPrivateTitle: "Built for privacy first",
-  heroInfoPrivateBody:
-    "Uploads are used only for model scoring — we do not build a cloud gallery of your files. Your vault and saved sessions stay encrypted in your browser.",
-  heroInfoRemindTitle: "You are not alone",
-  heroInfoRemindBody:
-    "Image-based abuse is real harm, not shame you have to carry quietly. If you are in immediate danger, contact local police first — then document when you are ready.",
-  heroInfoLawTitle: "Laws that may apply in India",
-  heroInfoLawBody:
-    "IT Act §66E, §67, §67A and IPC §354C can apply to morphed and non-consensual intimate images. DeepShield helps you document; cybercrime.gov.in or a lawyer guides filing.",
-  heroInfoDocumentTitle: "Save evidence early",
-  heroInfoDocumentBody:
-    "Screenshot URLs, profiles, timestamps, and messages before platforms remove them. Keep originals where you can — compression can hide important detail.",
-  heroInfoPaceTitle: "Go at your own pace",
-  heroInfoPaceBody:
-    "There is no rush and no judgment here. Scroll when you are ready — more guidance, stories, and support are on this page below.",
-  heroHelplineBadge: "If you need help now",
-  heroHelplineIntro:
-    "If you are in danger, contact local police first. These national lines support cyber abuse and emotional care.",
   heroClosing:
     "DeepShield is free, private in your browser, and built for survivors — not spectacle.",
   trust1: "Browser-first privacy",
