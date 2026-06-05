@@ -10,9 +10,46 @@ function trimSecret(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
-/** Always use the current request host so OAuth cookies stay on the same site. */
+function normalizeBaseUrl(raw: string): string {
+  const trimmed = raw.replace(/\/$/, "");
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
+/**
+ * Canonical site origin used for Google OAuth redirect_uri.
+ * Must match an Authorized redirect URI in Google Cloud Console exactly.
+ */
 export function getGoogleOAuthBaseUrl(request: NextRequest): string {
+  const explicit = trimSecret(process.env.GOOGLE_REDIRECT_URI);
+  if (explicit) {
+    return explicit
+      .replace(/\/api\/auth\/google\/callback\/?$/i, "")
+      .replace(/\/$/, "");
+  }
+
+  const publicApp = trimSecret(process.env.NEXT_PUBLIC_APP_URL);
+  if (publicApp) {
+    return normalizeBaseUrl(publicApp);
+  }
+
+  const productionUrl = trimSecret(process.env.VERCEL_PROJECT_PRODUCTION_URL);
+  if (productionUrl && process.env.VERCEL_ENV === "production") {
+    return normalizeBaseUrl(productionUrl);
+  }
+
   return request.nextUrl.origin.replace(/\/$/, "");
+}
+
+export function getRequestOrigin(request: NextRequest): string {
+  return request.nextUrl.origin.replace(/\/$/, "");
+}
+
+/** True when OAuth must run on a different host than the current request (env canonical URL). */
+export function shouldRedirectToCanonicalOAuthHost(request: NextRequest): boolean {
+  return getGoogleOAuthBaseUrl(request) !== getRequestOrigin(request);
 }
 
 export function getGoogleRedirectUri(baseUrl: string): string {

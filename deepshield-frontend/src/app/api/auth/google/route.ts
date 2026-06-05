@@ -4,6 +4,8 @@ import {
   buildGoogleAuthUrl,
   createOAuthState,
   getGoogleClientId,
+  getGoogleOAuthBaseUrl,
+  getRequestOrigin,
   GOOGLE_AUTH_COOKIE_FROM,
   GOOGLE_AUTH_COOKIE_REDIRECT,
   GOOGLE_AUTH_COOKIE_STATE,
@@ -11,6 +13,7 @@ import {
   oauthCookieSecure,
   resolveGoogleRedirectUri,
   safeReturnPath,
+  shouldRedirectToCanonicalOAuthHost,
 } from "@/lib/googleOAuth";
 
 export async function GET(request: NextRequest) {
@@ -20,9 +23,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
+
+  if (shouldRedirectToCanonicalOAuthHost(request)) {
+    const canonicalBase = getGoogleOAuthBaseUrl(request);
+    const start = new URL("/api/auth/google", `${canonicalBase}/`);
+    start.searchParams.set("from", returnTo);
+    return NextResponse.redirect(start);
+  }
+
   const clientId = getGoogleClientId();
   const redirectUri = resolveGoogleRedirectUri(request);
-  const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
   const { state, nonce } = createOAuthState(returnTo);
 
   const response = NextResponse.redirect(
