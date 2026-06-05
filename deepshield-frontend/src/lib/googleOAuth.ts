@@ -138,3 +138,12 @@ export function oauthCookieSecure(request: NextRequest): boolean {
   const proto = request.headers.get("x-forwarded-proto");
   return proto === "https" || process.env.NODE_ENV === "production";
 }
+
+export function authCookieOptions(request: NextRequest, maxAge: number) {
+  return {
+    path: "/",
+    sameSite: "lax" as const,
+    secure: oauthCookieSecure(request),
+    maxAge,
+  };
+}

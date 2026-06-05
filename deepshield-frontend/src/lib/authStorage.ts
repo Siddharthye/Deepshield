@@ -132,6 +132,28 @@ export function signInWithGoogleProfile(profile: {
   return user;
 }
 
+export function encodePendingUserCookie(user: AuthUser): string {
+  const json = JSON.stringify(user);
+  return Buffer.from(json, "utf8").toString("base64url");
+}
+
+export function decodePendingUserCookie(value: string): AuthUser | null {
+  try {
+    const json = Buffer.from(value, "base64url").toString("utf8");
+    const parsed = JSON.parse(json) as AuthUser;
+    if (!parsed?.email || parsed.provider !== "google") return null;
+    return parsed;
+  } catch {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(value)) as AuthUser;
+      if (!parsed?.email || parsed.provider !== "google") return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+}
+
 /** Read one-time user payload set by OAuth callback, then clear the cookie. */
 export function consumePendingUserCookie(cookieName: string): AuthUser | null {
   if (typeof document === "undefined") return null;
@@ -140,16 +162,10 @@ export function consumePendingUserCookie(cookieName: string): AuthUser | null {
     .find((row) => row.startsWith(`${cookieName}=`));
   if (!match) return null;
 
-  const raw = decodeURIComponent(match.slice(cookieName.length + 1));
+  const raw = match.slice(cookieName.length + 1);
   document.cookie = `${cookieName}=; path=/; max-age=0; SameSite=Lax`;
 
-  try {
-    const parsed = JSON.parse(raw) as AuthUser;
-    if (!parsed?.email || parsed.provider !== "google") return null;
-    return parsed;
-  } catch {
-    return null;
-  }
+  return decodePendingUserCookie(decodeURIComponent(raw));
 }
 
 export function signOut() {

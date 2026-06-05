@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE, AUTH_COOKIE_MAX_AGE_SECONDS } from "@/lib/authStorage";
+import { AUTH_COOKIE, AUTH_COOKIE_MAX_AGE_SECONDS, encodePendingUserCookie } from "@/lib/authStorage";
 import type { AuthUser } from "@/lib/authStorage";
 import {
   exchangeGoogleCode,
@@ -12,8 +12,8 @@ import {
   GOOGLE_AUTH_COOKIE_STATE,
   isGoogleOAuthConfigured,
   mapGoogleOAuthError,
-  oauthCookieSecure,
   PENDING_USER_COOKIE,
+  authCookieOptions,
   resolveGoogleRedirectUri,
 } from "@/lib/googleOAuth";
 
@@ -89,25 +89,19 @@ export async function GET(request: NextRequest) {
       picture: profile.picture,
     };
 
-    const destination = new URL(returnTo, request.url);
-    const response = NextResponse.redirect(destination);
-    const cookieBase = {
-      path: "/",
-      sameSite: "lax" as const,
-      secure: oauthCookieSecure(request),
-    };
+    const completeUrl = new URL("/auth/complete", request.url);
+    completeUrl.searchParams.set("from", returnTo);
 
-    // Set auth cookie on the server so middleware allows the redirect target immediately.
+    const response = NextResponse.redirect(completeUrl);
+
     response.cookies.set(AUTH_COOKIE, "1", {
-      ...cookieBase,
-      maxAge: AUTH_COOKIE_MAX_AGE_SECONDS,
-      httpOnly: false,
+      ...authCookieOptions(request, AUTH_COOKIE_MAX_AGE_SECONDS),
+      httpOnly: true,
     });
 
-    response.cookies.set(PENDING_USER_COOKIE, JSON.stringify(user), {
-      ...cookieBase,
-      maxAge: 300,
-      httpOnly: false,
+    response.cookies.set(PENDING_USER_COOKIE, encodePendingUserCookie(user), {
+      ...authCookieOptions(request, 300),
+      httpOnly: true,
     });
     response.cookies.set(GOOGLE_AUTH_COOKIE_STATE, "", { path: "/", maxAge: 0 });
     response.cookies.set(GOOGLE_AUTH_COOKIE_FROM, "", { path: "/", maxAge: 0 });

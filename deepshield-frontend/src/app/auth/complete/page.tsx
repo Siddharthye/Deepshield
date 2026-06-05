@@ -1,20 +1,17 @@
 "use client";
 
 import { Suspense, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { PENDING_USER_COOKIE } from "@/lib/googleOAuth";
+import { useSearchParams } from "next/navigation";
 import {
-  consumePendingUserCookie,
   readSession,
+  signInWithGoogleProfile,
   syncAuthCookieFromSession,
+  type AuthUser,
 } from "@/lib/authStorage";
 import { useLanguage } from "@/context/LanguageContext";
 
 function AuthCompleteInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { completeOAuth } = useAuth();
   const { t } = useLanguage();
   const handled = useRef(false);
 
@@ -28,22 +25,33 @@ function AuthCompleteInner() {
         ? from
         : "/";
 
-    const existing = readSession();
-    if (existing) {
-      syncAuthCookieFromSession();
-      router.replace(returnTo);
-      return;
+    async function finish() {
+      const existing = readSession();
+      if (existing) {
+        syncAuthCookieFromSession();
+        window.location.replace(returnTo);
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/auth/session", { credentials: "same-origin" });
+        if (res.ok) {
+          const data = (await res.json()) as { user: AuthUser | null };
+          if (data.user) {
+            signInWithGoogleProfile(data.user);
+            window.location.replace(returnTo);
+            return;
+          }
+        }
+      } catch {
+        /* fall through to login */
+      }
+
+      window.location.replace("/login?error=oauth_missing");
     }
 
-    const user = consumePendingUserCookie(PENDING_USER_COOKIE);
-    if (!user) {
-      router.replace("/login?error=oauth_missing");
-      return;
-    }
-
-    completeOAuth(user);
-    router.replace(returnTo);
-  }, [completeOAuth, router, searchParams]);
+    void finish();
+  }, [searchParams]);
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md flex-col items-center justify-center px-4 text-center">
