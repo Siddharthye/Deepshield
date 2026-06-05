@@ -3,20 +3,17 @@ import type { ChatMessage, ExplainResult, RiskResult, ScanSession } from "./type
 
 
 function getApiBase(): string {
-
   const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-
   if (!raw) return "";
-
   const sameOrigin = new Set(["same-origin", "relative", "proxy", "__relative__"]);
-
   if (sameOrigin.has(raw.toLowerCase())) return "";
-
   return raw.replace(/\/$/, "");
-
 }
 
-
+/** Backend origin when API calls are proxied to a separate host (e.g. deepshield-xi.vercel.app). */
+export function getBackendOrigin(): string {
+  return getApiBase();
+}
 
 const API_BASE = getApiBase();
 

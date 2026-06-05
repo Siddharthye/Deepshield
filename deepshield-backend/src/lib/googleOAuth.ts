@@ -2,15 +2,13 @@ import type { NextRequest } from "next/server";
 
 export const GOOGLE_AUTH_COOKIE_STATE = "google_oauth_state";
 export const GOOGLE_AUTH_COOKIE_FROM = "google_oauth_from";
+export const GOOGLE_AUTH_COOKIE_RETURN_ORIGIN = "google_oauth_return_origin";
 export const GOOGLE_AUTH_COOKIE_REDIRECT = "google_oauth_redirect";
-export const PENDING_USER_COOKIE = "deepshield_user_pending";
-export const SESSION_BOOTSTRAP_COOKIE = "deepshield_session_bootstrap";
 
 function trimSecret(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
-/** Always use the current request host so redirect_uri matches the live site URL. */
 export function getRequestOrigin(request: NextRequest): string {
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
   const proto = request.headers.get("x-forwarded-proto") ?? "https";
@@ -20,16 +18,8 @@ export function getRequestOrigin(request: NextRequest): string {
   return request.nextUrl.origin.replace(/\/$/, "");
 }
 
-export function getGoogleOAuthBaseUrl(request: NextRequest): string {
-  return getRequestOrigin(request);
-}
-
-export function getGoogleRedirectUri(baseUrl: string): string {
-  return `${baseUrl.replace(/\/$/, "")}/api/auth/google/callback`;
-}
-
-export function resolveGoogleRedirectUri(request: NextRequest): string {
-  return getGoogleRedirectUri(getGoogleOAuthBaseUrl(request));
+export function getGoogleRedirectUri(request: NextRequest): string {
+  return `${getRequestOrigin(request)}/api/auth/google/callback`;
 }
 
 export function safeReturnPath(from: string | null | undefined): string {
@@ -51,7 +41,7 @@ export function safeReturnOrigin(raw: string | null | undefined): string | null 
   }
 }
 
-export function createOAuthState(returnTo: string, returnOrigin?: string | null): {
+export function createOAuthState(returnTo: string, returnOrigin: string | null): {
   state: string;
   nonce: string;
 } {
@@ -85,10 +75,6 @@ export function parseOAuthState(state: string): {
   } catch {
     return { nonce, returnTo: "/", returnOrigin: null };
   }
-}
-
-export function appUrl(request: NextRequest, pathname: string): URL {
-  return new URL(pathname, `${getGoogleOAuthBaseUrl(request)}/`);
 }
 
 export function buildGoogleAuthUrl(params: {
@@ -126,35 +112,9 @@ export async function exchangeGoogleCode(
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
-    let googleError = "";
-    try {
-      const parsed = JSON.parse(detail) as { error?: string };
-      googleError = parsed.error ?? "";
-    } catch {
-      /* plain text */
-    }
-    throw new Error(
-      `token_exchange_failed:${res.status}:${googleError}:${detail.slice(0, 120)}`,
-    );
+    throw new Error(`token_exchange_failed:${res.status}:${detail.slice(0, 160)}`);
   }
   return res.json() as Promise<{ access_token: string }>;
-}
-
-export function mapGoogleOAuthError(error: unknown): string {
-  const msg = error instanceof Error ? error.message : "";
-  if (msg.includes("token_exchange_failed")) {
-    if (msg.includes("redirect_uri_mismatch") || msg.includes("redirect_uri")) {
-      return "google_redirect";
-    }
-    if (msg.includes("invalid_client") || msg.includes("invalid_grant")) {
-      return "google_credentials";
-    }
-    return "google_token";
-  }
-  if (msg.includes("userinfo_failed") || msg.includes("userinfo_missing")) {
-    return "google_userinfo";
-  }
-  return "google_failed";
 }
 
 export type GoogleUserInfo = {
@@ -191,13 +151,4 @@ export function isGoogleOAuthConfigured(): boolean {
 export function oauthCookieSecure(request: NextRequest): boolean {
   const proto = request.headers.get("x-forwarded-proto");
   return proto === "https" || process.env.NODE_ENV === "production";
-}
-
-export function authCookieOptions(request: NextRequest, maxAge: number) {
-  return {
-    path: "/",
-    sameSite: "lax" as const,
-    secure: oauthCookieSecure(request),
-    maxAge,
-  };
 }
