@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import {
   buildGoogleAuthUrl,
-  createOAuthState,
   getGoogleClientId,
   GOOGLE_AUTH_COOKIE_FROM,
   GOOGLE_AUTH_COOKIE_REDIRECT,
@@ -10,8 +9,14 @@ import {
   isGoogleOAuthConfigured,
   oauthCookieSecure,
   resolveGoogleRedirectUri,
-  safeReturnPath,
 } from "@/lib/googleOAuth";
+
+function safeReturnPath(from: string | null): string {
+  if (from && from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/login")) {
+    return from;
+  }
+  return "/";
+}
 
 export async function GET(request: NextRequest) {
   if (!isGoogleOAuthConfigured()) {
@@ -20,11 +25,10 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
-
   const clientId = getGoogleClientId();
   const redirectUri = resolveGoogleRedirectUri(request);
-  const { state, nonce } = createOAuthState(returnTo);
+  const state = crypto.randomUUID();
+  const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
 
   const response = NextResponse.redirect(
     buildGoogleAuthUrl({ clientId, redirectUri, state }),
@@ -38,7 +42,7 @@ export async function GET(request: NextRequest) {
     maxAge: 600,
   };
 
-  response.cookies.set(GOOGLE_AUTH_COOKIE_STATE, nonce, cookieBase);
+  response.cookies.set(GOOGLE_AUTH_COOKIE_STATE, state, cookieBase);
   response.cookies.set(GOOGLE_AUTH_COOKIE_FROM, returnTo, cookieBase);
   response.cookies.set(GOOGLE_AUTH_COOKIE_REDIRECT, redirectUri, cookieBase);
 

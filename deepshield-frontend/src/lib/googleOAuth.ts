@@ -4,24 +4,25 @@ export const GOOGLE_AUTH_COOKIE_STATE = "google_oauth_state";
 export const GOOGLE_AUTH_COOKIE_FROM = "google_oauth_from";
 export const GOOGLE_AUTH_COOKIE_REDIRECT = "google_oauth_redirect";
 export const PENDING_USER_COOKIE = "deepshield_user_pending";
-export const SESSION_BOOTSTRAP_COOKIE = "deepshield_session_bootstrap";
 
 function trimSecret(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
-/** Always use the current request host so redirect_uri matches the live site URL. */
-export function getRequestOrigin(request: NextRequest): string {
-  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  const proto = request.headers.get("x-forwarded-proto") ?? "https";
-  if (host) {
-    return `${proto}://${host}`.replace(/\/$/, "");
-  }
-  return request.nextUrl.origin.replace(/\/$/, "");
-}
-
+/**
+ * Site origin for OAuth redirects.
+ * Prefer GOOGLE_REDIRECT_URI (stable production URL). Otherwise use the current request host
+ * (works for Vercel preview URLs — add each preview callback to Google Console if needed).
+ */
 export function getGoogleOAuthBaseUrl(request: NextRequest): string {
-  return getRequestOrigin(request);
+  const explicit = process.env.GOOGLE_REDIRECT_URI?.trim();
+  if (explicit) {
+    return explicit
+      .replace(/\/api\/auth\/google\/callback\/?$/i, "")
+      .replace(/\/$/, "");
+  }
+
+  return request.nextUrl.origin.replace(/\/$/, "");
 }
 
 export function getGoogleRedirectUri(baseUrl: string): string {
@@ -30,61 +31,6 @@ export function getGoogleRedirectUri(baseUrl: string): string {
 
 export function resolveGoogleRedirectUri(request: NextRequest): string {
   return getGoogleRedirectUri(getGoogleOAuthBaseUrl(request));
-}
-
-export function safeReturnPath(from: string | null | undefined): string {
-  if (from && from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/login")) {
-    return from;
-  }
-  return "/";
-}
-
-export function safeReturnOrigin(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  try {
-    const url = new URL(raw);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-    if (url.username || url.password) return null;
-    return url.origin;
-  } catch {
-    return null;
-  }
-}
-
-export function createOAuthState(returnTo: string, returnOrigin?: string | null): {
-  state: string;
-  nonce: string;
-} {
-  const nonce = crypto.randomUUID();
-  const payload = JSON.stringify({
-    returnTo,
-    returnOrigin: returnOrigin ?? "",
-  });
-  const encoded = Buffer.from(payload, "utf8").toString("base64url");
-  return { state: `${nonce}.${encoded}`, nonce };
-}
-
-export function parseOAuthState(state: string): {
-  nonce: string;
-  returnTo: string;
-  returnOrigin: string | null;
-} | null {
-  const dot = state.indexOf(".");
-  if (dot <= 0) return null;
-  const nonce = state.slice(0, dot);
-  const encoded = state.slice(dot + 1);
-  try {
-    const parsed = JSON.parse(
-      Buffer.from(encoded, "base64url").toString("utf8"),
-    ) as { returnTo?: string; returnOrigin?: string };
-    return {
-      nonce,
-      returnTo: safeReturnPath(parsed.returnTo),
-      returnOrigin: safeReturnOrigin(parsed.returnOrigin),
-    };
-  } catch {
-    return { nonce, returnTo: "/", returnOrigin: null };
-  }
 }
 
 export function appUrl(request: NextRequest, pathname: string): URL {
@@ -191,13 +137,4 @@ export function isGoogleOAuthConfigured(): boolean {
 export function oauthCookieSecure(request: NextRequest): boolean {
   const proto = request.headers.get("x-forwarded-proto");
   return proto === "https" || process.env.NODE_ENV === "production";
-}
-
-export function authCookieOptions(request: NextRequest, maxAge: number) {
-  return {
-    path: "/",
-    sameSite: "lax" as const,
-    secure: oauthCookieSecure(request),
-    maxAge,
-  };
 }

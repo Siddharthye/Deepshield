@@ -7,7 +7,6 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
-import { getBackendOrigin } from "@/lib/api";
 import { SAFETY } from "@/lib/safetyContacts";
 import type { I18nKey } from "@/lib/i18n";
 
@@ -119,16 +118,8 @@ export function AuthForm() {
   function handleGoogle() {
     setError(null);
     setLoading(true);
-    const backend = getBackendOrigin();
-    const oauthHost =
-      backend && backend.replace(/\/$/, "") !== window.location.origin.replace(/\/$/, "")
-        ? backend
-        : window.location.origin;
-    const url = new URL("/api/auth/google", `${oauthHost.replace(/\/$/, "")}/`);
+    const url = new URL("/api/auth/google", window.location.origin);
     url.searchParams.set("from", returnTo);
-    if (oauthHost.replace(/\/$/, "") !== window.location.origin.replace(/\/$/, "")) {
-      url.searchParams.set("return_origin", window.location.origin);
-    }
     window.location.assign(url.toString());
   }
 

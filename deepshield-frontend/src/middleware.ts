@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { AUTH_COOKIE } from "@/lib/authStorage";
-import {
-  PENDING_USER_COOKIE,
-  safeReturnPath,
-  SESSION_BOOTSTRAP_COOKIE,
-} from "@/lib/googleOAuth";
 
 const LOGIN_PATH = "/login";
 
@@ -35,23 +30,8 @@ function isProtectedPath(pathname: string): boolean {
   return PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-function isAuthed(request: NextRequest): boolean {
-  if (request.cookies.get(AUTH_COOKIE)?.value === "1") return true;
-  if (request.cookies.get(PENDING_USER_COOKIE)?.value) return true;
-  if (request.cookies.get(SESSION_BOOTSTRAP_COOKIE)?.value) return true;
-  return false;
-}
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  if (pathname === LOGIN_PATH) {
-    if (isAuthed(request)) {
-      const dest = safeReturnPath(request.nextUrl.searchParams.get("from"));
-      return NextResponse.redirect(new URL(dest, request.url));
-    }
-    return NextResponse.next();
-  }
 
   if (isPublicPath(pathname)) {
     return NextResponse.next();
@@ -61,7 +41,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isAuthed(request)) {
+  const authed = request.cookies.get(AUTH_COOKIE)?.value === "1";
+  if (authed) {
     return NextResponse.next();
   }
 
@@ -74,7 +55,6 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
-    "/login",
     "/scan/:path*",
     "/trace/:path*",
     "/report/:path*",
