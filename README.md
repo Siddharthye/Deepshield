@@ -12,7 +12,7 @@ DeepShield is a browser-first toolkit for people facing deepfake abuse, morphed 
 
 | App | Role | URL |
 |-----|------|-----|
-| **Frontend** | UI, auth, client-side detection | Your Vercel frontend URL |
+| **Frontend** | UI, auth, client-side detection | [deepshield-frontendd.vercel.app](https://deepshield-frontendd.vercel.app) |
 | **Backend API** | Hugging Face, LLM, trace APIs | [deepshield-xi.vercel.app](https://deepshield-xi.vercel.app) |
 
 The frontend proxies most `/api/*` routes to the backend via `deepshield-frontend/vercel.json`. Google OAuth routes stay on the frontend.
