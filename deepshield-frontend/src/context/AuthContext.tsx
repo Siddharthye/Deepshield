@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import {
+  consumeBootstrapSessionCookie,
   readSession,
   registerWithEmail,
   signInWithEmail,
@@ -37,7 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useLayoutEffect(() => {
-    const session = readSession();
+    let session = readSession();
+    if (!session) {
+      const boot = consumeBootstrapSessionCookie();
+      if (boot) session = signInWithGoogleProfile(boot);
+    }
     if (session) syncAuthCookieFromSession();
     setUser(session);
     setReady(true);

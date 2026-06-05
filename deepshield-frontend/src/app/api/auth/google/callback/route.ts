@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE, AUTH_COOKIE_MAX_AGE_SECONDS, encodePendingUserCookie } from "@/lib/authStorage";
+import { AUTH_COOKIE, encodePendingUserCookie } from "@/lib/authStorage";
 import type { AuthUser } from "@/lib/authStorage";
 import {
   exchangeGoogleCode,
@@ -12,9 +12,12 @@ import {
   GOOGLE_AUTH_COOKIE_STATE,
   isGoogleOAuthConfigured,
   mapGoogleOAuthError,
+  parseOAuthState,
   PENDING_USER_COOKIE,
   authCookieOptions,
   resolveGoogleRedirectUri,
+  safeReturnPath,
+  SESSION_BOOTSTRAP_COOKIE,
 } from "@/lib/googleOAuth";
 
 export const runtime = "nodejs";
@@ -24,6 +27,7 @@ function clearAuthCookies(response: NextResponse) {
   for (const name of [
     AUTH_COOKIE,
     PENDING_USER_COOKIE,
+    SESSION_BOOTSTRAP_COOKIE,
     GOOGLE_AUTH_COOKIE_STATE,
     GOOGLE_AUTH_COOKIE_FROM,
     GOOGLE_AUTH_COOKIE_REDIRECT,
@@ -35,7 +39,7 @@ function clearAuthCookies(response: NextResponse) {
 function redirectToLogin(request: NextRequest, error: string) {
   const login = new URL("/login", request.url);
   login.searchParams.set("error", error);
-  const response = NextResponse.redirect(login);
+  const response = NextResponse.redirect(login, 303);
   clearAuthCookies(response);
   return response;
 }
@@ -55,14 +59,15 @@ export async function GET(request: NextRequest) {
   }
 
   const code = searchParams.get("code");
-  const state = searchParams.get("state");
-  const savedState = request.cookies.get(GOOGLE_AUTH_COOKIE_STATE)?.value;
+  const state = searchParams.get("state") ?? "";
+  const parsedState = parseOAuthState(state);
+  const savedNonce = request.cookies.get(GOOGLE_AUTH_COOKIE_STATE)?.value;
 
-  if (!code || !state || !savedState || state !== savedState) {
+  if (!code || !parsedState || !savedNonce || parsedState.nonce !== savedNonce) {
     console.error("[google/callback] oauth_state mismatch", {
       hasCode: Boolean(code),
       hasState: Boolean(state),
-      hasSavedState: Boolean(savedState),
+      hasSavedNonce: Boolean(savedNonce),
     });
     return redirectToLogin(request, "oauth_state");
   }
@@ -72,11 +77,9 @@ export async function GET(request: NextRequest) {
   const redirectUri =
     request.cookies.get(GOOGLE_AUTH_COOKIE_REDIRECT)?.value ||
     resolveGoogleRedirectUri(request);
-  const returnTo =
-    request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value?.startsWith("/") &&
-    !request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value?.startsWith("//")
-      ? request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)!.value
-      : "/";
+  const returnTo = safeReturnPath(
+    request.cookies.get(GOOGLE_AUTH_COOKIE_FROM)?.value ?? parsedState.returnTo,
+  );
 
   try {
     const tokens = await exchangeGoogleCode(code, redirectUri, clientId, clientSecret);
@@ -89,16 +92,10 @@ export async function GET(request: NextRequest) {
       picture: profile.picture,
     };
 
-    const completeUrl = new URL("/auth/complete", request.url);
-    completeUrl.searchParams.set("from", returnTo);
+    const finalizeUrl = new URL("/api/auth/finalize", request.url);
+    finalizeUrl.searchParams.set("from", returnTo);
 
-    const response = NextResponse.redirect(completeUrl);
-
-    response.cookies.set(AUTH_COOKIE, "1", {
-      ...authCookieOptions(request, AUTH_COOKIE_MAX_AGE_SECONDS),
-      httpOnly: true,
-    });
-
+    const response = NextResponse.redirect(finalizeUrl, 303);
     response.cookies.set(PENDING_USER_COOKIE, encodePendingUserCookie(user), {
       ...authCookieOptions(request, 300),
       httpOnly: true,

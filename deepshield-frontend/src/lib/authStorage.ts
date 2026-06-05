@@ -168,8 +168,26 @@ export function consumePendingUserCookie(cookieName: string): AuthUser | null {
   return decodePendingUserCookie(decodeURIComponent(raw));
 }
 
+/** Read one-time bootstrap payload after server finalize, then clear the cookie. */
+export function consumeBootstrapSessionCookie(): AuthUser | null {
+  if (typeof document === "undefined") return null;
+  const cookieName = "deepshield_session_bootstrap";
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${cookieName}=`));
+  if (!match) return null;
+
+  const raw = match.slice(cookieName.length + 1);
+  document.cookie = `${cookieName}=; path=/; max-age=0; SameSite=Lax`;
+
+  return decodePendingUserCookie(decodeURIComponent(raw));
+}
+
 export function signOut() {
   writeSession(null);
+  if (typeof document !== "undefined") {
+    document.cookie = "deepshield_session_bootstrap=; path=/; max-age=0; SameSite=Lax";
+  }
 }
 
 export { isValidEmail };

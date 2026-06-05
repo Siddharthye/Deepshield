@@ -4,24 +4,14 @@ export const GOOGLE_AUTH_COOKIE_STATE = "google_oauth_state";
 export const GOOGLE_AUTH_COOKIE_FROM = "google_oauth_from";
 export const GOOGLE_AUTH_COOKIE_REDIRECT = "google_oauth_redirect";
 export const PENDING_USER_COOKIE = "deepshield_user_pending";
+export const SESSION_BOOTSTRAP_COOKIE = "deepshield_session_bootstrap";
 
 function trimSecret(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
-/**
- * Site origin for OAuth redirects.
- * Prefer GOOGLE_REDIRECT_URI (stable production URL). Otherwise use the current request host
- * (works for Vercel preview URLs — add each preview callback to Google Console if needed).
- */
+/** Always use the current request host so OAuth cookies stay on the same site. */
 export function getGoogleOAuthBaseUrl(request: NextRequest): string {
-  const explicit = process.env.GOOGLE_REDIRECT_URI?.trim();
-  if (explicit) {
-    return explicit
-      .replace(/\/api\/auth\/google\/callback\/?$/i, "")
-      .replace(/\/$/, "");
-  }
-
   return request.nextUrl.origin.replace(/\/$/, "");
 }
 
@@ -31,6 +21,32 @@ export function getGoogleRedirectUri(baseUrl: string): string {
 
 export function resolveGoogleRedirectUri(request: NextRequest): string {
   return getGoogleRedirectUri(getGoogleOAuthBaseUrl(request));
+}
+
+export function safeReturnPath(from: string | null | undefined): string {
+  if (from && from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/login")) {
+    return from;
+  }
+  return "/";
+}
+
+export function createOAuthState(returnTo: string): { state: string; nonce: string } {
+  const nonce = crypto.randomUUID();
+  const encodedReturn = Buffer.from(returnTo, "utf8").toString("base64url");
+  return { state: `${nonce}.${encodedReturn}`, nonce };
+}
+
+export function parseOAuthState(state: string): { nonce: string; returnTo: string } | null {
+  const dot = state.indexOf(".");
+  if (dot <= 0) return null;
+  const nonce = state.slice(0, dot);
+  const encodedReturn = state.slice(dot + 1);
+  try {
+    const returnTo = Buffer.from(encodedReturn, "base64url").toString("utf8");
+    return { nonce, returnTo: safeReturnPath(returnTo) };
+  } catch {
+    return { nonce, returnTo: "/" };
+  }
 }
 
 export function appUrl(request: NextRequest, pathname: string): URL {

@@ -9,6 +9,7 @@ import {
 import {
   authCookieOptions,
   PENDING_USER_COOKIE,
+  safeReturnPath,
   SESSION_BOOTSTRAP_COOKIE,
 } from "@/lib/googleOAuth";
 
@@ -16,19 +17,22 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const raw = request.cookies.get(PENDING_USER_COOKIE)?.value;
-  const authed = request.cookies.get(AUTH_COOKIE)?.value === "1";
+  const returnTo = safeReturnPath(request.nextUrl.searchParams.get("from"));
+  const pendingRaw = request.cookies.get(PENDING_USER_COOKIE)?.value;
 
-  if (!raw) {
-    return NextResponse.json({ user: null, authed });
+  if (!pendingRaw) {
+    if (request.cookies.get(AUTH_COOKIE)?.value === "1") {
+      return NextResponse.redirect(new URL(returnTo, request.url), 303);
+    }
+    return NextResponse.redirect(new URL("/login?error=oauth_missing", request.url), 303);
   }
 
-  const user = decodePendingUserCookie(raw);
+  const user = decodePendingUserCookie(pendingRaw);
   if (!user) {
-    return NextResponse.json({ user: null, authed: false }, { status: 400 });
+    return NextResponse.redirect(new URL("/login?error=oauth_missing", request.url), 303);
   }
 
-  const response = NextResponse.json({ user, authed: true });
+  const response = NextResponse.redirect(new URL(returnTo, request.url), 303);
   response.cookies.set(AUTH_COOKIE, "1", {
     ...authCookieOptions(request, AUTH_COOKIE_MAX_AGE_SECONDS),
     httpOnly: true,
