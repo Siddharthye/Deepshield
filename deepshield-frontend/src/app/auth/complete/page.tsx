@@ -1,10 +1,14 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { PENDING_USER_COOKIE } from "@/lib/googleOAuth";
-import { consumePendingUserCookie } from "@/lib/authStorage";
+import {
+  consumePendingUserCookie,
+  readSession,
+  syncAuthCookieFromSession,
+} from "@/lib/authStorage";
 import { useLanguage } from "@/context/LanguageContext";
 
 function AuthCompleteInner() {
@@ -12,25 +16,33 @@ function AuthCompleteInner() {
   const searchParams = useSearchParams();
   const { completeOAuth } = useAuth();
   const { t } = useLanguage();
+  const handled = useRef(false);
 
   useEffect(() => {
+    if (handled.current) return;
+    handled.current = true;
+
     const from = searchParams.get("from");
     const returnTo =
       from && from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/login")
         ? from
         : "/";
 
+    const existing = readSession();
+    if (existing) {
+      syncAuthCookieFromSession();
+      router.replace(returnTo);
+      return;
+    }
+
     const user = consumePendingUserCookie(PENDING_USER_COOKIE);
     if (!user) {
-      document.cookie = "deepshield_auth=; path=/; max-age=0; SameSite=Lax";
-      document.cookie = `${PENDING_USER_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
       router.replace("/login?error=oauth_missing");
       return;
     }
 
     completeOAuth(user);
     router.replace(returnTo);
-    router.refresh();
   }, [completeOAuth, router, searchParams]);
 
   return (

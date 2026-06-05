@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE } from "@/lib/authStorage";
+import { AUTH_COOKIE, AUTH_COOKIE_MAX_AGE_SECONDS } from "@/lib/authStorage";
 import type { AuthUser } from "@/lib/authStorage";
 import {
   exchangeGoogleCode,
@@ -89,16 +89,24 @@ export async function GET(request: NextRequest) {
       picture: profile.picture,
     };
 
-    const completeUrl = new URL("/auth/complete", request.url);
-    completeUrl.searchParams.set("from", returnTo);
+    const destination = new URL(returnTo, request.url);
+    const response = NextResponse.redirect(destination);
+    const cookieBase = {
+      path: "/",
+      sameSite: "lax" as const,
+      secure: oauthCookieSecure(request),
+    };
 
-    const response = NextResponse.redirect(completeUrl);
+    // Set auth cookie on the server so middleware allows the redirect target immediately.
+    response.cookies.set(AUTH_COOKIE, "1", {
+      ...cookieBase,
+      maxAge: AUTH_COOKIE_MAX_AGE_SECONDS,
+      httpOnly: false,
+    });
 
     response.cookies.set(PENDING_USER_COOKIE, JSON.stringify(user), {
-      path: "/",
+      ...cookieBase,
       maxAge: 300,
-      sameSite: "lax",
-      secure: oauthCookieSecure(request),
       httpOnly: false,
     });
     response.cookies.set(GOOGLE_AUTH_COOKIE_STATE, "", { path: "/", maxAge: 0 });

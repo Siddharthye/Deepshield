@@ -7,7 +7,9 @@ import {
   useLayoutEffect,
   useState,
 } from "react";
+import { PENDING_USER_COOKIE } from "@/lib/googleOAuth";
 import {
+  consumePendingUserCookie,
   readSession,
   registerWithEmail,
   signInWithEmail,
@@ -37,7 +39,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useLayoutEffect(() => {
-    const session = readSession();
+    let session = readSession();
+    if (!session) {
+      const pending = consumePendingUserCookie(PENDING_USER_COOKIE);
+      if (pending) session = signInWithGoogleProfile(pending);
+    }
     if (session) syncAuthCookieFromSession();
     setUser(session);
     setReady(true);

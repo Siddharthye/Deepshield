@@ -8,9 +8,9 @@ export type AuthUser = {
 };
 
 export const AUTH_COOKIE = "deepshield_auth";
+export const AUTH_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 const SESSION_KEY = "deepshield_auth_session";
 const ACCOUNTS_KEY = "deepshield_auth_accounts";
-const COOKIE_MAX_AGE_DAYS = 30;
 
 type StoredAccount = {
   email: string;
@@ -29,7 +29,7 @@ function isValidEmail(email: string) {
 function setAuthCookie(active: boolean) {
   if (typeof document === "undefined") return;
   if (active) {
-    const maxAge = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60;
+    const maxAge = AUTH_COOKIE_MAX_AGE_SECONDS;
     document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${maxAge}; SameSite=Lax`;
   } else {
     document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
